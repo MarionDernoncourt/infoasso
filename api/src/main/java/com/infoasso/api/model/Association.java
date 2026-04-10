@@ -1,8 +1,7 @@
 package com.infoasso.api.model;
 
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,24 +17,25 @@ public class Association {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @NotBlank(message = "Le nom ne peut pas être vide.")
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @NotBlank(message = "La description doit être complétée.")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @NotBlank(message = "L'email est obligatoire.")
+    @Column(nullable = false)
     private String email;
 
-    @Pattern(regexp = "^(?:(?:\\+|00)33|0)\\s*[1-9](?:[\\s.-]*\\d{2}){4}$",
-            message = "Le numéro de téléphone n'est pas valide")
     private String phoneNumber;
 
     private String website;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
 }

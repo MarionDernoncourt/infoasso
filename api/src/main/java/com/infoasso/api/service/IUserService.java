@@ -1,13 +1,12 @@
 package com.infoasso.api.service;
 
-import com.infoasso.api.dto.UserDTO;
-import com.infoasso.api.dto.UserRegistrationDTO;
-import com.infoasso.api.model.User;
+import com.infoasso.api.dto.user.UserReadDto;
+import com.infoasso.api.dto.user.UserCreateDto;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface IUserService {
-    UserDTO findUserById(Long id);
+    UserReadDto findUserById(Long id);
 
-    UserDTO createUser(UserRegistrationDTO user);
+    UserReadDto createUser(UserCreateDto user);
 }

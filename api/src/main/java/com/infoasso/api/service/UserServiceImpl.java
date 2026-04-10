@@ -1,7 +1,7 @@
 package com.infoasso.api.service;
 
-import com.infoasso.api.dto.UserDTO;
-import com.infoasso.api.dto.UserRegistrationDTO;
+import com.infoasso.api.dto.user.UserReadDto;
+import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.User;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public UserDTO findUserById(Long id) {
+    public UserReadDto findUserById(Long id) {
         logger.info("Finding user by id {}", id);
         User user = userRepository.findById(id).orElseThrow(() -> new RessourceNotFoundException("User", id));
         logger.info("User found {}", user.getEmail());
@@ -33,7 +33,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserDTO createUser(UserRegistrationDTO user) {
+    public UserReadDto createUser(UserCreateDto user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new BadRequestException("Un utilisateur avec cet email existe déjà.");
         }
@@ -50,14 +50,14 @@ public class UserServiceImpl implements IUserService {
     }
 
 
-    private UserDTO mapToUserDTO(User user) {
-        UserDTO userDTO = new UserDTO();
+    private UserReadDto mapToUserDTO(User user) {
+        UserReadDto userDTO = new UserReadDto();
         userDTO.setId(user.getId());
         userDTO.setEmail(user.getEmail());
         return userDTO;
     }
 
-    private User mapToUser(UserDTO userDTO) {
+    private User mapToUser(UserReadDto userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
         user.setEmail(userDTO.getEmail());

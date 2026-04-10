@@ -1,8 +1,8 @@
 package com.infoasso.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.infoasso.api.dto.UserDTO;
-import com.infoasso.api.dto.UserRegistrationDTO;
+import com.infoasso.api.dto.user.UserReadDto;
+import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser
     public void findUserById_shouldReturn_200Ok() throws Exception {
-        UserDTO user = new UserDTO();
+        UserReadDto user = new UserReadDto();
         user.setId(1L);
         user.setEmail("info@asso.com");
 
@@ -70,17 +70,17 @@ public class UserControllerTest {
     @Test
     @WithMockUser
     public void createUser_shouldReturn_200Created() throws Exception {
-        UserRegistrationDTO newUser = new UserRegistrationDTO();
+        UserCreateDto newUser = new UserCreateDto();
         newUser.setEmail("user@asso.com");
         newUser.setPassword("Password123");
 
         String userJson = objectMapper.writeValueAsString(newUser);
 
-        UserDTO savedUser = new UserDTO();
+        UserReadDto savedUser = new UserReadDto();
         savedUser.setId(1L);
         savedUser.setEmail("user@asso.com");
 
-        when(userService.createUser(any(UserRegistrationDTO.class))).thenReturn(savedUser);
+        when(userService.createUser(any(UserCreateDto.class))).thenReturn(savedUser);
 
         mockMvc.perform(post("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +95,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser
     public void createUser_shouldReturn_400BadRequest() throws Exception {
-        UserRegistrationDTO newUser = new UserRegistrationDTO();
+        UserCreateDto newUser = new UserCreateDto();
         newUser.setEmail("user.com");
         newUser.setPassword("password123");
 
@@ -113,13 +113,13 @@ public class UserControllerTest {
     @Test
     @WithMockUser
     public void createUser_shouldReturn_500InternalServerError() throws Exception {
-        UserRegistrationDTO newUser = new UserRegistrationDTO();
+        UserCreateDto newUser = new UserCreateDto();
         newUser.setEmail("user@asso.com");
         newUser.setPassword("Password123");
 
         String userJson = objectMapper.writeValueAsString(newUser);
 
-        when(userService.createUser(any(UserRegistrationDTO.class))).thenThrow(new RuntimeException("Une erreur interne est survenue"));
+        when(userService.createUser(any(UserCreateDto.class))).thenThrow(new RuntimeException("Une erreur interne est survenue"));
 
         mockMvc.perform(post("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)

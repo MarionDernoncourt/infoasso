@@ -1,7 +1,7 @@
 package com.infoasso.api.service;
 
-import com.infoasso.api.dto.UserDTO;
-import com.infoasso.api.dto.UserRegistrationDTO;
+import com.infoasso.api.dto.user.UserReadDto;
+import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.User;
@@ -10,10 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.startsWith;
 
 @SpringBootTest
 @Transactional
@@ -33,7 +31,7 @@ public class UserServiceIT {
         User savedUser = userRepository.save(user);
         Long generatedId = savedUser.getId();
 
-        UserDTO resultDTO = userService.findUserById(generatedId);
+        UserReadDto resultDTO = userService.findUserById(generatedId);
 
         assertEquals(generatedId, resultDTO.getId());
         assertEquals(user.getEmail(), resultDTO.getEmail());
@@ -48,11 +46,11 @@ public class UserServiceIT {
 
     @Test
     public void createUser_withSucces() {
-        UserRegistrationDTO userRegistration = new UserRegistrationDTO();
+        UserCreateDto userRegistration = new UserCreateDto();
         userRegistration.setEmail("user@asso.com");
         userRegistration.setPassword("Password123");
 
-        UserDTO savedUser = userService.createUser(userRegistration);
+        UserReadDto savedUser = userService.createUser(userRegistration);
         User userInDb = userRepository.findById(savedUser.getId()).orElseThrow();
 
         assertEquals(userRegistration.getEmail(), savedUser.getEmail());
@@ -67,7 +65,7 @@ public class UserServiceIT {
         user.setPassword("Passwordzz1");
         userRepository.save(user);
 
-        UserRegistrationDTO userRegistration = new UserRegistrationDTO();
+        UserCreateDto userRegistration = new UserCreateDto();
         userRegistration.setEmail("user@asso.com");
         userRegistration.setPassword("Password123");
 

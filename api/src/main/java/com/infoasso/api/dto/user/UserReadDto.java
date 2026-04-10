@@ -1,4 +1,4 @@
-package com.infoasso.api.dto;
+package com.infoasso.api.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UserReadDto {
 
     private Long id;
 

@@ -1,8 +1,7 @@
 package com.infoasso.api.controller;
 
-import com.infoasso.api.dto.UserDTO;
-import com.infoasso.api.dto.UserRegistrationDTO;
-import com.infoasso.api.model.User;
+import com.infoasso.api.dto.user.UserReadDto;
+import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.service.IUserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -23,17 +22,17 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserReadDto> getUser(@PathVariable Long id) {
         logger.info("GET /api/user/{} : Request received for user : {}", id, id);
-        UserDTO userDTO = userService.findUserById(id);
+        UserReadDto userDTO = userService.findUserById(id);
         logger.info(" Response received : 200 OK : The user {} is found", id);
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
     @PostMapping("")
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserRegistrationDTO user) {
+    public ResponseEntity<UserReadDto> createUser(@Valid @RequestBody UserCreateDto user) {
         logger.info("POST /api/user : Request received for user : {}",  user.getEmail());
-        UserDTO newUser = userService.createUser(user);
+        UserReadDto newUser = userService.createUser(user);
         logger.info(" Response received : 201 CREATED : The user {} has been created", newUser.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
