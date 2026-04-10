@@ -1,5 +1,6 @@
 package com.infoasso.api.dto.association;
 
+import com.infoasso.api.model.CategoryType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,8 +30,11 @@ public class AssociationCreateDto {
 
     private String website;
 
-    @NotNull(message = "La catégorie est obligatoire")
-    private Long categoryId;
+    @NotBlank(message = "Le label de la catégorie (ex: Football) est obligatoire")
+    private String categoryLabel;
+
+    @NotNull(message = "Le type de catégorie (ex: SPORT) est obligatoire")
+    private CategoryType categoryType;
 
 
     private Long userId;

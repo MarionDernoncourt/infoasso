@@ -1,5 +1,8 @@
 package com.infoasso.api.dto.association;
 
+import com.infoasso.api.model.CategoryType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +24,8 @@ public class AssociationReadDto {
     private String website;
 
     private String categoryLabel;
+
+    private CategoryType categoryType;
 
     private String ownerEmail;
 

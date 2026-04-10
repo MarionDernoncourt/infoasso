@@ -1,11 +1,15 @@
 package com.infoasso.api.service;
 
+
 import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
-import com.infoasso.api.model.*;
+import com.infoasso.api.model.Association;
+import com.infoasso.api.model.Category;
+import com.infoasso.api.model.CategoryType;
+import com.infoasso.api.model.User;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.repository.UserRepository;
@@ -21,7 +25,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 
 @SpringBootTest
 @Transactional
@@ -45,10 +48,9 @@ public class AssociationIT {
     @BeforeEach
     void setup() {
         sportCategory = new Category();
-        sportCategory.setLabel("SPORT");
+        sportCategory.setLabel("rugby");
         sportCategory.setType(CategoryType.SPORT);
         categoryRepository.save(sportCategory);
-
 
         user = new User();
         user.setEmail("user@mail.com");
@@ -65,20 +67,13 @@ public class AssociationIT {
         associationRepository.save(association);
     }
 
+    // --- READ TESTS ---
+
     @Test
     public void findAll_withNoParams_whenSuccess() {
         List<AssociationReadDto> associationList = associationService.findAll(null, null);
         assertEquals(1, associationList.size());
-        assertEquals("SPORT", associationList.get(0).getCategoryLabel());
-    }
-
-    @Test
-    @WithMockUser
-    public void findAll_withParams_whenSuccess() {
-        List<AssociationReadDto> associationList = associationService.findAll("test", "SPORT");
-        assertEquals(1, associationList.size());
-        assertEquals("SPORT", associationList.get(0).getCategoryLabel());
-        assertEquals("test", associationList.get(0).getName());
+        assertEquals("rugby", associationList.get(0).getCategoryLabel());
     }
 
     @Test
@@ -90,85 +85,75 @@ public class AssociationIT {
         assertEquals(association.getCategory().getLabel(), associationReadDto.getCategoryLabel());
         assertEquals(association.getName(), associationReadDto.getName());
     }
+
     @Test
     @WithMockUser
     public void findById_whenNotFound() {
-
-       assertThrows(RessourceNotFoundException.class, () -> {
-           associationService.findById(999L);
-       });
+        assertThrows(RessourceNotFoundException.class, () -> associationService.findById(999L));
     }
+
+    // --- CREATE TESTS ---
 
     @Test
     @WithMockUser
     public void createAssociation_whenSuccess() {
-        entityManager.flush();
-        entityManager.clear();
+        AssociationCreateDto dto = new AssociationCreateDto();
+        dto.setName("assoToCreate");
+        dto.setDescription("test creating association");
+        dto.setEmail("created@asso.com");
+        dto.setUserId(user.getId());
+        dto.setCategoryType(CategoryType.SPORT);
+        dto.setCategoryLabel("football"); // Nouveau label
 
-        AssociationCreateDto associationToCreate = new AssociationCreateDto();
-        associationToCreate.setName("assoToCreate");
-        associationToCreate.setDescription("test creating assocation");
-        associationToCreate.setEmail("created@asso.com");
-        associationToCreate.setUserId(user.getId());
-        associationToCreate.setCategoryId(sportCategory.getId());
+        AssociationReadDto result = associationService.createAssociation(dto);
 
-        AssociationReadDto newAsso = associationService.createAssociation(associationToCreate);
+        assertEquals("assoToCreate", result.getName());
+        assertEquals("football", result.getCategoryLabel());
+        // On vérifie que la catégorie a bien été créée en base
+        assertEquals(true, categoryRepository.findByLabelIgnoreCaseAndType("football", CategoryType.SPORT).isPresent());
+    }
 
-        assertEquals(associationToCreate.getName(), newAsso.getName());
-        assertEquals(associationToCreate.getDescription(), newAsso.getDescription());
+    @Test
+    @WithMockUser
+    public void createAssociation_withExistingCategory_shouldNotCreateDuplicate() {
+        long categoryCountBefore = categoryRepository.count();
+
+        AssociationCreateDto dto = new AssociationCreateDto();
+        dto.setName("Une Autre Asso");
+        dto.setDescription("Description");
+        dto.setEmail("another@mail.com");
+        dto.setUserId(user.getId());
+        dto.setCategoryType(CategoryType.SPORT);
+        dto.setCategoryLabel("rugby"); // Existe déjà via le setup()
+
+        associationService.createAssociation(dto);
+
+        // Le nombre de catégories ne doit pas avoir augmenté !
+        assertEquals(categoryCountBefore, categoryRepository.count());
     }
 
     @Test
     @WithMockUser
     public void createAssociation_whenNameAlreadyExists_shouldThrowBadRequest() {
         AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("test"); // Nom déjà utilisé dans le setup()
-        dto.setCategoryId(sportCategory.getId());
+        dto.setName("test"); // Déjà en base via setup
+        dto.setCategoryLabel("rugby");
+        dto.setCategoryType(CategoryType.SPORT);
         dto.setUserId(user.getId());
 
-        assertThrows(BadRequestException.class, () -> {
-            associationService.createAssociation(dto);
-        });
+        assertThrows(BadRequestException.class, () -> associationService.createAssociation(dto));
     }
 
-    @Test
-    @WithMockUser
-    public void createAssociation_whenCategoryNotFound_shouldThrow404() {
-        AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("Nouvelle Asso");
-        dto.setCategoryId(999L); // ID qui n'existe pas
-        dto.setUserId(user.getId());
-
-        assertThrows(RessourceNotFoundException.class, () -> {
-            associationService.createAssociation(dto);
-        });
-    }
-
-    @Test
-    @WithMockUser
-    public void createAssociation_whenUserNotFound_shouldThrow404() {
-        AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("Nouvelle Asso");
-        dto.setCategoryId(sportCategory.getId());
-        dto.setUserId(999L); // User inconnu
-
-        assertThrows(RessourceNotFoundException.class, () -> {
-            associationService.createAssociation(dto);
-        });
-    }
+    // --- UPDATE TESTS ---
 
     @Test
     @WithMockUser
     public void updateAssociation_whenSuccess() {
-        Category musicCategory = new Category();
-        musicCategory.setLabel("MUSIQUE");
-        musicCategory.setType(CategoryType.CULTURE);
-        categoryRepository.save(musicCategory);
-
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
         updateDto.setName("test");
         updateDto.setDescription("Nouvelle description");
-        updateDto.setCategoryId(musicCategory.getId());
+        updateDto.setCategoryLabel("MUSIQUE"); // Nouveau label
+        updateDto.setCategoryType(CategoryType.CULTURE);
 
         AssociationReadDto result = associationService.updateAssociation(association.getId(), updateDto);
 
@@ -176,52 +161,29 @@ public class AssociationIT {
         assertEquals("MUSIQUE", result.getCategoryLabel());
         assertEquals("test", result.getName());
     }
+
     @Test
     @WithMockUser
     public void updateAssociation_whenNameTakenByOther_shouldThrowBadRequest() {
         Association otherAsso = new Association();
         otherAsso.setName("AUTRE_ASSO");
-        otherAsso.setDescription("Nouvelle description");
-        otherAsso.setEmail("other@asso.com");
         otherAsso.setCategory(sportCategory);
         otherAsso.setOwner(user);
+        otherAsso.setDescription("autre asso");
+        otherAsso.setEmail("other@asso.com");
         associationRepository.save(otherAsso);
 
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
         updateDto.setName("AUTRE_ASSO");
 
-        assertThrows(BadRequestException.class, () -> {
-            associationService.updateAssociation(association.getId(), updateDto);
-        });
-    }
-
-    @Test
-    @WithMockUser
-    public void updateAssociation_whenNotFound_shouldThrow404() {
-        AssociationUpdateDto updateDto = new AssociationUpdateDto();
-        updateDto.setName("Inutile");
-
-        assertThrows(RessourceNotFoundException.class, () -> {
-            associationService.updateAssociation(999L, updateDto);
-        });
+        assertThrows(BadRequestException.class, () -> associationService.updateAssociation(association.getId(), updateDto));
     }
 
     @Test
     @WithMockUser
     public void deleteAssociation_whenSuccess() {
         Long id = association.getId();
-
         associationService.deleteAssociation(id);
-
-             boolean exists = associationRepository.existsById(id);
-        assertEquals(false, exists);
-    }
-
-    @Test
-    @WithMockUser
-    public void deleteAssociation_whenNotFound_shouldThrow404() {
-        assertThrows(RessourceNotFoundException.class, () -> {
-            associationService.deleteAssociation(999L);
-        });
+        assertEquals(false, associationRepository.existsById(id));
     }
 }

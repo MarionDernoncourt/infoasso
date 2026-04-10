@@ -5,6 +5,7 @@ import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.service.IAssociationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,8 @@ public class AssociationControllerTest {
         associationCreate.setName("test");
         associationCreate.setDescription("description association sportive");
         associationCreate.setEmail("asso@info.com");
-        associationCreate.setCategoryId(2L);
+        associationCreate.setCategoryLabel("hockey");
+        associationCreate.setCategoryType(CategoryType.SPORT);
 
         String associationJson = objectMapper.writeValueAsString(associationCreate);
 
@@ -125,7 +127,8 @@ public class AssociationControllerTest {
         associationCreate.setName("test");
         associationCreate.setDescription("description association sportive");
         associationCreate.setEmail("asso");
-        associationCreate.setCategoryId(2L);
+        associationCreate.setCategoryLabel("hockey");
+        associationCreate.setCategoryType(CategoryType.SPORT);
 
         String associationJson = objectMapper.writeValueAsString(associationCreate);
 
@@ -143,8 +146,8 @@ public class AssociationControllerTest {
         associationCreate.setName("test");
         associationCreate.setDescription("description association sportive");
         associationCreate.setEmail("asso@info.com");
-        associationCreate.setCategoryId(2L);
-
+        associationCreate.setCategoryLabel("hockey");
+        associationCreate.setCategoryType(CategoryType.SPORT);
         String associationJson = objectMapper.writeValueAsString(associationCreate);
 
         when(associationService.createAssociation(any(AssociationCreateDto.class))).thenThrow(new RuntimeException("Erreur interne"));
@@ -225,6 +228,6 @@ public class AssociationControllerTest {
 
     mockMvc.perform(delete("/api/associations/10").with(csrf()))
             .andExpect(status().isNotFound());
-        verify(associationService, times(1)).deleteAssociation(1L);
+        verify(associationService, times(1)).deleteAssociation(10L);
     }
 }
