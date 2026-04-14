@@ -5,6 +5,7 @@ import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.BadRequestException;
+import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.Category;
@@ -92,7 +93,6 @@ public class AssociationIT {
         assertThrows(RessourceNotFoundException.class, () -> associationService.findById(999L));
     }
 
-    // --- CREATE TESTS ---
 
     @Test
     @WithMockUser
@@ -124,24 +124,23 @@ public class AssociationIT {
         dto.setEmail("another@mail.com");
         dto.setUserId(user.getId());
         dto.setCategoryType(CategoryType.SPORT);
-        dto.setCategoryLabel("rugby"); // Existe déjà via le setup()
+        dto.setCategoryLabel("rugby");
 
         associationService.createAssociation(dto);
 
-        // Le nombre de catégories ne doit pas avoir augmenté !
         assertEquals(categoryCountBefore, categoryRepository.count());
     }
 
     @Test
     @WithMockUser
-    public void createAssociation_whenNameAlreadyExists_shouldThrowBadRequest() {
+    public void createAssociation_whenNameAlreadyExists_shouldThrownResourceAlreadyExistsException() {
         AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("test"); // Déjà en base via setup
+        dto.setName("test");
         dto.setCategoryLabel("rugby");
         dto.setCategoryType(CategoryType.SPORT);
         dto.setUserId(user.getId());
 
-        assertThrows(BadRequestException.class, () -> associationService.createAssociation(dto));
+        assertThrows(ResourceAlreadyExistsException.class, () -> associationService.createAssociation(dto));
     }
 
     // --- UPDATE TESTS ---

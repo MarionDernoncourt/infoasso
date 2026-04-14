@@ -4,9 +4,11 @@ import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.BadRequestException;
+import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.Category;
+import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.model.User;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
@@ -26,11 +28,13 @@ public class AssociationServiceImpl implements IAssociationService {
     private final AssociationRepository associationRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ICategoryService categoryService;
 
-    public AssociationServiceImpl(AssociationRepository associationRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    public AssociationServiceImpl(AssociationRepository associationRepository, UserRepository userRepository, CategoryRepository categoryRepository, ICategoryService categoryService) {
         this.associationRepository = associationRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -63,22 +67,15 @@ public class AssociationServiceImpl implements IAssociationService {
     }
 
     @Override
-    @Transactional
     public AssociationReadDto createAssociation(AssociationCreateDto dto) {
         logger.info("Creating association: {}", dto.getName());
 
         checkNameUniqueness(dto.getName());
 
-        // Logique : Chercher la catégorie existante ou la créer
-        Category category = categoryRepository.findByLabelIgnoreCaseAndType(dto.getCategoryLabel(), dto.getCategoryType())
-                .orElseGet(() -> {
-                    logger.info("Creating new category: {} of type {}", dto.getCategoryLabel(), dto.getCategoryType());
-                    Category newCat = new Category();
-                    newCat.setLabel(dto.getCategoryLabel());
-                    newCat.setType(dto.getCategoryType());
-                    return categoryRepository.save(newCat);
-                });
-
+        Category category = getOrCreateCategoryEntity(
+                dto.getCategoryLabel(),
+                dto.getCategoryType()
+        );
         Association asso = mapToEntity(dto);
         asso.setCategory(category);
         asso.setOwner(getValidatedOwner(dto.getUserId()));
@@ -151,13 +148,7 @@ public class AssociationServiceImpl implements IAssociationService {
 
         // Mise à jour de la catégorie (Label + Type)
         if (dto.getCategoryLabel() != null && dto.getCategoryType() != null) {
-            Category category = categoryRepository.findByLabelIgnoreCaseAndType(dto.getCategoryLabel(), dto.getCategoryType())
-                    .orElseGet(() -> {
-                        Category newCat = new Category();
-                        newCat.setLabel(dto.getCategoryLabel());
-                        newCat.setType(dto.getCategoryType());
-                        return categoryRepository.save(newCat);
-                    });
+            Category category = getOrCreateCategoryEntity(dto.getCategoryLabel(), dto.getCategoryType());
             association.setCategory(category);
         }
 
@@ -170,12 +161,22 @@ public class AssociationServiceImpl implements IAssociationService {
 
     private void checkNameUniqueness(String name) {
         if (associationRepository.existsByName(name)) {
-            throw new BadRequestException("Une association avec le nom '" + name + "' existe déjà.");
+            throw new ResourceAlreadyExistsException("Une association avec le nom '" + name + "' existe déjà.");
         }
     }
 
     private User getValidatedOwner(Long ownerId) {
         return userRepository.findById(ownerId)
                 .orElseThrow(() -> new RessourceNotFoundException("User", ownerId));
+    }
+
+    public Category getOrCreateCategoryEntity(String label, CategoryType type) {
+        return categoryRepository.findByLabelIgnoreCaseAndType(label, type)
+                .orElseGet(() -> {
+                    Category newCat = new Category();
+                    newCat.setLabel(label);
+                    newCat.setType(type);
+                    return categoryRepository.save(newCat);
+                });
     }
 }

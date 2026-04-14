@@ -13,8 +13,6 @@ import java.util.List;
 public interface IAssociationService {
     AssociationReadDto findById(Long id);
 
-   // Association findBySchedule(Schedule schedule);
-
     List<AssociationReadDto> findAll(String name, String category);
 
     AssociationReadDto createAssociation(AssociationCreateDto association);
