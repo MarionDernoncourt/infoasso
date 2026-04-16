@@ -1,4 +1,4 @@
-package com.infoasso.api.config;
+package com.infoasso.api.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

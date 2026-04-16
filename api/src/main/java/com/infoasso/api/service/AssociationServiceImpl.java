@@ -3,7 +3,6 @@ package com.infoasso.api.service;
 import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
-import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.Association;
@@ -67,6 +66,7 @@ public class AssociationServiceImpl implements IAssociationService {
     }
 
     @Override
+    @Transactional
     public AssociationReadDto createAssociation(AssociationCreateDto dto) {
         logger.info("Creating association: {}", dto.getName());
 

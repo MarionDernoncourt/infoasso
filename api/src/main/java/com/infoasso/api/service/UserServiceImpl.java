@@ -4,12 +4,14 @@ import com.infoasso.api.dto.user.UserReadDto;
 import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.model.Role;
 import com.infoasso.api.model.User;
 import com.infoasso.api.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -33,6 +35,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public UserReadDto createUser(UserCreateDto user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new BadRequestException("Un utilisateur avec cet email existe déjà.");
@@ -42,6 +45,7 @@ public class UserServiceImpl implements IUserService {
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setRole(Role.ROLE_USER);
 
         User savedUser = userRepository.save(newUser);
         logger.info("User created {}", savedUser.getEmail());

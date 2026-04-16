@@ -167,12 +167,15 @@ public class AssociationControllerTest {
         AssociationUpdateDto associationToUpdate = new AssociationUpdateDto();
         associationToUpdate.setName("association updated");
         associationToUpdate.setDescription("description association musicale");
+        associationToUpdate.setCategoryLabel("hockey");
+        associationToUpdate.setCategoryType(CategoryType.SPORT);
 
         String associationJson = objectMapper.writeValueAsString(associationToUpdate);
 
         AssociationReadDto updatedResponse = new AssociationReadDto();
         updatedResponse.setId(1L);
         updatedResponse.setName("association updated");
+        associationToUpdate.setEmail("asso@info.com");
 
         when(associationService.updateAssociation(any(Long.class), any(AssociationUpdateDto.class))).thenReturn(updatedResponse);
 
@@ -230,4 +233,5 @@ public class AssociationControllerTest {
             .andExpect(status().isNotFound());
         verify(associationService, times(1)).deleteAssociation(10L);
     }
+
 }

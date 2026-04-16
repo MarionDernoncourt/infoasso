@@ -7,10 +7,7 @@ import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
-import com.infoasso.api.model.Association;
-import com.infoasso.api.model.Category;
-import com.infoasso.api.model.CategoryType;
-import com.infoasso.api.model.User;
+import com.infoasso.api.model.*;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.repository.UserRepository;
@@ -20,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class AssociationIT {
 
@@ -56,6 +55,7 @@ public class AssociationIT {
         user = new User();
         user.setEmail("user@mail.com");
         user.setPassword("Password123");
+        user.setRole(Role.ROLE_USER);
         userRepository.save(user);
 
         association = new Association();
@@ -175,7 +175,7 @@ public class AssociationIT {
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
         updateDto.setName("AUTRE_ASSO");
 
-        assertThrows(BadRequestException.class, () -> associationService.updateAssociation(association.getId(), updateDto));
+        assertThrows(ResourceAlreadyExistsException.class, () -> associationService.updateAssociation(association.getId(), updateDto));
     }
 
     @Test

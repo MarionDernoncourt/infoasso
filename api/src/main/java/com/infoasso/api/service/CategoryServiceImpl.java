@@ -41,6 +41,7 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryReadDto createCategory(CategoryCreateDto category) {
         logger.info("Trying to create or find Category : {} ({})", category.getLabel(), category.getType());
         Category newCategory = categoryRepository.findByLabelIgnoreCaseAndType(category.getLabel(), category.getType())

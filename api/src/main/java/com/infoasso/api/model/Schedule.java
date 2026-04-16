@@ -1,6 +1,7 @@
 package com.infoasso.api.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,14 +15,18 @@ import java.time.LocalTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "schedules")
+@Table(name = "schedules", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_schedule_unique_session",
+                columnNames = {"association_id", "activity_name", "day_of_week", "start_time"})
+})
 public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "association_id", nullable = false)
     private Association association;
 
@@ -36,9 +41,9 @@ public class Schedule {
     private LocalTime endTime;
 
     @Min(value = 0 , message = "L'âge minimum ne peut pas être négatif.")
-    private int ageMin;
+    private Integer ageMin;
 
-    private int ageMax;
+    private Integer ageMax;
 
     @NotBlank(message = "Le nom de l'activité est obligatoire.")
     private String activityName;
