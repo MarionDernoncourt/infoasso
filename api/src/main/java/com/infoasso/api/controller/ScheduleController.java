@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
@@ -42,6 +43,7 @@ public class ScheduleController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ScheduleReadDto> createSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleCreateDto scheduleCreateDto) {
         logger.info("POST: / : Request received for create schedule for association with id " + id);
         ScheduleReadDto createdSchedule = scheduleService.createSchedule(id, scheduleCreateDto);
@@ -50,6 +52,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/{scheduleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
         logger.info("PUT: / : Request received for update schedule with id " + scheduleId);
         ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(scheduleId, scheduleUpdateDto);
@@ -58,6 +61,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{scheduleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId) {
         logger.info("DELETE: / : Request received to delete schedule with id " + scheduleId);
         scheduleService.deleteSchedule(scheduleId);

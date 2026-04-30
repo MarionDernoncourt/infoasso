@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserReadDto> getUser(@PathVariable Long id) {
         logger.info("GET /api/user/{} : Request received for user : {}", id, id);
         UserReadDto userDTO = userService.findUserById(id);
@@ -30,6 +32,7 @@ public class UserController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserReadDto> createUser(@Valid @RequestBody UserCreateDto user) {
         logger.info("POST /api/user : Request received for user : {}",  user.getEmail());
         UserReadDto newUser = userService.createUser(user);

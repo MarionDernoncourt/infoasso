@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class AssociationController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AssociationReadDto> createAssociation(@Valid @RequestBody AssociationCreateDto association) {
         logger.info("POST / : Request received to create {}", association.getName());
         AssociationReadDto associationCreated = associationService.createAssociation(association);
@@ -53,6 +55,7 @@ public class AssociationController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AssociationReadDto> updateAssociation(@PathVariable Long id, @Valid @RequestBody AssociationUpdateDto association) {
         logger.info("PUT / {} : Request received to update {}", id, association.getName());
         AssociationReadDto associationUpdated = associationService.updateAssociation(id, association);
@@ -61,6 +64,7 @@ public class AssociationController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteAssociation(@PathVariable Long id) {
         logger.info("DELETE / {} : Request received to delete {}", id, id);
         associationService.deleteAssociation(id);
