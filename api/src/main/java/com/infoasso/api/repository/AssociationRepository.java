@@ -19,4 +19,10 @@ public interface AssociationRepository extends JpaRepository<Association,Long> {
     List<Association> findByCategoryLabelIgnoreCase(String label);
 
     List<Association> findByNameContainingIgnoreCaseAndCategoryLabelIgnoreCase(String name, String category);
+
+    // Pour le grand public
+    List<Association> findByIsPublishedTrue();
+
+    // Pour le back-office Mairie
+    List<Association> findByIsPublishedFalse();
 }

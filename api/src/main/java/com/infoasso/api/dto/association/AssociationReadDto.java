@@ -13,9 +13,17 @@ import lombok.NoArgsConstructor;
 public class AssociationReadDto {
     private Long id;
 
-    private String name;
+    private String rnaNumber;
+
+    private String officialName;
+
+    private String displayName;
 
     private String description;
+
+    private String streetAddress;
+    private String zipCode;
+    private String city;
 
     private String email;
 

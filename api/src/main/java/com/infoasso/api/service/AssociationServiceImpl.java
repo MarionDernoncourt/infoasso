@@ -68,9 +68,9 @@ public class AssociationServiceImpl implements IAssociationService {
     @Override
     @Transactional
     public AssociationReadDto createAssociation(AssociationCreateDto dto) {
-        logger.info("Creating association: {}", dto.getName());
+        logger.info("Creating association: {}", dto.getDisplayName());
 
-        checkNameUniqueness(dto.getName());
+        checkNameUniqueness(dto.getDisplayName());
 
         Category category = getOrCreateCategoryEntity(
                 dto.getCategoryLabel(),

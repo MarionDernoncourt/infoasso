@@ -43,6 +43,8 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private boolean gdprConsent = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

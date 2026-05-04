@@ -15,5 +15,7 @@ public class AssociationSummaryDto {
     private Long id;
 
     @NotBlank
-    private String name;
+    private String displayName;
+
+    private String categoryLabel;
 }
