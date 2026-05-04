@@ -1,5 +1,9 @@
 package com.infoasso.api.security;
 
+import com.infoasso.api.security.jwt.AuthEntryPointJwt;
+import com.infoasso.api.security.jwt.AuthTokenFilter;
+import com.infoasso.api.security.jwt.JwtUtils;
+import com.infoasso.api.security.services.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,7 +25,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtUtils jwtUtils;
+    private final AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -33,9 +40,15 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter(jwtUtils, userDetailsService);
+    }
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .csrf(csrf -> csrf.disable()) // Désactivé pour le développement (indispensable pour POST)
+                // API Stateless (pas de session HTTP)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // 1. Accessible a tous (Login / Register )
@@ -47,6 +60,9 @@ public class SecurityConfig {
                         // 3. authentification obligatoire pour TOUT LE RESTE (POST, PUT, DELETE)
                         .anyRequest().authenticated()
                 );
+        // Ajout du filtre JWT -> passage dans le filtre avant le le UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
