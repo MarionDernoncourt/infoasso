@@ -10,13 +10,13 @@ import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.repository.ScheduleRepository;
 import com.infoasso.api.repository.UserRepository;
+import com.infoasso.api.service.impl.ScheduleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -63,7 +62,9 @@ public class ScheduleServiceIT {
         userRepository.save(user);
 
         association = new Association();
-        association.setName("footbal club");
+        association.setRnaNumber("W123456789");
+        association.setOfficialName("footbal club");
+        association.setDisplayName("footbal club");
         association.setDescription("description association");
         association.setEmail("email@asso.com");
         association.setCategory(category);

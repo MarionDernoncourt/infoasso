@@ -1,4 +1,4 @@
-package com.infoasso.api.service;
+package com.infoasso.api.service.impl;
 
 import com.infoasso.api.dto.association.AssociationSummaryDto;
 import com.infoasso.api.dto.schedule.ScheduleCreateDto;
@@ -11,6 +11,7 @@ import com.infoasso.api.model.DayOfWeek;
 import com.infoasso.api.model.Schedule;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.ScheduleRepository;
+import com.infoasso.api.service.IScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -124,7 +125,7 @@ logger.info("Trying to delete schedule with id {}", scheduleId);
         if (schedule.getAssociation() != null) {
             AssociationSummaryDto assoDto = new AssociationSummaryDto();
             assoDto.setId(schedule.getAssociation().getId());
-            assoDto.setName(schedule.getAssociation().getName());
+            assoDto.setDisplayName(schedule.getAssociation().getDisplayName());
             readDto.setAssociation(assoDto);
         }
 

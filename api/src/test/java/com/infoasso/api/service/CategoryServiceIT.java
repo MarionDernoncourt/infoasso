@@ -1,13 +1,12 @@
 package com.infoasso.api.service;
 
-import com.infoasso.api.controller.CategoryController;
 import com.infoasso.api.dto.category.CategoryCreateDto;
 import com.infoasso.api.dto.category.CategoryReadDto;
-import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.Category;
 import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.repository.CategoryRepository;
+import com.infoasso.api.service.impl.CategoryServiceImpl;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")

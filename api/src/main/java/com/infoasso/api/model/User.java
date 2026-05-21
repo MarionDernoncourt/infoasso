@@ -43,6 +43,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @OneToMany(mappedBy = "owner")
+    private List<Association> associations;
+
     @Column(nullable = false)
     private boolean gdprConsent = false;
 

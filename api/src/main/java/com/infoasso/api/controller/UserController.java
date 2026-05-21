@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final static Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -31,12 +31,5 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
-    @PostMapping("")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserReadDto> createUser(@Valid @RequestBody UserCreateDto user) {
-        logger.info("POST /api/user : Request received for user : {}",  user.getEmail());
-        UserReadDto newUser = userService.createUser(user);
-        logger.info(" Response received : 201 CREATED : The user {} has been created", newUser.getEmail());
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
-    }
+
 }

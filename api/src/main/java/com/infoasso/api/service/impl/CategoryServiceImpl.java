@@ -1,10 +1,11 @@
-package com.infoasso.api.service;
+package com.infoasso.api.service.impl;
 
 import com.infoasso.api.dto.category.CategoryCreateDto;
 import com.infoasso.api.dto.category.CategoryReadDto;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.Category;
 import com.infoasso.api.repository.CategoryRepository;
+import com.infoasso.api.service.ICategoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -51,13 +51,15 @@ public class SecurityConfig {
                 // API Stateless (pas de session HTTP)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Accessible a tous (Login / Register )
+                        // 1. Inscription et Connexion
                         .requestMatchers("/api/auth/**").permitAll()
-                        // 2. LECTURE autorisée à TOUS (meême sans jeton)
+                        .requestMatchers("/api/users/register").permitAll() // Doit matcher EXACTEMENT ton Controller
+
+                        // 2. Lecture publique
                         .requestMatchers(HttpMethod.GET, "/api/associations/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schedules/**").permitAll()
-                        // 3. authentification obligatoire pour TOUT LE RESTE (POST, PUT, DELETE)
+                        // 3. Authentification obligatoire pour TOUT LE RESTE (POST, PUT, DELETE)
                         .anyRequest().authenticated()
                 );
         // Ajout du filtre JWT -> passage dans le filtre avant le le UsernamePasswordAuthenticationFilter
