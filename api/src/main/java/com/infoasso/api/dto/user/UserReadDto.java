@@ -16,4 +16,6 @@ public class UserReadDto {
     @Email(message = "Le format de l'email est invalide.")
     @NotBlank(message = "L'email est obligatoire.")
     private String email;
+
+    private String role;
 }

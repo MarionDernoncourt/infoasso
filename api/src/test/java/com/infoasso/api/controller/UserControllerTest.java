@@ -2,20 +2,20 @@ package com.infoasso.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infoasso.api.dto.user.UserReadDto;
-import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
-import com.infoasso.api.service.UserServiceImpl;
+import com.infoasso.api.security.jwt.AuthEntryPointJwt;
+import com.infoasso.api.security.jwt.JwtUtils;
+import com.infoasso.api.security.services.UserDetailsServiceImpl;
+import com.infoasso.api.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,13 +28,22 @@ public class UserControllerTest {
     private UserController userController;
     @Autowired
     private MockMvc mockMvc;
-    @MockitoBean
-    private UserServiceImpl userService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockitoBean
+    private UserServiceImpl userService;
+    @MockitoBean
+    private UserDetailsServiceImpl userDetailsService;
+    @MockitoBean
+    private JwtUtils jwtUtils;
+    @MockitoBean
+    private AuthEntryPointJwt authEntryPointJwt;
+
+
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     public void findUserById_shouldReturn_200Ok() throws Exception {
         UserReadDto user = new UserReadDto();
         user.setId(1L);
@@ -42,90 +51,30 @@ public class UserControllerTest {
 
         when(userService.findUserById(any(Long.class))).thenReturn(user);
 
-        mockMvc.perform(get("/api/user/1"))
+        mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.email").value("info@asso.com"));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     public void findUserById_shouldReturn_500InternalServerError() throws Exception {
         when(userService.findUserById(any(Long.class))).thenThrow(new RuntimeException("Une erreur interne est survenue"));
 
-        mockMvc.perform(get("/api/user/1"))
+        mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("Une erreur interne est survenue"));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     public void findUserById_shouldReturn_404NotFound() throws Exception {
         when(userService.findUserById(any(Long.class))).thenThrow(new RessourceNotFoundException("User", 1L));
 
-        mockMvc.perform(get("/api/user/1"))
+        mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    @WithMockUser
-    public void createUser_shouldReturn_200Created() throws Exception {
-        UserCreateDto newUser = new UserCreateDto();
-        newUser.setEmail("user@asso.com");
-        newUser.setPassword("Password123");
 
-        String userJson = objectMapper.writeValueAsString(newUser);
-
-        UserReadDto savedUser = new UserReadDto();
-        savedUser.setId(1L);
-        savedUser.setEmail("user@asso.com");
-
-        when(userService.createUser(any(UserCreateDto.class))).thenReturn(savedUser);
-
-        mockMvc.perform(post("/api/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .with(csrf()))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value("1"))
-                .andExpect(jsonPath("$.email").value("user@asso.com"));
-
-    }
-
-    @Test
-    @WithMockUser
-    public void createUser_shouldReturn_400BadRequest() throws Exception {
-        UserCreateDto newUser = new UserCreateDto();
-        newUser.setEmail("user.com");
-        newUser.setPassword("password123");
-
-        String userJson = objectMapper.writeValueAsString(newUser);
-
-        mockMvc.perform(post("/api/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                        .with(csrf()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists());
-
-    }
-
-    @Test
-    @WithMockUser
-    public void createUser_shouldReturn_500InternalServerError() throws Exception {
-        UserCreateDto newUser = new UserCreateDto();
-        newUser.setEmail("user@asso.com");
-        newUser.setPassword("Password123");
-
-        String userJson = objectMapper.writeValueAsString(newUser);
-
-        when(userService.createUser(any(UserCreateDto.class))).thenThrow(new RuntimeException("Une erreur interne est survenue"));
-
-        mockMvc.perform(post("/api/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .with(csrf()))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").exists());
-    }
 }

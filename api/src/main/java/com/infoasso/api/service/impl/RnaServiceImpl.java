@@ -1,5 +1,6 @@
-package com.infoasso.api.service;
+package com.infoasso.api.service.impl;
 
+import com.infoasso.api.service.IRnaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -10,14 +11,14 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Service
-public class RnaService {
+public class RnaServiceImpl implements IRnaService {
 
-    private final static Logger logger = LoggerFactory.getLogger(RnaService.class);
+    private final static Logger logger = LoggerFactory.getLogger(RnaServiceImpl.class);
     private final String API_URL = "https://entreprise.data.gouv.fr/api/rna/v1/id/";
 
     private final RestTemplate restTemplate;
 
-    public RnaService(RestTemplate restTemplate) {
+    public RnaServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 

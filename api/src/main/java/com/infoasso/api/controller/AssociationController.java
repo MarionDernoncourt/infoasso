@@ -41,25 +41,25 @@ public class AssociationController {
     public ResponseEntity<AssociationReadDto> findById(@PathVariable Long id) {
         logger.info("GET /{} : Request received for association id {}", id, id);
         AssociationReadDto association = associationService.findById(id);
-        logger.info("GET /{} : Response 200 OK : The association {} is found", id, association.getName());
+        logger.info("GET /{} : Response 200 OK : The association {} is found", id, association.getOfficialName());
         return ResponseEntity.status(HttpStatus.OK).body(association);
     }
 
     @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AssociationReadDto> createAssociation(@Valid @RequestBody AssociationCreateDto association) {
-        logger.info("POST / : Request received to create {}", association.getName());
+        logger.info("POST / : Request received to create {}", association.getDisplayName());
         AssociationReadDto associationCreated = associationService.createAssociation(association);
-        logger.info("POST / : Response 201 CREATED : The association {} has been created", associationCreated.getName());
+        logger.info("POST / : Response 201 CREATED : The association {} has been created", associationCreated.getDisplayName());
         return ResponseEntity.status(HttpStatus.CREATED).body(associationCreated);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AssociationReadDto> updateAssociation(@PathVariable Long id, @Valid @RequestBody AssociationUpdateDto association) {
-        logger.info("PUT / {} : Request received to update {}", id, association.getName());
+        logger.info("PUT / {} : Request received to update {}", id, association.getOfficialName());
         AssociationReadDto associationUpdated = associationService.updateAssociation(id, association);
-        logger.info("PUT/ {} : Response 200 OK : The association {} is updated", id, associationUpdated.getName());
+        logger.info("PUT/ {} : Response 200 OK : The association {} is updated", id, associationUpdated.getDisplayName());
         return ResponseEntity.status(HttpStatus.OK).body(associationUpdated);
     }
 

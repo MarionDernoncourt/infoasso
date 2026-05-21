@@ -7,8 +7,7 @@ import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.DayOfWeek;
-import com.infoasso.api.model.Schedule;
-import com.infoasso.api.service.ScheduleServiceImpl;
+import com.infoasso.api.service.impl.ScheduleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public class ScheduleControllerTest {
     public void setup() {
         association = new AssociationSummaryDto();
         association.setId(1L);
-        association.setName("Football");
+        association.setDisplayName("Football");
 
         schedule = new ScheduleReadDto();
         schedule.setId(1L);

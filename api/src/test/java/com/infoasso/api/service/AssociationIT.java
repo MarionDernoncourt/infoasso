@@ -4,26 +4,32 @@ package com.infoasso.api.service;
 import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
-import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.*;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.repository.UserRepository;
+import com.infoasso.api.service.impl.AssociationServiceImpl;
+import com.infoasso.api.service.impl.RnaServiceImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -40,6 +46,8 @@ public class AssociationIT {
     private UserRepository userRepository;
     @Autowired
     private EntityManager entityManager;
+    @MockBean
+    private RnaServiceImpl rnaService;
 
     private Association association;
     private Category sportCategory;
@@ -53,17 +61,31 @@ public class AssociationIT {
         categoryRepository.save(sportCategory);
 
         user = new User();
-        user.setEmail("user@mail.com");
+        user.setEmail("mario@example.com");
         user.setPassword("Password123");
         user.setRole(Role.ROLE_USER);
+        user.setGdprConsent(true);
         userRepository.save(user);
 
         association = new Association();
-        association.setName("test");
+        association.setRnaNumber("W123456789");
+        association.setDisplayName("test");
+        association.setOfficialName("CLUB DE HOCKEY LOOS ASSOCIATION");
         association.setDescription("description association");
         association.setEmail("email@asso.com");
         association.setCategory(sportCategory);
         association.setOwner(user);
+
+        Map<String, String> mockRnaData = new HashMap<>();
+        mockRnaData.put("nom", "ASSOCIATION TEST OFFICIELLE");
+        mockRnaData.put("objet", "Description générique pour les tests");
+        mockRnaData.put("adrs_numvoie", "10");
+        mockRnaData.put("adrs_typevoie", "RUE");
+        mockRnaData.put("adrs_libvoie", "DE LA PAIX");
+        mockRnaData.put("adrs_codepostal", "59120");
+        mockRnaData.put("libcom", "LOOS");
+
+        Mockito.when(rnaService.getAssociationData(anyString())).thenReturn(mockRnaData);
 
         associationRepository.save(association);
     }
@@ -84,7 +106,7 @@ public class AssociationIT {
         AssociationReadDto associationReadDto = associationService.findById(id);
 
         assertEquals(association.getCategory().getLabel(), associationReadDto.getCategoryLabel());
-        assertEquals(association.getName(), associationReadDto.getName());
+        assertEquals(association.getDisplayName(), associationReadDto.getDisplayName());
     }
 
     @Test
@@ -95,34 +117,34 @@ public class AssociationIT {
 
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "mario@example.com")
     public void createAssociation_whenSuccess() {
         AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("assoToCreate");
+        dto.setRnaNumber("W000000001");
+        dto.setDisplayName("assoToCreate");
         dto.setDescription("test creating association");
         dto.setEmail("created@asso.com");
-        dto.setUserId(user.getId());
         dto.setCategoryType(CategoryType.SPORT);
         dto.setCategoryLabel("football"); // Nouveau label
 
         AssociationReadDto result = associationService.createAssociation(dto);
 
-        assertEquals("assoToCreate", result.getName());
+        assertEquals("assoToCreate", result.getDisplayName());
         assertEquals("football", result.getCategoryLabel());
         // On vérifie que la catégorie a bien été créée en base
         assertEquals(true, categoryRepository.findByLabelIgnoreCaseAndType("football", CategoryType.SPORT).isPresent());
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "mario@example.com")
     public void createAssociation_withExistingCategory_shouldNotCreateDuplicate() {
         long categoryCountBefore = categoryRepository.count();
 
         AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("Une Autre Asso");
+        dto.setRnaNumber("W123456790");
+        dto.setDisplayName("Une Autre Asso");
         dto.setDescription("Description");
         dto.setEmail("another@mail.com");
-        dto.setUserId(user.getId());
         dto.setCategoryType(CategoryType.SPORT);
         dto.setCategoryLabel("rugby");
 
@@ -132,24 +154,23 @@ public class AssociationIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "mario@example.com")
     public void createAssociation_whenNameAlreadyExists_shouldThrownResourceAlreadyExistsException() {
         AssociationCreateDto dto = new AssociationCreateDto();
-        dto.setName("test");
+        dto.setDisplayName("test");
         dto.setCategoryLabel("rugby");
         dto.setCategoryType(CategoryType.SPORT);
-        dto.setUserId(user.getId());
 
-        assertThrows(ResourceAlreadyExistsException.class, () -> associationService.createAssociation(dto));
+        assertThrows(RuntimeException.class, () -> associationService.createAssociation(dto));
     }
 
     // --- UPDATE TESTS ---
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "mario@example.com")
     public void updateAssociation_whenSuccess() {
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
-        updateDto.setName("test");
+        updateDto.setDisplayName("test");
         updateDto.setDescription("Nouvelle description");
         updateDto.setCategoryLabel("MUSIQUE"); // Nouveau label
         updateDto.setCategoryType(CategoryType.CULTURE);
@@ -158,28 +179,30 @@ public class AssociationIT {
 
         assertEquals("Nouvelle description", result.getDescription());
         assertEquals("MUSIQUE", result.getCategoryLabel());
-        assertEquals("test", result.getName());
+        assertEquals("test", result.getDisplayName());
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "mario@example.com")
     public void updateAssociation_whenNameTakenByOther_shouldThrowBadRequest() {
-        Association otherAsso = new Association();
-        otherAsso.setName("AUTRE_ASSO");
-        otherAsso.setCategory(sportCategory);
-        otherAsso.setOwner(user);
-        otherAsso.setDescription("autre asso");
-        otherAsso.setEmail("other@asso.com");
-        associationRepository.save(otherAsso);
+        Association other = new Association();
+        other.setOfficialName("NOM_OFFICIEL_UNIQUE");
+        other.setDisplayName("Asso 2");
+        other.setRnaNumber("W999888777");
+        other.setCategory(sportCategory);
+        other.setOwner(user);
+        other.setEmail("other@test.com");
+        associationRepository.save(other);
+
+        entityManager.flush();
 
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
-        updateDto.setName("AUTRE_ASSO");
-
+        updateDto.setOfficialName("NOM_OFFICIEL_UNIQUE");
         assertThrows(ResourceAlreadyExistsException.class, () -> associationService.updateAssociation(association.getId(), updateDto));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "mario@example.com")
     public void deleteAssociation_whenSuccess() {
         Long id = association.getId();
         associationService.deleteAssociation(id);

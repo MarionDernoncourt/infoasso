@@ -1,5 +1,6 @@
 package com.infoasso.api.dto.user;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,4 +23,7 @@ public class UserCreateDto {
             message = "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre."
     )
     private String password;
+
+    @AssertTrue(message = "Vous devez accepter le traitement de vos données (RGPD) pour vous inscrire.")
+    private boolean gdprConsent;
 }

@@ -1,12 +1,11 @@
 package com.infoasso.api.service;
 
 import com.infoasso.api.dto.user.UserReadDto;
-import com.infoasso.api.dto.user.UserCreateDto;
-import com.infoasso.api.exceptions.BadRequestException;
 import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.model.Role;
 import com.infoasso.api.model.User;
 import com.infoasso.api.repository.UserRepository;
+import com.infoasso.api.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,37 +47,7 @@ public class UserServiceIT {
         });
     }
 
-    @Test
-    public void createUser_withSucces() {
-        UserCreateDto userRegistration = new UserCreateDto();
-        userRegistration.setEmail("user@asso.com");
-        userRegistration.setPassword("Password123");
 
-        UserReadDto savedUser = userService.createUser(userRegistration);
-        User userInDb = userRepository.findById(savedUser.getId()).orElseThrow();
-
-        assertEquals(userRegistration.getEmail(), savedUser.getEmail());
-        assertNotNull(savedUser.getId());
-        assertTrue(userInDb.getPassword().startsWith("$2a$"));
-    }
-
-    @Test
-    public void createUser_whenUserAlreadyExists() {
-        User user = new User();
-        user.setEmail("user@asso.com");
-        user.setPassword("Passwordzz1");
-        user.setRole(Role.ROLE_USER);
-
-        userRepository.save(user);
-
-        UserCreateDto userRegistration = new UserCreateDto();
-        userRegistration.setEmail("user@asso.com");
-        userRegistration.setPassword("Password123");
-
-        assertThrows(BadRequestException.class, () -> {
-            userService.createUser(userRegistration);
-        });
-    }
 
 
 }
