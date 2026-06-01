@@ -113,6 +113,42 @@ public class ScheduleServiceIT {
     }
 
     @Test
+    public void findById_whenSuccess() {
+        Long associationId = association.getId();
+        Long scheduleId = schedule.getId();
+
+        // Exécution du vrai service connecté à la BDD de test
+        ScheduleReadDto foundSchedule = scheduleService.findById(associationId, scheduleId);
+
+        // Assertions
+        assertEquals(scheduleId, foundSchedule.getId());
+        assertEquals("Baby football", foundSchedule.getActivityName());
+        assertEquals(DayOfWeek.MONDAY, foundSchedule.getDayOfWeek());
+    }
+
+    @Test
+    public void findById_whenAssociationNotFound_shouldThrowNotFound() {
+        Long invalidAssociationId = 999L; // Cet ID n'existe pas en BDD
+        Long scheduleId = schedule.getId();
+
+        // On vérifie que la validation de l'association bloque bien la requête
+        assertThrows(RessourceNotFoundException.class, () -> {
+            scheduleService.findById(invalidAssociationId, scheduleId);
+        });
+    }
+
+    @Test
+    public void findById_whenScheduleNotFound_shouldThrowNotFound() {
+        Long associationId = association.getId();
+        Long invalidScheduleId = 999L; // Ce schedule n'existe pas en BDD
+
+        // On vérifie que le .orElseThrow() du Repository fait bien son job
+        assertThrows(RessourceNotFoundException.class, () -> {
+            scheduleService.findById(associationId, invalidScheduleId);
+        });
+    }
+
+    @Test
     public void createSchedule_whenSuccess() {
         ScheduleCreateDto scheduleCreateDto = new ScheduleCreateDto();
         {

@@ -54,6 +54,21 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
     @Override
+    public ScheduleReadDto findById(Long associationId, Long scheduleId) {
+        logger.info("Searching for schedule with id {} for association with id {}", scheduleId, associationId);
+
+        // Vérification si association existe
+        if (!getAssociationValidated(associationId)) {
+            throw new RessourceNotFoundException("Association", associationId);
+        }
+        // Récupération du schedule
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RessourceNotFoundException("Association", scheduleId));
+
+        return mapToReadDto(schedule);
+    }
+
+    @Override
     @Transactional
     public ScheduleReadDto createSchedule(Long associationId, ScheduleCreateDto scheduleCreateDto) {
         logger.info("Creating schedule for association id {}", associationId);
@@ -89,7 +104,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     public void deleteSchedule(Long scheduleId) {
-logger.info("Trying to delete schedule with id {}", scheduleId);
+        logger.info("Trying to delete schedule with id {}", scheduleId);
 
         // 1. Vérification si schedule existe
         Schedule schedule = scheduleRepository.findById(scheduleId)

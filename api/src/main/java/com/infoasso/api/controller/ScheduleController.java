@@ -42,6 +42,14 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(schedules);
     }
 
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity<ScheduleReadDto> findById(@PathVariable Long id, @PathVariable Long scheduleId) {
+        logger.info("GET : / : Request received for the schedule with id {} for the association with {}", scheduleId, id);
+        ScheduleReadDto  schedule = scheduleService.findById(id, scheduleId);
+        logger.info("GET / : Response 200 OK for schedule with id {} for the association with {}", scheduleId, id);
+        return ResponseEntity.status(HttpStatus.OK).body(schedule);
+    }
+
     @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ScheduleReadDto> createSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleCreateDto scheduleCreateDto) {
@@ -53,7 +61,7 @@ public class ScheduleController {
 
     @PutMapping("/{scheduleId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
+    public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long id, @PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
         logger.info("PUT: / : Request received for update schedule with id " + scheduleId);
         ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(scheduleId, scheduleUpdateDto);
         logger.info("PUT : / : Response 200 OK : Schedule updated with id " + updatedSchedule.getId());
@@ -62,7 +70,7 @@ public class ScheduleController {
 
     @DeleteMapping("/{scheduleId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId) {
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @PathVariable Long scheduleId) {
         logger.info("DELETE: / : Request received to delete schedule with id " + scheduleId);
         scheduleService.deleteSchedule(scheduleId);
         logger.info("DELETE : / : Response 204 NO CONTENT");
