@@ -1,5 +1,7 @@
 package com.infoasso.api.service;
 
+import com.infoasso.api.dto.auth.JwtResponseDto;
+import com.infoasso.api.dto.auth.LoginRequestDto;
 import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.dto.user.UserReadDto;
 import org.springframework.stereotype.Service;
@@ -9,4 +11,5 @@ public interface IAuthService {
 
     UserReadDto createUser(UserCreateDto user);
 
+    JwtResponseDto login (LoginRequestDto loginRequest);
 }

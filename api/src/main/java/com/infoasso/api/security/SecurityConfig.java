@@ -55,11 +55,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll() // Doit matcher EXACTEMENT ton Controller
 
-                        // 2. Lecture publique
+                        //2. Swagger et OpenAPI
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                        // 3. Lecture publique
                         .requestMatchers(HttpMethod.GET, "/api/associations/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schedules/**").permitAll()
-                        // 3. Authentification obligatoire pour TOUT LE RESTE (POST, PUT, DELETE)
+
+                        // 4. Authentification obligatoire pour TOUT LE RESTE (POST, PUT, DELETE)
                         .anyRequest().authenticated()
                 );
         // Ajout du filtre JWT -> passage dans le filtre avant le le UsernamePasswordAuthenticationFilter
