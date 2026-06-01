@@ -1,5 +1,7 @@
 package com.infoasso.api.controller;
 
+import com.infoasso.api.dto.auth.JwtResponseDto;
+import com.infoasso.api.dto.auth.LoginRequestDto;
 import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.dto.user.UserReadDto;
 import com.infoasso.api.service.IAuthService;
@@ -27,9 +29,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserReadDto> createUser(@Valid @RequestBody UserCreateDto user) {
-        logger.info("POST /api/user : Request received for user : {}",  user.getEmail());
+        logger.info("POST /api/auth/register : Request received for user : {}",  user.getEmail());
         UserReadDto newUser = authService.createUser(user);
         logger.info(" Response received : 201 CREATED : The user {} has been created", newUser.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponseDto> login (@Valid @RequestBody LoginRequestDto loginRequestDto) {
+        logger.info("POST /api/auth/login : Request received for user : {}", loginRequestDto.getEmail());
+        JwtResponseDto jwtResponseDto = authService.login(loginRequestDto);
+        logger.info("Response received : 200 OK : The user {} is logged in", jwtResponseDto.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(jwtResponseDto);
+    }
+
 }
