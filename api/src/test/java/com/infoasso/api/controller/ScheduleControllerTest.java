@@ -97,6 +97,61 @@ public class ScheduleControllerTest {
                 .andExpect(jsonPath("$.message").exists());
     }
 
+
+    @Test
+    @WithMockUser
+    public void findById_whenSuccess_shouldReturn200() throws Exception {
+        // Mock : le service prend l'id de l'asso (1L) et l'id du schedule (1L)
+        when(scheduleService.findById(eq(1L), eq(1L))).thenReturn(schedule);
+
+        mockMvc.perform(get("/api/associations/1/schedules/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.activityName").value("Baby football"))
+                .andExpect(jsonPath("$.association.id").value(1L));
+
+        verify(scheduleService, times(1)).findById(1L, 1L);
+    }
+
+    @Test
+    @WithMockUser
+    public void findById_whenScheduleNotFound_shouldReturn404() throws Exception {
+        // Mock : simulation de la 404 si le schedule 999 n'existe pas
+        when(scheduleService.findById(eq(1L), eq(999L)))
+                .thenThrow(new RessourceNotFoundException("Schedule", 999L));
+
+        mockMvc.perform(get("/api/associations/1/schedules/999"))
+                .andExpect(status().isNotFound())
+                // Si ton GlobalExceptionHandler renvoie un objet avec le message d'erreur
+                .andExpect(jsonPath("$.message").exists());
+
+        verify(scheduleService, times(1)).findById(1L, 999L);
+    }
+
+    @Test
+    @WithMockUser
+    public void findById_whenAssociationNotFound_shouldReturn404() throws Exception {
+        // Mock : l'association 99L n'existe pas
+        when(scheduleService.findById(eq(99L), eq(1L)))
+                .thenThrow(new RessourceNotFoundException("Association", 99L));
+
+        mockMvc.perform(get("/api/associations/99/schedules/1"))
+                .andExpect(status().isNotFound());
+
+        verify(scheduleService, times(1)).findById(99L, 1L);
+    }
+
+    @Test
+    @WithMockUser
+    public void findById_whenUnexpectedRuntimeException_shouldReturn500() throws Exception {
+        // Mock : On simule un crash imprévu du code (ex: BDD inaccessible, NullPointerException...)
+        when(scheduleService.findById(anyLong(), anyLong()))
+                .thenThrow(new RuntimeException("Erreur critique imprévue de la base de données"));
+
+        mockMvc.perform(get("/api/associations/1/schedules/1"))
+                .andExpect(status().isInternalServerError()); // Vérifie que le statut HTTP est bien 500
+    }
+
     @Test
     @WithMockUser
     public void findAll_whenNoResults_shouldReturnEmptyList() throws Exception {
