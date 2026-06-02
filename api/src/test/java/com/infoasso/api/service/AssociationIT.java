@@ -5,7 +5,7 @@ import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.*;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
@@ -112,7 +112,7 @@ public class AssociationIT {
     @Test
     @WithMockUser
     public void findById_whenNotFound() {
-        assertThrows(RessourceNotFoundException.class, () -> associationService.findById(999L));
+        assertThrows(ResourceNotFoundException.class, () -> associationService.findById(999L));
     }
 
 

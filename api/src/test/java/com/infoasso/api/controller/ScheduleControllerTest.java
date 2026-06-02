@@ -5,7 +5,7 @@ import com.infoasso.api.dto.association.AssociationSummaryDto;
 import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.DayOfWeek;
 import com.infoasso.api.service.impl.ScheduleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,7 +87,7 @@ public class ScheduleControllerTest {
     @Test
     @WithMockUser
     public void findAll_whenAssociationNotFound() throws Exception {
-        when(scheduleService.findAll(any(Long.class), any(Integer.class), any(DayOfWeek.class), any(LocalTime.class))).thenThrow(new RessourceNotFoundException("Association", 1L));
+        when(scheduleService.findAll(any(Long.class), any(Integer.class), any(DayOfWeek.class), any(LocalTime.class))).thenThrow(new ResourceNotFoundException("Association", 1L));
 
         mockMvc.perform(get("/api/associations/1/schedules")
                         .param("age", "4")
@@ -118,7 +118,7 @@ public class ScheduleControllerTest {
     public void findById_whenScheduleNotFound_shouldReturn404() throws Exception {
         // Mock : simulation de la 404 si le schedule 999 n'existe pas
         when(scheduleService.findById(eq(1L), eq(999L)))
-                .thenThrow(new RessourceNotFoundException("Schedule", 999L));
+                .thenThrow(new ResourceNotFoundException("Schedule", 999L));
 
         mockMvc.perform(get("/api/associations/1/schedules/999"))
                 .andExpect(status().isNotFound())
@@ -133,7 +133,7 @@ public class ScheduleControllerTest {
     public void findById_whenAssociationNotFound_shouldReturn404() throws Exception {
         // Mock : l'association 99L n'existe pas
         when(scheduleService.findById(eq(99L), eq(1L)))
-                .thenThrow(new RessourceNotFoundException("Association", 99L));
+                .thenThrow(new ResourceNotFoundException("Association", 99L));
 
         mockMvc.perform(get("/api/associations/99/schedules/1"))
                 .andExpect(status().isNotFound());
@@ -285,7 +285,7 @@ public class ScheduleControllerTest {
     @Test
     @WithMockUser
     public void deleteSchedule_whenScheduleNotFound() throws Exception {
-        doThrow(new RessourceNotFoundException("Schedule", 999L)).when(scheduleService).deleteSchedule(999L);
+        doThrow(new ResourceNotFoundException("Schedule", 999L)).when(scheduleService).deleteSchedule(999L);
 
         mockMvc.perform(delete("/api/associations/1/schedules/999").with(csrf()))
                 .andExpect(status().isNotFound());

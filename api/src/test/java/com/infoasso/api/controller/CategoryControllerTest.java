@@ -7,7 +7,7 @@ import com.infoasso.api.dto.category.CategoryReadDto;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.service.ICategoryService;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +83,7 @@ public class CategoryControllerTest {
     @Test
     @WithMockUser
     public void findById_shouldReturn404NotFound() throws Exception {
-        when(categoryService.findById(any(Long.class))).thenThrow(new RessourceNotFoundException("Categorie non trouvée", 3L));
+        when(categoryService.findById(any(Long.class))).thenThrow(new ResourceNotFoundException("Categorie non trouvée", 3L));
         mockMvc.perform(get("/api/category/3"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").exists());

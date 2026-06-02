@@ -1,6 +1,5 @@
 package com.infoasso.api.security.services;
 
-import com.infoasso.api.exceptions.RessourceNotFoundException;
 import com.infoasso.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

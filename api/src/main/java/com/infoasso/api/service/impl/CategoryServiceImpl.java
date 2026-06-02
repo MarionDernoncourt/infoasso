@@ -2,7 +2,7 @@ package com.infoasso.api.service.impl;
 
 import com.infoasso.api.dto.category.CategoryCreateDto;
 import com.infoasso.api.dto.category.CategoryReadDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Category;
 import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.service.ICategoryService;
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements ICategoryService {
     public CategoryReadDto findById(Long id) {
         logger.info("Searching for category with id " + id);
         Category category = categoryRepository.findById(id).orElseThrow(() ->
-                new RessourceNotFoundException("Category", id));
+                new ResourceNotFoundException("Category", id));
         logger.info("Found category with id " + id);
         return mapToDto(category);
     }

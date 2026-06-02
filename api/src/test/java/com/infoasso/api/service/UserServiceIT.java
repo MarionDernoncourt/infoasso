@@ -1,7 +1,7 @@
 package com.infoasso.api.service;
 
 import com.infoasso.api.dto.user.UserReadDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Role;
 import com.infoasso.api.model.User;
 import com.infoasso.api.repository.UserRepository;
@@ -42,7 +42,7 @@ public class UserServiceIT {
 
     @Test
     public void getUserById_whenUserDoesNotExist() {
-        assertThrows(RessourceNotFoundException.class, () -> {
+        assertThrows(ResourceNotFoundException.class, () -> {
             userService.findUserById(254L);
         });
     }

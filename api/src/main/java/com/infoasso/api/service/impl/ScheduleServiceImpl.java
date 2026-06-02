@@ -5,7 +5,7 @@ import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.DayOfWeek;
 import com.infoasso.api.model.Schedule;
@@ -40,7 +40,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // Verification si association existe
         if (!getAssociationValidated(associationId)) {
-            throw new RessourceNotFoundException("Association", associationId);
+            throw new ResourceNotFoundException("Association", associationId);
         }
 
         // Récupération des schedule
@@ -59,11 +59,11 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // Vérification si association existe
         if (!getAssociationValidated(associationId)) {
-            throw new RessourceNotFoundException("Association", associationId);
+            throw new ResourceNotFoundException("Association", associationId);
         }
         // Récupération du schedule
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", scheduleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
 
         return mapToReadDto(schedule);
     }
@@ -75,7 +75,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // 1. Verification existence association
         Association association = associationRepository.findById(associationId)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", associationId));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", associationId));
 
         // 2. Verification si Schedule existe dejà
         if (scheduleRepository.existsByAssociationIdAndActivityNameAndDayOfWeekAndStartTime(associationId, scheduleCreateDto.getActivityName(), scheduleCreateDto.getDayOfWeek(), scheduleCreateDto.getStartTime())) {
@@ -94,7 +94,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // 1. Vérification si schedule existe
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", scheduleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
 
         // 2. Mise à jour de l'entité
         Schedule updatedSchedule = scheduleRepository.save(updateEntityFromDto(schedule, scheduleUpdateDto));
@@ -108,7 +108,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // 1. Vérification si schedule existe
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", scheduleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
 
         // 2. Suppression du schedule
         scheduleRepository.delete(schedule);

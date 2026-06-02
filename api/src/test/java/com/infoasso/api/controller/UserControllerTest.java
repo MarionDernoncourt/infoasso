@@ -2,7 +2,7 @@ package com.infoasso.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infoasso.api.dto.user.UserReadDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.security.jwt.AuthEntryPointJwt;
 import com.infoasso.api.security.jwt.JwtUtils;
 import com.infoasso.api.security.services.UserDetailsServiceImpl;
@@ -70,7 +70,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void findUserById_shouldReturn_404NotFound() throws Exception {
-        when(userService.findUserById(any(Long.class))).thenThrow(new RessourceNotFoundException("User", 1L));
+        when(userService.findUserById(any(Long.class))).thenThrow(new ResourceNotFoundException("User", 1L));
 
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isNotFound());
