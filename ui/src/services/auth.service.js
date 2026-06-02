@@ -3,7 +3,7 @@ import apiClient from "./api";
 export default {
   // Connexion de l'utilisateur
   async login(credentials) {
-    //credentials = {username : '...', password: '...' }
+    //credentials = {email : '...', password: '...' }
     const response = await apiClient.post("/auth/login", credentials);
     if (response.data && response.data.token) {
       localStorage.setItem("token", response.data.token);

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,33 +19,33 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(RessourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleRessourceNotFoundException(RessourceNotFoundException e){
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleRessourceNotFoundException(ResourceNotFoundException e){
         logger.info("RESSOURCE NOT FOUND ERROR : {}", e.getMessage());
                return createErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> handleReadableException(HttpMessageNotReadableException ex) {
+    public ResponseEntity<Map<String, Object>> handleReadableException(HttpMessageNotReadableException ex) {
         logger.error("READABLE ERROR: {}", ex.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Map<String, String>> handleBadRequestException(BadRequestException e) {
+    public ResponseEntity<Map<String, Object>> handleBadRequestException(BadRequestException e) {
         logger.info("BAD REQUEST ERROR: {}", e.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-            public ResponseEntity<Map<String, String>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e){
+            public ResponseEntity<Map<String, Object>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e){
         logger.info("RESOURCE ALREADY EXISTS: {}", e.getMessage());
         return createErrorResponse(HttpStatus.CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e){
+    public ResponseEntity<Map<String, Object>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e){
         logger.info("METHOD ARGUMENT TYPE MISMATCH: {}", e.getMessage());
         return createErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
@@ -66,17 +67,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+        @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException e) {
+        logger.info("AUTHENTIFICATION ERROR: {}", e.getMessage());
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect.");
+    }
+
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGlobalException(Exception e) {
+    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception e) {
         logger.error("UNEXPECTED ERROR: {}", e.getMessage());
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
     };
-
-    private ResponseEntity<Map<String, String>> createErrorResponse(HttpStatus status, String message) {
-        Map<String, String> response = new HashMap<>();
+    private ResponseEntity<Map<String, Object>> createErrorResponse(HttpStatus status, String message) {
+        Map<String, Object> response = new HashMap<>();
         response.put("message", message);
-        response.put("status", String.valueOf(status.value()));
+        response.put("status", status.value());
         return ResponseEntity.status(status).body(response);
     }
+
+
 
 }

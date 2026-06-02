@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.security.jwt.AuthEntryPointJwt;
 import com.infoasso.api.security.jwt.JwtUtils;
@@ -89,7 +89,7 @@ public class AssociationControllerTest {
     @Test
     @WithMockUser
     public void findById_shouldReturn_404NotFound() throws Exception {
-        when(associationService.findById(99L)).thenThrow(new RessourceNotFoundException("Association", 99L));
+        when(associationService.findById(99L)).thenThrow(new ResourceNotFoundException("Association", 99L));
 
         mockMvc.perform(get("/api/associations/99"))
                 .andExpect(status().isNotFound());
@@ -153,7 +153,7 @@ public class AssociationControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void deleteAssociation_shouldReturn_404NotFound() throws Exception {
-        doThrow(new RessourceNotFoundException("Association", 10L)).when(associationService).deleteAssociation(10L);
+        doThrow(new ResourceNotFoundException("Association", 10L)).when(associationService).deleteAssociation(10L);
 
         mockMvc.perform(delete("/api/associations/10")
                         .with(csrf()))

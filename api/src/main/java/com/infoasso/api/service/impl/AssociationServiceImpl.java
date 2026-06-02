@@ -4,7 +4,7 @@ import com.infoasso.api.dto.association.AssociationCreateDto;
 import com.infoasso.api.dto.association.AssociationReadDto;
 import com.infoasso.api.dto.association.AssociationUpdateDto;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.Category;
 import com.infoasso.api.model.CategoryType;
@@ -38,7 +38,7 @@ public class AssociationServiceImpl implements IAssociationService {
     public AssociationReadDto findById(Long id) {
         logger.info("Recherche de l'association avec l'ID : {}", id);
         Association association = associationRepository.findById(id)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", id));
         return mapToReadDto(association);
     }
 
@@ -106,7 +106,7 @@ public class AssociationServiceImpl implements IAssociationService {
         logger.info("Mise à jour de l'association ID : {}", id);
 
         Association association = associationRepository.findById(id)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", id));
 // Vérification du nom officiel
         if (dto.getOfficialName() != null && !dto.getOfficialName().equals(association.getOfficialName())) {
             boolean exists = associationRepository.existsByOfficialNameAndIdNot(dto.getOfficialName(), id);
@@ -134,7 +134,7 @@ public class AssociationServiceImpl implements IAssociationService {
     public void deleteAssociation(Long id) {
         logger.info("Suppression de l'association ID : {}", id);
         Association association = associationRepository.findById(id)
-                .orElseThrow(() -> new RessourceNotFoundException("Association", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Association", id));
         associationRepository.delete(association);
     }
 

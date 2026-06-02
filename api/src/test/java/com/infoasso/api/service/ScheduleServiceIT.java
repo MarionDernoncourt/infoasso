@@ -4,7 +4,7 @@ import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.*;
 import com.infoasso.api.repository.AssociationRepository;
 import com.infoasso.api.repository.CategoryRepository;
@@ -101,7 +101,7 @@ public class ScheduleServiceIT {
 
     @Test
     public void findAll_associationNotFound() {
-        assertThrows(RessourceNotFoundException.class, () -> scheduleService.findAll(3L, null, null, null));
+        assertThrows(ResourceNotFoundException.class, () -> scheduleService.findAll(3L, null, null, null));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ScheduleServiceIT {
         Long scheduleId = schedule.getId();
 
         // On vérifie que la validation de l'association bloque bien la requête
-        assertThrows(RessourceNotFoundException.class, () -> {
+        assertThrows(ResourceNotFoundException.class, () -> {
             scheduleService.findById(invalidAssociationId, scheduleId);
         });
     }
@@ -143,7 +143,7 @@ public class ScheduleServiceIT {
         Long invalidScheduleId = 999L; // Ce schedule n'existe pas en BDD
 
         // On vérifie que le .orElseThrow() du Repository fait bien son job
-        assertThrows(RessourceNotFoundException.class, () -> {
+        assertThrows(ResourceNotFoundException.class, () -> {
             scheduleService.findById(associationId, invalidScheduleId);
         });
     }
@@ -193,7 +193,7 @@ public class ScheduleServiceIT {
 
     @Test
     public void updateSchedule_whenScheduleNotFound_shouldThrowNotFound() {
-        assertThrows(RessourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, any(ScheduleUpdateDto.class)));
+        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, any(ScheduleUpdateDto.class)));
     }
 
     @Test

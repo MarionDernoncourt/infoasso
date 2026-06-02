@@ -2,7 +2,7 @@ package com.infoasso.api.service;
 
 import com.infoasso.api.dto.category.CategoryCreateDto;
 import com.infoasso.api.dto.category.CategoryReadDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Category;
 import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.repository.CategoryRepository;
@@ -59,7 +59,7 @@ public class CategoryServiceIT {
 
     @Test
     public void findById_whenNotFound() {
-        assertThrows(RessourceNotFoundException.class, () -> categoryService.findById(999L));
+        assertThrows(ResourceNotFoundException.class, () -> categoryService.findById(999L));
     }
 
     @Test

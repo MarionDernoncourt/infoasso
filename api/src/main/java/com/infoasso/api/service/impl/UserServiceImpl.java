@@ -1,7 +1,7 @@
 package com.infoasso.api.service.impl;
 
 import com.infoasso.api.dto.user.UserReadDto;
-import com.infoasso.api.exceptions.RessourceNotFoundException;
+import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.User;
 import com.infoasso.api.repository.UserRepository;
 import com.infoasso.api.service.IUserService;
@@ -26,7 +26,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserReadDto findUserById(Long id) {
         logger.info("Finding user by id {}", id);
-        User user = userRepository.findById(id).orElseThrow(() -> new RessourceNotFoundException("User", id));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", id));
         logger.info("User found {}", user.getEmail());
         return mapToUserDTO(user);
     }
