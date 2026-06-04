@@ -58,8 +58,10 @@ const fieldErrors = ref({});
 const isLoading = ref(false);
 
 const login = async () => {
+  isLoading.value = true;
+  fieldErrors.value = {};
   try {
-    await authService.login(credentials.value)
+    await authService.login(credentials.value);
     router.push("/dashboard")
   } catch (error) {
     console.error("Erreur de connexion", error)
@@ -139,8 +141,8 @@ form {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.2rem;
   width: 100%;
+  margin-bottom: 0;
 }
 
 input {
@@ -188,14 +190,7 @@ a:hover {
   width: 100%;
   margin-bottom: 1.2rem; }
 
-.form-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-  margin-bottom: 0;
-}
+
 
 .error-text {
   color: #de4747;
