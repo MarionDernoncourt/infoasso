@@ -7,7 +7,11 @@ export default {
     const response = await apiClient.post("/auth/login", credentials);
     if (response.data && response.data.token) {
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user_id", response.data.id);
+      localStorage.setItem("user_email", response.data.email);
+      localStorage.setItem("user_role", response.data.role);
     }
+
     return response.data;
   },
 

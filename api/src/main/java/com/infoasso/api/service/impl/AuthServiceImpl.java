@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements IAuthService {
@@ -54,6 +56,7 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional
     public JwtResponseDto login(LoginRequestDto loginRequest) {
         logger.info("Login request for {}", loginRequest.getEmail());
 
@@ -71,6 +74,10 @@ public class AuthServiceImpl implements IAuthService {
         // 4. Récupération de l'entité User
         User user = (User) authentication.getPrincipal();
 
+        // 5. Mise a jour last login
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+        logger.info("Last login updated for user {}", user.getEmail());
         // Récupération du rôtel sous forme de String
         String roleName = user.getRole().name();
 
