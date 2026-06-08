@@ -19,6 +19,8 @@ public class AssociationCreateDto {
     @Pattern(regexp = "^W\\d{9}$", message = "Le format du RNA est invalide (ex: W123456789)")
     private String rnaNumber;
 
+    private String officialName;
+
     @NotBlank(message = "Le nom d'usage (ex: Club de Foot de Loos) est obligatoire.")
     private String displayName;
 

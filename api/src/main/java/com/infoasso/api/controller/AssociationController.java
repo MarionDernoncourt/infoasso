@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class AssociationController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AssociationReadDto> createAssociation(@Valid @RequestBody AssociationCreateDto association) {
         logger.info("POST / : Request received to create {}", association.getDisplayName());
         AssociationReadDto associationCreated = associationService.createAssociation(association);
@@ -55,7 +56,7 @@ public class AssociationController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AssociationReadDto> updateAssociation(@PathVariable Long id, @Valid @RequestBody AssociationUpdateDto association) {
         logger.info("PUT / {} : Request received to update {}", id, association.getOfficialName());
         AssociationReadDto associationUpdated = associationService.updateAssociation(id, association);
@@ -64,12 +65,29 @@ public class AssociationController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteAssociation(@PathVariable Long id) {
         logger.info("DELETE / {} : Request received to delete {}", id, id);
         associationService.deleteAssociation(id);
         logger.info("DELETE / {} : Response 204 No Content", id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/my-associations")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<AssociationReadDto>> findAllMyAssociation(Authentication auth) {
+        logger.info("GET /my-associations : Request received to get all associations for user {}",auth.getName());
+        String userEmail = auth.getName();
+
+        List<AssociationReadDto> associations = associationService.findAllAssociationsByUserEmail(userEmail);
+
+        if(associations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        logger.info("GET /my associations : Response 200 OK — Found {} association(s)", associations.size());
+        return ResponseEntity.status(HttpStatus.OK).body(associations);
+
+    }
+
 
 }

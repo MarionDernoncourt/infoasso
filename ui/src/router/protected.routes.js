@@ -5,7 +5,7 @@ export default [
     component: () => import("@/views/protected/DashboardView.vue"),
   },
   {
-    path: "/assocation/create",
+    path: "/association/create",
     name: "create-asso",
     component: () => import("@/views/protected/CreateAssoView.vue"),
   },

@@ -78,13 +78,10 @@ public class AssociationServiceImpl implements IAssociationService {
         User owner = userRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new RuntimeException("Utilisateur connecté non trouvé en base."));
 
-        // 3. Appeler le service RNA pour récupérer les données officielles (officialName, etc.)
-        var rnaData = rnaService.getAssociationData(dto.getRnaNumber());
-
-        // 4. Préparer l'entité
+              // 4. Préparer l'entité
         Association asso = new Association();
         asso.setRnaNumber(dto.getRnaNumber());
-        asso.setOfficialName(rnaData.get("nom")); // Nom de la préfecture
+        asso.setOfficialName(dto.getOfficialName());
         asso.setDisplayName(dto.getDisplayName()); // Nom personnalisé (ex: "Club Hockey Loos")
         asso.setDescription(dto.getDescription());
         asso.setEmail(dto.getEmail());
@@ -136,6 +133,19 @@ public class AssociationServiceImpl implements IAssociationService {
         Association association = associationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Association", id));
         associationRepository.delete(association);
+    }
+
+    @Override
+    public List<AssociationReadDto> findAllAssociationsByUserEmail(String email) {
+        logger.info("Récupération de la liste des associations du user {}", email);
+
+        // 1. Récupération de TOUTES les assos de l'utilisateur
+        List<Association> associations = associationRepository.findByOwnerEmail(email);
+
+        // 2. Transformation en DTOs
+        return associations.stream()
+                .map(this::mapToReadDto)
+                .toList();
     }
 
     // --- HELPER METHODS ---

@@ -11,6 +11,11 @@ export default {
     const response = await apiClient.get(`/associations/${id}`);
     return response.data;
   },
+  // Récupération des associations de l'utilisateur connecté
+  async getMyAssociations() {
+    const response = await apiClient.get("associations/my-associations");
+    return response.data;
+  },
   // Création d'une association
   async create(assoData) {
     const response = await apiClient.post("/associations", assoData);
