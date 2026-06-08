@@ -69,6 +69,7 @@ public class AssociationIT {
 
         association = new Association();
         association.setRnaNumber("W123456789");
+        association.setOfficialName("Hockey Club Loos");
         association.setDisplayName("test");
         association.setOfficialName("CLUB DE HOCKEY LOOS ASSOCIATION");
         association.setDescription("description association");
@@ -77,7 +78,7 @@ public class AssociationIT {
         association.setOwner(user);
 
         Map<String, String> mockRnaData = new HashMap<>();
-        mockRnaData.put("nom", "ASSOCIATION TEST OFFICIELLE");
+        mockRnaData.put("officialName", "ASSOCIATION TEST OFFICIELLE");
         mockRnaData.put("objet", "Description générique pour les tests");
         mockRnaData.put("adrs_numvoie", "10");
         mockRnaData.put("adrs_typevoie", "RUE");
@@ -121,6 +122,7 @@ public class AssociationIT {
     public void createAssociation_whenSuccess() {
         AssociationCreateDto dto = new AssociationCreateDto();
         dto.setRnaNumber("W000000001");
+        dto.setOfficialName("test Club Loos");
         dto.setDisplayName("assoToCreate");
         dto.setDescription("test creating association");
         dto.setEmail("created@asso.com");
@@ -142,6 +144,7 @@ public class AssociationIT {
 
         AssociationCreateDto dto = new AssociationCreateDto();
         dto.setRnaNumber("W123456790");
+        dto.setOfficialName("Autre Club Loos");
         dto.setDisplayName("Une Autre Asso");
         dto.setDescription("Description");
         dto.setEmail("another@mail.com");
