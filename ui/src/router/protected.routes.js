@@ -9,4 +9,9 @@ export default [
     name: "create-asso",
     component: () => import("@/views/protected/CreateAssoView.vue"),
   },
+  {
+    path: "/association/update/:id",
+    name: "update-asso",
+    component: () => import("@/views/protected/UpdateView.vue"),
+  },
 ];
