@@ -67,7 +67,8 @@ public class AssociationServiceImpl implements IAssociationService {
     @Transactional
     public AssociationReadDto createAssociation(AssociationCreateDto dto) {
         logger.info("Début création association pour le RNA : {}", dto.getRnaNumber());
-
+        logger.info("DTO reçu du Front : streetAddress={}, zipCode={}, city={}",
+                dto.getStreetAddress(), dto.getZipCode(), dto.getCity());
         // 1. Vérifier si l'association n'existe pas déjà (par numéro RNA)
         if (associationRepository.existsByRnaNumber(dto.getRnaNumber())) {
             throw new ResourceAlreadyExistsException("L'association avec le RNA " + dto.getRnaNumber() + " existe déjà en base.");
@@ -86,6 +87,10 @@ public class AssociationServiceImpl implements IAssociationService {
         asso.setDescription(dto.getDescription());
         asso.setEmail(dto.getEmail());
         asso.setOwner(owner);
+        asso.setStreetAddress(dto.getStreetAddress());
+        asso.setZipCode(dto.getZipCode());
+        asso.setCity(dto.getCity());
+        asso.setPhoneNumber(dto.getPhoneNumber());
 
         // 5. Gérer la catégorie
         Category category = getOrCreateCategoryEntity(dto.getCategoryLabel(), dto.getCategoryType());
@@ -158,10 +163,17 @@ public class AssociationServiceImpl implements IAssociationService {
         dto.setDisplayName(association.getDisplayName());
         dto.setDescription(association.getDescription());
         dto.setEmail(association.getEmail());
+        dto.setStreetAddress(association.getStreetAddress());
+        dto.setZipCode(association.getZipCode());
+        dto.setCity(association.getCity());
+        dto.setPhoneNumber(association.getPhoneNumber());
+    dto.setWebsite(association.getWebsite());
 
         if (association.getCategory() != null) {
+            dto.setCategoryType(association.getCategory().getType());
             dto.setCategoryLabel(association.getCategory().getLabel());
         }
+
         if (association.getOwner() != null) {
             dto.setOwnerEmail(association.getOwner().getEmail());
         }

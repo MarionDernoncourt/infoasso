@@ -43,18 +43,18 @@
               <span class="category-badge">
                 🏷️ {{ selectedAsso?.category?.name || 'Association' }}
               </span>
-              <p class="asso-official-name">Nom officiel: {{ selectedAsso?.officialName }}</p>
+              <p class="asso-official-name">Nom officiel : {{ selectedAsso?.officialName }}</p>
               <p class="asso-rna">RNA : {{ selectedAsso?.rnaNumber }}</p>
             </div>
           </div>
 
           <hr class="divider">
           <div class="asso-details">
-            <p><strong>Adresse :</strong>{{ selectedAsso?.streetAddress }}, {{ selectedAsso?.zipCode }}, {{
+            <p><strong>Adresse : </strong>{{ selectedAsso?.streetAddress }} {{ selectedAsso?.zipCode }} {{
               selectedAsso?.city }}</p>
             <p><strong>Téléphone :</strong> {{ selectedAsso?.phoneNumber || 'Non renseigné' }}</p>
-            <p><strong>Email public :</strong> {{ selectedAsso?.email }}</p>
-            <p v-if="selectedAsso?.website"><strong>Site web :</strong><a :href="selectedAsso.website"
+            <p><strong>Email public : </strong> {{ selectedAsso?.email }}</p>
+            <p v-if="selectedAsso?.website"><strong>Site web : </strong><a :href="selectedAsso.website"
                 target="_blank">{{ selectedAsso?.website }}</a></p>
             <p class="asso-description"><strong>Description :</strong>{{ selectedAsso?.description || "Aucune description pour le moment."}}</p>
           </div>
