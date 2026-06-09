@@ -1,6 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit" class="asso-form">
-<h2 class="form-title">{{ formTitle }}</h2>
+    <h2 class="form-title">{{ formTitle }}</h2>
+
     <div class="form-section">
       <h3>🏢 Identité de la structure</h3>
 
@@ -8,7 +9,8 @@
         <div class="form-group">
           <label for="rnaNumber">Numéro RNA (WXXXXXXXXX) *</label>
           <div class="rna-input-group">
-            <input type="text" id="rnaNumber" v-model="formData.rnaNumber" required placeholder="Ex: W123456789" :class="{'input-error': errors.rnaNumber}">
+            <input type="text" id="rnaNumber" v-model="formData.rnaNumber" required placeholder="Ex: W123456789"
+              :class="{ 'input-error': errors.rnaNumber }">
             <button type="button" class="verify-btn" @click="checkRNA" :disabled="isCheckingRNA || !formData.rnaNumber">
               {{ isCheckingRNA ? '...' : '🔍 Vérifier' }}
             </button>
@@ -25,38 +27,33 @@
         </div>
       </div>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="displayName">Nom d'usage (affiché sur le site) *</label>
-          <input type="text" id="displayName" v-model="formData.displayName" required
-            placeholder="Ex: Basket Club Loos" :class="{'input-error' : errors.displayName}">
-          <p v-if="errors.displayName" class="error-text">{{ errors.displayName }}</p>
-        </div>
+      <div class="form-group">
+        <label for="displayName">Nom d'usage (affiché sur le site) *</label>
+        <input type="text" id="displayName" v-model="formData.displayName" required placeholder="Ex: Basket Club Loos"
+          :class="{ 'input-error': errors.displayName }">
+        <p v-if="errors.displayName" class="error-text">{{ errors.displayName }}</p>
       </div>
 
       <div class="form-grid">
         <div class="form-group">
-          <label for="category">Catégorie d'activité *</label>
-          <select id="category" v-model="formData.categoryId" required :class="{'input-error' : errors.categoryType}">
-            <option value="" disabled>Sélectionnez une catégorie</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-              {{ cat.label }}
+          <label for="categoryType">Secteur d'activité</label>
+          <select id="categoryType" v-model="formData.categoryType" @change="handleTypeChange" required>
+            <option value="" disabled>-- Choisissez un secteur --</option>
+            <option v-for="type in categoryTypes" :key="type" :value="type">
+              {{ type }}
             </option>
           </select>
-          <p v-if="errors.categoryType" class="error-text">{{ errors.categoryType }}</p>
         </div>
 
         <div class="form-group">
-          <label for="categoryLabel">Précision de l'activité (ex: Football, Théâtre) *</label>
-          <input
-            type="text"
-            id="categoryLabel"
-            v-model="formData.categoryLabel"
-            required
-            placeholder="Ex: Football"
-            :class="{'input-error' : errors.categoryLabel}"
-          >
-          <p v-if="errors.categoryLabel" class="error-text">{{ errors.categoryLabel }}</p>
+          <label for="categoryLabel">Activité spécifique (ex: Football, Chorale...)</label>
+          <input type="text" id="categoryLabel" v-model="formData.categoryLabel" list="category-suggestions"
+            @input="fetchSuggestions" :disabled="!formData.categoryType" placeholder="Tapez pour chercher ou ajouter..."
+            required />
+
+          <datalist id="category-suggestions">
+            <option v-for="suggestion in labelSuggestions" :key="suggestion.id" :value="suggestion.label" />
+          </datalist>
         </div>
       </div>
     </div>
@@ -78,7 +75,8 @@
 
         <div class="form-group">
           <label for="city">Ville</label>
-          <input type="text" id="city" v-model="formData.city" placeholder="Ex: Loos" :class="{'input-error' : errors.city}">
+          <input type="text" id="city" v-model="formData.city" placeholder="Ex: Loos"
+            :class="{ 'input-error': errors.city }">
           <p v-if="errors.city" class="error-text">{{ errors.city }}</p>
         </div>
       </div>
@@ -86,14 +84,22 @@
       <div class="form-grid">
         <div class="form-group">
           <label for="email">Email de contact *</label>
-          <input type="email" id="email" v-model="formData.email" required placeholder="Ex: contact@monasso.com" :class="{ 'input-error': errors.email }">
+          <input type="email" id="email" v-model="formData.email" required placeholder="Ex: contact@monasso.com"
+            :class="{ 'input-error': errors.email }">
           <p v-if="errors.email" class="error-text">{{ errors.email }}</p>
         </div>
 
         <div class="form-group">
           <label for="phoneNumber">Numéro de téléphone</label>
-          <input type="tel" id="phoneNumber" v-model="formData.phoneNumber" placeholder="Ex: 03 20 ..." :class="{ 'input-error': errors.phoneNumber }">
+          <input type="tel" id="phoneNumber" v-model="formData.phoneNumber" placeholder="Ex: 03 20 ..."
+            :class="{ 'input-error': errors.phoneNumber }">
           <p v-if="errors.phoneNumber" class="error-text">{{ errors.phoneNumber }}</p>
+        </div>
+
+        <div class="form-group">
+          <label for="website">Website
+            <input type="text" id="website" v-model="formData.website" placeholder="Ex: www.losc.fr"/>
+          </label>
         </div>
       </div>
     </section>
@@ -104,25 +110,24 @@
       <div class="form-group">
         <label for="description">Description de l'association *</label>
         <textarea id="description" v-model="formData.description" rows="4" required
-          placeholder="Présentez votre association, ses valeurs, ses horaires..." :class="{ 'input-error': errors.description }"></textarea>
+          placeholder="Présentez votre association, ses valeurs, ses horaires..."
+          :class="{ 'input-error': errors.description }"></textarea>
       </div>
       <p v-if="errors.description" class="error-text">{{ errors.description }}</p>
     </section>
 
     <div class="form-actions">
       <button type="button" class="cancel-btn" @click="$emit('cancel')">Annuler</button>
-      <button type="submit" class="submit-btn" :disabled="isSubmitting || !rnaSuccess">
+      <button type="submit" class="submit-btn" :disabled="isSubmitting || (!rnaSuccess && !formData.officialName)">
         {{ isSubmitting ? 'Enregistrement...' : submitButtonText }}
       </button>
     </div>
-
   </form>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from "vue";
-import categoryService from '@/services/category.service'
+import categoryService from '@/services/category.service';
 import rnaService from "@/services/rna.service";
 
 // PROPS & EMITS (communication avec les views)
@@ -145,83 +150,115 @@ const props = defineProps({
   },
   formTitle: {
     type: String,
-  default: "Fiche Association"
- }
+    default: "Fiche Association"
+  }
 });
 
 const emit = defineEmits(["submit", "cancel"]);
 
 // VARIABLES REACTIVES
+const categoryTypes = ref([]);
+const labelSuggestions = ref([]);
+
 const formData = ref({
   rnaNumber: "",
   officialName: "",
   displayName: "",
-  categoryId: "",
-  categoryLabel:"",
+  categoryType: "",
+  categoryLabel: "",
   streetAddress: "",
   zipCode: "",
   city: "",
   email: "",
   phoneNumber: "",
   description: "",
+  website:"",
 });
 
 const isCheckingRNA = ref(false);
 const rnaError = ref(false);
 const rnaSuccess = ref(false);
-const categories = ref([]);
+
+// FONCTIONS POUR LES CATÉGORIES
+// 1. Quand on change de secteur, on réinitialise l'activité spécifique
+const handleTypeChange = () => {
+  formData.value.categoryLabel = "";
+  labelSuggestions.value = [];
+};
+
+// 2. Appel à API pour récupérer l'autocomplétion au fil de la saisie
+const fetchSuggestions = async () => {
+  const query = formData.value.categoryLabel.trim();
+  const type = formData.value.categoryType;
+
+  // On évite de surcharger le réseau si la saisie est trop courte
+  if (!query || query.length < 2) {
+    labelSuggestions.value = [];
+    return;
+  }
+
+  try {
+    // Appel de ton service en passant le type ENUM et le début du texte tapé
+    const response = await categoryService.searchCategories(type, query);
+    labelSuggestions.value = response.data; // Stocke la liste [{id, label, type}, ...]
+  } catch (error) {
+    console.error("Erreur lors de la récupération des suggestions :", error);
+  }
+};
 
 onMounted(async () => {
+  // 📡 Récupération des ENUMs pour le Select
+  try {
+    const response = await categoryService.getCategoryTypes();
+    categoryTypes.value = response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des types de catégories : ", error);
+  }
+
+  // 📝 Mode Update
   if (props.initalData) {
     formData.value = { ...props.initalData };
     rnaSuccess.value = true;
   }
-
-  try {
-    const data = await categoryService.getAllCategories();
-    categories.value = data;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des catégories: ", error);
-    categories.value = [{ id: 0, label: "Erreur de chargement" }];
-  }
 });
 
+// LOGIQUE VERIFICATION RNA
 const checkRNA = async () => {
   const rnaNumber = formData.value.rnaNumber.trim();
-  if(!rnaNumber) return;
+  if (!rnaNumber) return;
 
   try {
     isCheckingRNA.value = true;
     rnaError.value = false;
     rnaSuccess.value = false;
 
-   const result = await rnaService.checkRnaNumber(rnaNumber);
+    const result = await rnaService.checkRnaNumber(rnaNumber);
 
-   if(result && result.officialName) {
-    formData.value.officialName = result.officialName;
-    rnaSuccess.value = true;
-   } else {
+    if (result && result.officialName) {
+      formData.value.officialName = result.officialName;
+      rnaSuccess.value = true;
+    } else {
+      rnaError.value = true;
+    }
+  } catch (error) {
+    console.error("Erreur lors de la vérification du RNA : ", error);
     rnaError.value = true;
-   }
-} catch (error) {
-  console.error("Erreur lors de la vérification du RNA : ", error);
-  rnaError.value = true;
-  rnaSuccess.value = false ;
-  formData.value.officialName = "";
-} finally {
-  isCheckingRNA.value = false;
-}
-}
+    rnaSuccess.value = false;
+    formData.value.officialName = "";
+  } finally {
+    isCheckingRNA.value = false;
+  }
+};
 
+// SOUMISSION DU FORMULAIRE
 const handleSubmit = () => {
-  if (!rnaSuccess.value) {
+  if (!rnaSuccess.value && !formData.value.officialName) {
     alert("Veuillez d'abord vérifier votre numéro RNA.");
     return;
   }
   emit("submit", formData.value);
 };
 </script>
-
 
 <style scoped>
 .asso-form {
@@ -296,7 +333,8 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #ff7a59; /* La couleur orange/corail de ta charte */
+  border-color: #ff7a59;
+  /* La couleur orange/corail de ta charte */
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.1);
 }
@@ -317,7 +355,8 @@ textarea:focus {
 
 .verify-btn {
   padding: 0 24px;
-  background-color: #2c1f18; /* Marron foncé/Anthracite chic */
+  background-color: #2c1f18;
+  /* Marron foncé/Anthracite chic */
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -375,7 +414,8 @@ textarea:focus {
 
 .submit-btn {
   padding: 12px 32px;
-  background-color: #ff7a59; /* Bouton principal d'action */
+  background-color: #ff7a59;
+  /* Bouton principal d'action */
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -393,7 +433,10 @@ textarea:focus {
   color: #bcada4;
   cursor: not-allowed;
 }
-input.input-error, select.input-error, textarea.input-error {
+
+input.input-error,
+select.input-error,
+textarea.input-error {
   border-color: #dc3545 !important;
   background-color: #fff8f8 !important;
 }
@@ -404,19 +447,23 @@ input.input-error, select.input-error, textarea.input-error {
   margin: 4px 0 0 0;
   font-weight: 500;
 }
+
 .form-title {
   font-size: 1.6rem;
-  color: #2c1f18; /* Ton marron/anthracite chic */
+  color: #2c1f18;
+  /* Ton marron/anthracite chic */
   margin: 0 0 8px 0;
   font-weight: 700;
-  border-bottom: 2px solid #ff7a59; /* Petite ligne corail en dessous */
+  border-bottom: 2px solid #ff7a59;
+  /* Petite ligne corail en dessous */
   padding-bottom: 12px;
 }
 
 /* --- Responsive (Pour les petits écrans de PC ou tablettes) --- */
 @media (max-width: 768px) {
   .form-grid {
-    grid-template-columns: 1fr; /* On repasse sur une seule colonne */
+    grid-template-columns: 1fr;
+    /* On repasse sur une seule colonne */
     gap: 16px;
   }
 

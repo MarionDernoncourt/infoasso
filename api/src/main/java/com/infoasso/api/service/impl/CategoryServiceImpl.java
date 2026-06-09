@@ -4,6 +4,7 @@ import com.infoasso.api.dto.category.CategoryCreateDto;
 import com.infoasso.api.dto.category.CategoryReadDto;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Category;
+import com.infoasso.api.model.CategoryType;
 import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.service.ICategoryService;
 import org.slf4j.Logger;
@@ -54,6 +55,15 @@ public class CategoryServiceImpl implements ICategoryService {
                     return categoryRepository.save(newCat);
                 });
         return mapToDto(newCategory);
+    }
+
+    @Override
+    public List<CategoryReadDto> searchByLabelAndType(CategoryType type, String query) {
+        logger.info("Autocompletion request for type {} and query {}", type, query);
+
+        List<Category> categories = categoryRepository.findByTypeAndLabelContainingIgnoreCase(type, query);
+
+        return categories.stream().map(this::mapToDto).toList();
     }
 
 
