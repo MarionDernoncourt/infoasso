@@ -91,6 +91,7 @@ public class AssociationServiceImpl implements IAssociationService {
         asso.setZipCode(dto.getZipCode());
         asso.setCity(dto.getCity());
         asso.setPhoneNumber(dto.getPhoneNumber());
+        asso.setWebsite(dto.getWebsite());
 
         // 5. Gérer la catégorie
         Category category = getOrCreateCategoryEntity(dto.getCategoryLabel(), dto.getCategoryType());
@@ -122,6 +123,11 @@ public class AssociationServiceImpl implements IAssociationService {
         if (dto.getDisplayName() != null) association.setDisplayName(dto.getDisplayName());
         if (dto.getDescription() != null) association.setDescription(dto.getDescription());
         if (dto.getEmail() != null) association.setEmail(dto.getEmail());
+        if(dto.getStreetAddress() != null) association.setStreetAddress(dto.getStreetAddress());
+        if(dto.getZipCode() != null) association.setZipCode(dto.getZipCode());
+        if(dto.getCity() != null) association.setCity(dto.getCity());
+        if (dto.getWebsite() != null) association.setWebsite(dto.getWebsite());
+        if (dto.getPhoneNumber() != null) association.setPhoneNumber(dto.getPhoneNumber());
 
         if (dto.getCategoryLabel() != null && dto.getCategoryType() != null) {
             Category category = getOrCreateCategoryEntity(dto.getCategoryLabel(), dto.getCategoryType());
@@ -167,7 +173,7 @@ public class AssociationServiceImpl implements IAssociationService {
         dto.setZipCode(association.getZipCode());
         dto.setCity(association.getCity());
         dto.setPhoneNumber(association.getPhoneNumber());
-    dto.setWebsite(association.getWebsite());
+        dto.setWebsite(association.getWebsite());
 
         if (association.getCategory() != null) {
             dto.setCategoryType(association.getCategory().getType());

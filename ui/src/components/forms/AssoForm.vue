@@ -98,7 +98,7 @@
 
         <div class="form-group">
           <label for="website">Website
-            <input type="text" id="website" v-model="formData.website" placeholder="Ex: www.losc.fr"/>
+            <input type="text" id="website" v-model="formData.website" placeholder="Ex: www.monasso.fr"/>
           </label>
         </div>
       </div>
@@ -132,7 +132,7 @@ import rnaService from "@/services/rna.service";
 
 // PROPS & EMITS (communication avec les views)
 const props = defineProps({
-  initalData: {
+  initialData: {
     type: Object,
     default: () => null
   },
@@ -216,8 +216,8 @@ onMounted(async () => {
   }
 
   // 📝 Mode Update
-  if (props.initalData) {
-    formData.value = { ...props.initalData };
+  if (props.initialData) {
+    formData.value = { ...props.initialData };
     rnaSuccess.value = true;
   }
 });

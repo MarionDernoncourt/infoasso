@@ -35,7 +35,7 @@
         <section class="info-card">
           <div class="card-header">
             <h3>Informations Générales</h3>
-            <button class="edit-btn">Modifier la fiche</button>
+            <button class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la fiche</button>
           </div>
           <div class="card-body">
             <div class="asso-profile">
@@ -84,8 +84,10 @@ import { ref, onMounted } from 'vue';
 import TheHeader from '@/components/layout/TheHeader.vue'
 import TheSidebar from '@/components/layout/TheSidebar.vue';
 import assoService from '@/services/asso.service'
+import { useRouter } from "vue-router"
 
 // STATE REACTIFS //
+const router = useRouter();
 const associationsList = ref([]);
 const selectedAsso = ref(null);
 const hasAssociation = ref(false);
@@ -111,11 +113,24 @@ onMounted(async () => {
   } catch (error) {
     console.error("Erreur lors du chargement du dashboard: ", error);
     hasAssociation.value = false;
+
+    if (error.response && (error.response.status === 401 || (error.response.status === 500 && error.config.url.includes('my-associations')))) {
+    localStorage.clear();
+    router.push('/login');
+  }
+
   } finally {
     isLoading.value = false;
   }
 })
 
+const goToUpdatePage = (id) => {
+  if (!id) {
+    console.error("⚠️ Impossible de rediriger : l'ID de l'association est introuvable !");
+    return;
+  }
+  router.push(`/association/update/${id}`);
+}
 </script>
 
 <style scoped>
