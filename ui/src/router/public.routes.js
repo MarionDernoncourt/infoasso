@@ -15,6 +15,10 @@ export default [
     component: () => import("../views/public/AssoDetailView.vue"),
     props: true,
   },
+  {
+    path: "/association/:id/scheduleView",
+    component: () => import("../views/public/SchedulesView.vue"),
+  },
   // {
   //   path: "/contact",
   //   name: "contact",

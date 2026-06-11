@@ -76,4 +76,11 @@ public class ScheduleController {
         logger.info("DELETE : / : Response 204 NO CONTENT");
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/daysOfWeek")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<DayOfWeek[]> getDaysOfWeek() {
+        logger.info("GET: / : Request received for days of week");
+        return ResponseEntity.ok(DayOfWeek.values());
+    }
 }

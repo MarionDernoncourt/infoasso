@@ -27,4 +27,10 @@ export default {
     const response = await apiClient.delete(`/associations/${assoId}/schedules/${scheduleId}`);
     return response.data;
   },
+
+  // Récupération dayOfWeek
+  async getDaysOfWeek() {
+    const response = apiClient.get("/schedules/dayOfWeek");
+    return response.data;
+  },
 };
