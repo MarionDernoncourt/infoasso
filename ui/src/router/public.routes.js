@@ -15,4 +15,9 @@ export default [
     component: () => import("../views/public/AssoDetailView.vue"),
     props: true,
   },
+  // {
+  //   path: "/contact",
+  //   name: "contact",
+  //   component: () => import("../views/public/ContactView.vue"),
+  // },
 ];

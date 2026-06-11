@@ -9,16 +9,30 @@
       <a href="#" class="menu-item disabled-future">Fil d'actualité <span class="badge-v2">V2</span></a>
       <a href="#" class="menu-item">Mon compte</a>
     </nav>
-<div class="sidebar-footer">
-      <span class="user-email">👤 {{ userEmail || 'Mon Compte' }}</span>
-      <button class="logout-btn" @click="logout">Déconnexion</button>
+
+    <div class="sidebar-footer">
+      <!--  Section Profil & Déconnexion -->
+      <div class="user-section">
+        <span class="user-email">👤 {{ userEmail || 'Mon Compte' }}</span>
+        <button class="logout-btn" @click="logout">Déconnexion</button>
+      </div>
+
+      <!-- séparation discrète -->
+      <hr class="footer-divider" />
+
+      <div class="legal-section">
+        <span class="menu-item disabled-future">
+          Aide & Support
+          <span class="badge-v2">V2</span>
+        </span>
+
+        <p class="copyright">© 2026 Tous droits réservés</p>
+      </div>
     </div>
-
   </aside>
-  </template>
+</template>
 
-
- <script setup>
+<script setup>
 import { useRouter } from "vue-router";
 // 💡 Importe ton vrai service d'authentification (ajuste le chemin si besoin, ex: @/services/auth.service)
 import authService from "@/services/auth.service";
@@ -32,7 +46,7 @@ const router = useRouter();
 const logout = async () => {
   try {
     await authService.logout();
-        router.push("/login");
+    router.push("/login");
   } catch (error) {
     console.error("Erreur lors de la déconnexion :", error);
     localStorage.removeItem("token");
@@ -82,7 +96,8 @@ const logout = async () => {
   text-align: left;
 }
 
-.menu-item:hover, .menu-item.active {
+.menu-item:hover,
+.menu-item.active {
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
 }
@@ -135,5 +150,39 @@ const logout = async () => {
 .logout-btn:hover {
   background: #d9534f;
   border-color: #d9534f;
+}
+
+/* Ligne de séparation optionnelle si tu utilises la balise <hr class="footer-divider"> */
+.footer-divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 5px 0;
+}
+
+/* Le nouveau lien Aide & Support */
+.support-link {
+  display: block;
+  font-size: 0.85rem;
+  color: darksalmon;
+  /* Rappel de ta couleur fétiche */
+  text-decoration: none;
+  text-align: center;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.support-link:hover {
+  color: white;
+  /* Brille au survol */
+  text-decoration: underline;
+}
+
+/* Le petit texte de Copyright */
+.copyright {
+  font-size: 0.75rem;
+  color: #888;
+  /* Un gris discret pour ne pas gêner la lecture */
+  text-align: center;
+  margin: 0;
 }
 </style>
