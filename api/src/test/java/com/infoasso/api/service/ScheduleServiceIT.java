@@ -76,7 +76,7 @@ public class ScheduleServiceIT {
         schedule.setAgeMin(3);
         schedule.setAgeMax(5);
         schedule.setAssociation(this.association);
-        schedule.setDayOfWeek(DayOfWeek.MONDAY);
+        schedule.setDayOfWeek(DayOfWeek.Lundi);
         schedule.setStartTime(LocalTime.of(15, 00));
         schedule.setEndTime(LocalTime.of(15, 30));
         scheduleRepository.save(schedule);
@@ -94,7 +94,7 @@ public class ScheduleServiceIT {
     @Test
     public void findAll_Filters_whenSuccess() {
         Long associationId = association.getId();
-        schedules = scheduleService.findAll(associationId, 3, DayOfWeek.MONDAY, LocalTime.of(15, 00));
+        schedules = scheduleService.findAll(associationId, 3, DayOfWeek.Lundi, LocalTime.of(15, 00));
 
         assertEquals(1, schedules.size());
     }
@@ -107,7 +107,7 @@ public class ScheduleServiceIT {
     @Test
     public void findAll_whenFiltersDontMatch_shouldReturnEmptyList() {
         Long associationId = association.getId();
-        List<ScheduleReadDto> schedules = scheduleService.findAll(associationId, 20, DayOfWeek.SUNDAY, LocalTime.of(10, 0));
+        List<ScheduleReadDto> schedules = scheduleService.findAll(associationId, 20, DayOfWeek.Dimanche, LocalTime.of(10, 0));
 
         assertEquals(0, schedules.size());
     }
@@ -123,7 +123,7 @@ public class ScheduleServiceIT {
         // Assertions
         assertEquals(scheduleId, foundSchedule.getId());
         assertEquals("Baby football", foundSchedule.getActivityName());
-        assertEquals(DayOfWeek.MONDAY, foundSchedule.getDayOfWeek());
+        assertEquals(DayOfWeek.Lundi, foundSchedule.getDayOfWeek());
     }
 
     @Test
@@ -156,7 +156,7 @@ public class ScheduleServiceIT {
             scheduleCreateDto.setAgeMin(6);
             scheduleCreateDto.setAgeMax(8);
             scheduleCreateDto.setAssociationId(association.getId());
-            scheduleCreateDto.setDayOfWeek(DayOfWeek.MONDAY);
+            scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
             scheduleCreateDto.setStartTime(LocalTime.of(17, 00));
             scheduleCreateDto.setEndTime(LocalTime.of(18, 30));
 
@@ -174,7 +174,7 @@ public class ScheduleServiceIT {
         scheduleCreateDto.setAgeMin(3);
         scheduleCreateDto.setAgeMax(5);
         scheduleCreateDto.setAssociationId(association.getId());
-        scheduleCreateDto.setDayOfWeek(DayOfWeek.MONDAY);
+        scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
 
@@ -184,7 +184,7 @@ public class ScheduleServiceIT {
     @Test
     public void updateSchedule_whenSuccess() {
         ScheduleUpdateDto scheduleUpdateDto = new ScheduleUpdateDto();
-        scheduleUpdateDto.setDayOfWeek(DayOfWeek.FRIDAY);
+        scheduleUpdateDto.setDayOfWeek(DayOfWeek.Vendredi);
 
         ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(schedule.getId(), scheduleUpdateDto);
 

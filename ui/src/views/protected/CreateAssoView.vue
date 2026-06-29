@@ -7,8 +7,12 @@
       <TheHeader title="Tableau de bord" subtitle="" />
 
       <div class="form-wrapper">
-        <AssoForm submit-button-text="Créer la fiche de votre assocation" :is-submitting="isSubmitting"
-          :errors="backendErrors" form-title="Créer une nouvelle association" @submit="handleCreateAsso"
+        <AssoForm
+        submit-button-text="Créer la fiche de votre assocation"
+        :is-submitting="isSubmitting"
+          :errors="backendErrors"
+          form-title="Créer une nouvelle association"
+          @submit="handleCreateAsso"
           @cancel="handleCancel" />
       </div>
     </div>

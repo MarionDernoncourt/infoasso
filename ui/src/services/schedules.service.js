@@ -7,6 +7,11 @@ export default {
     return response.data;
   },
 
+  async getById(assoId, scheduleId) {
+    const response = await apiClient.get(`associations/${assoId}/schedules/${scheduleId}`);
+    return response.data;
+  },
+
   // Création d'un schedule
   async create(assoId, scheduleCreateDto) {
     const response = await apiClient.post(`/associations/${assoId}/schedules`, scheduleCreateDto);
@@ -30,7 +35,6 @@ export default {
 
   // Récupération dayOfWeek
   async getDaysOfWeek() {
-    const response = apiClient.get("/schedules/dayOfWeek");
-    return response.data;
+    return await apiClient.get("/enums/daysOfWeek");
   },
 };
