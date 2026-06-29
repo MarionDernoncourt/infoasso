@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit" class="schedule-form">
     <h2 class="form-title">
-      Ajouter une activité (horaires)
+      {{ initialData ? " Modifier l'horaire" : "Ajouter une activité " }}
     </h2>
 
     <div class="form-section">
@@ -20,31 +20,23 @@
     <div class="form-section">
       <h3>Horaire de l'activité</h3>
 
-      <div class="form-group">
-        <label for="dayOfWeek">Jour</label>
-        <select id="dayOfWeek" v-model="formData.dayOfWeek" required>
-          <option value="" disabled>--Sélectionner le jour--</option>
-          <option v-for="day in dayOfWeek" :key="day" :value="day"> {{ day }}</option>
-        </select>
-        <p v-if="errors.dayOfWeek" class="error-text">
-          {{ errors.dayOfWeek }}
-        </p>
-      </div>
+      <div class="form-row" style="display: flex; gap: 20px;">
+        <div class="form-group" style="flex: 1;">
+          <label for="dayOfWeek">Jour</label>
+          <select id="dayOfWeek" v-model="formData.dayOfWeek" required>
+            <option value="" disabled>--Sélectionner le jour--</option>
+            <option v-for="day in dayOfWeek" :key="day" :value="day">{{ day }}</option>
+          </select>
+        </div>
 
-      <div class="form-row" style="display: flex; gap: 20px">
-        <div class="form-group" style="flex: 1">
+        <div class="form-group" style="flex: 1;">
           <label for="startTime">Début</label>
           <input type="time" id="startTime" v-model="formData.startTime" required />
-          <p v-if="errors.startTime" class="error-text">
-            {{ errors.startTime }}
-          </p>
         </div>
-        <div class="form-group" style="flex: 1">
+
+        <div class="form-group" style="flex: 1;">
           <label for="endTime">Fin</label>
           <input type="time" id="endTime" v-model="formData.endTime" required />
-          <p v-if="errors.endTime" class="error-text">
-            {{ errors.endTime }}
-          </p>
         </div>
       </div>
     </div>
@@ -73,8 +65,8 @@
 
     <div class="forms-action">
       <button type="button" class="cancel-btn" @click="$emit('cancel')">Annuler</button>
-      <button type="submit" class="submit-btn" :disabled="isSubmitting"> {{ isSubmitting ? 'Enregistrement...' :
-        "Enregistrer" }}</button>
+      <button type="submit" class="submit-btn" :disabled="isSubmitting">
+        {{ isSubmitting ? 'Enregistrement...' : submitButtonText || "Enregistrer" }}</button>
 
     </div>
   </form>
@@ -82,12 +74,11 @@
 
 
 <script setup>
-import { useRouter, useRoute } from "vue";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from "vue-router"
 import schedulesService from "@/services/schedules.service";
 
 const route = useRoute();
-const router = useRouter();
 
 // PROPS & EMITS (comm avec les views)
 const props = defineProps({
@@ -102,14 +93,17 @@ const props = defineProps({
   errors: {
     type: Object,
     default: () => ({})
-  }
+  },
+  submitButtonText: {
+    type: String,
+    default: "Enregistrer"
+  },
 });
 
 const emit = defineEmits(['cancel', 'submit']);
 
 //VARIABLE REACTIVE
 const dayOfWeek = ref([]);
-
 const formData = ref({
   activityName: "",
   dayOfWeek: "",
@@ -120,6 +114,8 @@ const formData = ref({
 })
 
 onMounted(async () => {
+  console.log("Route actuelle :", route.name);
+
   //Récupération des ENUMs pour le Select
   try {
     const response = await schedulesService.getDaysOfWeek();
@@ -128,15 +124,91 @@ onMounted(async () => {
     console.error("Erreur lors de la récupération des jours de la semaine: ", error);
   }
 
-  // Mode update //
-  if (props.initialData) {
-    formData.value = { ...props.initialData };
-  }
 });
+
+watch(() => props.initialData, (newVal) => {
+  console.log("Watch déclenché, nouvelle valeur :", newVal); // AJOUTE ÇA
+  if (newVal) {
+    formData.value = {
+      activityName: newVal.activityName,
+      dayOfWeek: newVal.dayOfWeek,
+      startTime: newVal.startTime?.substring(0, 5),
+      endTime: newVal.endTime?.substring(0, 5),
+      ageMin: newVal.ageMin,
+      ageMax: newVal.ageMax,
+      associationId: newVal.association.id
+    };
+  }
+}, { immediate: true });
 
 // SOUMISSION FORMULAIRE
 const handleSubmit = () => {
+  console.log("Formulaire soumis, envoi au parent...");
   emit("submit", formData.value);
 }
 
 </script>
+
+<style scoped>
+.schedule-form h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+input,
+select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.forms-action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+
+.submit-btn {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #95a5a6;
+  color: white;
+}
+</style>

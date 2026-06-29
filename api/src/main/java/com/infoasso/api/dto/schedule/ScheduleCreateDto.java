@@ -1,5 +1,6 @@
 package com.infoasso.api.dto.schedule;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.DayOfWeek;
@@ -29,9 +30,11 @@ public class ScheduleCreateDto {
     @NotNull(message = "Le jour de la semaine doit être complété.")
     private DayOfWeek dayOfWeek;
 
+    @JsonFormat(pattern = "HH:mm")
     @NotNull(message = "Sélectionner une heure de début.")
     private LocalTime startTime;
 
+    @JsonFormat(pattern = "HH:mm")
     @NotNull(message = "Sélectionner une heure de fin.")
     private LocalTime endTime;
 

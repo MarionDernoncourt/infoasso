@@ -1,5 +1,5 @@
 package com.infoasso.api.model;
 
 public enum DayOfWeek {
-    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+    Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche
 }

@@ -51,7 +51,7 @@ public class ScheduleController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ScheduleReadDto> createSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleCreateDto scheduleCreateDto) {
         logger.info("POST: / : Request received for create schedule for association with id " + id);
         ScheduleReadDto createdSchedule = scheduleService.createSchedule(id, scheduleCreateDto);
@@ -60,7 +60,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/{scheduleId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long id, @PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
         logger.info("PUT: / : Request received for update schedule with id " + scheduleId);
         ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(scheduleId, scheduleUpdateDto);
@@ -69,7 +69,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{scheduleId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @PathVariable Long scheduleId) {
         logger.info("DELETE: / : Request received to delete schedule with id " + scheduleId);
         scheduleService.deleteSchedule(scheduleId);
@@ -77,10 +77,5 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/daysOfWeek")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<DayOfWeek[]> getDaysOfWeek() {
-        logger.info("GET: / : Request received for days of week");
-        return ResponseEntity.ok(DayOfWeek.values());
-    }
+
 }

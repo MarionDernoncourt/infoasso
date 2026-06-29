@@ -44,12 +44,13 @@ const handleCreateSchedule = async (formData) => {
   try {
     isSubmitting.value = true;
 
+  const assoId = route.params.id;
+
   const payload = {
     ...formData,
-    associationId : route.params.id,
+    associationId : Number(route.params.id),
   }
-
-    await schedulesService.create(payload);
+    await schedulesService.create(assoId, payload);
 
     alert("L'horaire a été créé avec succès");
     router.push(`/association/${route.params.id}/scheduleView`);
@@ -67,3 +68,26 @@ const handleCreateSchedule = async (formData) => {
 }
 
 </script>
+
+<style scoped>
+.createSchedule-container {
+  display: flex;
+  min-height: 100vh; /* Prend toute la hauteur de l'écran */
+}
+
+.createSchedule-main {
+  flex: 1; /* Prend tout l'espace restant à droite de la sidebar */
+  padding: 2rem;
+  background-color: #f4f7f6; /* Couleur de fond légère */
+  overflow-y: auto;
+}
+
+.form-wrapper {
+  max-width: 800px; /* Limite la largeur pour ne pas étirer le formulaire */
+  margin: 2rem auto; /* Centre le formulaire */
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+</style>

@@ -55,7 +55,7 @@ public class ScheduleControllerTest {
         schedule.setActivityName("Baby football");
         schedule.setAgeMin(3);
         schedule.setAgeMax(5);
-        schedule.setDayOfWeek(DayOfWeek.MONDAY);
+        schedule.setDayOfWeek(DayOfWeek.Lundi);
         schedule.setStartTime(LocalTime.of(15, 00));
         schedule.setEndTime(LocalTime.of(15, 30));
         schedule.setAssociation(association);
@@ -178,7 +178,7 @@ public class ScheduleControllerTest {
         scheduleCreateDto.setActivityName("Baby football");
         scheduleCreateDto.setAgeMin(3);
         scheduleCreateDto.setAgeMax(5);
-        scheduleCreateDto.setDayOfWeek(DayOfWeek.MONDAY);
+        scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
         scheduleCreateDto.setAssociationId(association.getId());
@@ -201,7 +201,7 @@ public class ScheduleControllerTest {
         scheduleCreateDto.setActivityName("Baby football");
         scheduleCreateDto.setAgeMin(5);
         scheduleCreateDto.setAgeMax(3);
-        scheduleCreateDto.setDayOfWeek(DayOfWeek.MONDAY);
+        scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 00));
         scheduleCreateDto.setAssociationId(association.getId());
