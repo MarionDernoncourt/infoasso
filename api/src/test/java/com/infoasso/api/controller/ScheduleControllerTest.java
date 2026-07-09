@@ -7,6 +7,7 @@ import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.DayOfWeek;
+import com.infoasso.api.model.Location;
 import com.infoasso.api.service.impl.ScheduleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ public class ScheduleControllerTest {
 
     private ScheduleReadDto schedule;
     private AssociationSummaryDto association;
+    private Location location;
 
 
     @BeforeEach
@@ -49,6 +51,13 @@ public class ScheduleControllerTest {
         association = new AssociationSummaryDto();
         association.setId(1L);
         association.setDisplayName("Football");
+
+        location = new Location();
+        location.setId(1L);
+        location.setName("Stade municipal");
+        location.setAddress("22 rue Pasteur");
+        location.setCity("Lille");
+        location.setZipCode("59000");
 
         schedule = new ScheduleReadDto();
         schedule.setId(1L);
@@ -58,6 +67,7 @@ public class ScheduleControllerTest {
         schedule.setDayOfWeek(DayOfWeek.Lundi);
         schedule.setStartTime(LocalTime.of(15, 00));
         schedule.setEndTime(LocalTime.of(15, 30));
+        schedule.setLocation(location);
         schedule.setAssociation(association);
     }
 
@@ -78,10 +88,10 @@ public class ScheduleControllerTest {
 
         mockMvc.perform(get("/api/associations/1/schedules")
                         .param("age", "4")
-                        .param("dayOfWeek", "MONDAY")
+                        .param("dayOfWeek", "Lundi")
                         .param("startTime", LocalTime.of(15, 0).toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].dayOfWeek").value("MONDAY"));
+                .andExpect(jsonPath("$[0].dayOfWeek").value("Lundi"));
     }
 
     @Test
@@ -91,7 +101,7 @@ public class ScheduleControllerTest {
 
         mockMvc.perform(get("/api/associations/1/schedules")
                         .param("age", "4")
-                        .param("dayOfWeek", "MONDAY")
+                        .param("dayOfWeek", "Lundi")
                         .param("startTime", LocalTime.of(15, 0).toString()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").exists());
@@ -182,6 +192,7 @@ public class ScheduleControllerTest {
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
         scheduleCreateDto.setAssociationId(association.getId());
+        scheduleCreateDto.setLocation(new Location(3L, "stade football", "12 rue du port","Lille", "59000"));
 
         String json = objectMapper.writeValueAsString(scheduleCreateDto);
 
@@ -205,6 +216,8 @@ public class ScheduleControllerTest {
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 00));
         scheduleCreateDto.setAssociationId(association.getId());
+        scheduleCreateDto.setLocation(location);
+
 
         String json = objectMapper.writeValueAsString(scheduleCreateDto);
 

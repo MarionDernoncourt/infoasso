@@ -2,6 +2,7 @@ package com.infoasso.api.dto.schedule;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.infoasso.api.model.DayOfWeek;
+import com.infoasso.api.model.Location;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,10 @@ public class ScheduleUpdateDto {
     private Integer ageMin;
 
     private Integer ageMax;
+
+    private String description;
+
+    private Location location;
 
 
     @JsonIgnore

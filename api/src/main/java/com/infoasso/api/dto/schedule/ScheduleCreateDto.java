@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.DayOfWeek;
+import com.infoasso.api.model.Location;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
@@ -42,6 +43,11 @@ public class ScheduleCreateDto {
     private Integer ageMin;
 
     private Integer ageMax;
+
+    private String description;
+
+    @NotNull(message="Le nom de la ville est obligatoire.")
+    private Location location;
 
     // --- Validations de cohérence ---
 

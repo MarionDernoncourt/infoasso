@@ -1,6 +1,7 @@
 package com.infoasso.api.service.impl;
 
 import com.infoasso.api.dto.association.AssociationSummaryDto;
+import com.infoasso.api.dto.location.LocationReadDto;
 import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
@@ -8,9 +9,12 @@ import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.DayOfWeek;
+import com.infoasso.api.model.Location;
 import com.infoasso.api.model.Schedule;
 import com.infoasso.api.repository.AssociationRepository;
+import com.infoasso.api.repository.LocationRepository;
 import com.infoasso.api.repository.ScheduleRepository;
+import com.infoasso.api.service.ILocationService;
 import com.infoasso.api.service.IScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +31,12 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final AssociationRepository associationRepository;
+    private final ILocationService  locationService;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AssociationRepository associationRepository) {
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AssociationRepository associationRepository, ILocationService  locationService) {
         this.scheduleRepository = scheduleRepository;
         this.associationRepository = associationRepository;
+        this.locationService = locationService;
     }
 
     @Override
@@ -155,6 +161,12 @@ public class ScheduleServiceImpl implements IScheduleService {
         schedule.setEndTime(createDto.getEndTime());
         schedule.setAgeMin(createDto.getAgeMin());
         schedule.setAgeMax(createDto.getAgeMax());
+        schedule.setDescription(createDto.getDescription());
+
+        // Vérification Location existe ou création
+        Location locationEntity = locationService.findOrCreateEntity(createDto.getLocation());
+        schedule.setLocation(locationEntity);
+
         schedule.setAssociation(association);
 
         return schedule;
@@ -179,6 +191,15 @@ public class ScheduleServiceImpl implements IScheduleService {
         }
         if (dto.getAgeMax() != null) {
             schedule.setAgeMax(dto.getAgeMax());
+        }
+        if (dto.getDescription() != null) {
+            schedule.setDescription(dto.getDescription());
+        }
+
+        if(dto.getLocation() != null) {
+            // Vérification Location existe ou création
+            Location locationEntity = locationService.findOrCreateEntity(dto.getLocation());
+            schedule.setLocation(locationEntity);
         }
 
         return schedule;
