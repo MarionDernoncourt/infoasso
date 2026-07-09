@@ -15,6 +15,14 @@
           {{ errors.activityName }}
         </p>
       </div>
+      <div class="form-group">
+        <label for="description">Description de l'activité</label>
+        <input type="text" id="description" v-model="formData.description"
+          placeholder="Ex: Initiation à la gym, parcours de motricité, ...." />
+        <p v-if="errors.description" class="error-text">
+          {{ errors.description }}
+        </p>
+      </div>
     </div>
 
     <div class="form-section">
@@ -32,11 +40,17 @@
         <div class="form-group" style="flex: 1;">
           <label for="startTime">Début</label>
           <input type="time" id="startTime" v-model="formData.startTime" required />
+          <p v-if="errors.startTime" class="error-text">
+            {{ errors.startTime }}
+          </p>
         </div>
 
         <div class="form-group" style="flex: 1;">
           <label for="endTime">Fin</label>
           <input type="time" id="endTime" v-model="formData.endTime" required />
+          <p v-if="errors.endTime" class="error-text">
+            {{ errors.endTime }}
+          </p>
         </div>
       </div>
     </div>
@@ -61,6 +75,31 @@
         </div>
       </div>
 
+    </div>
+
+    <div class="form-section">
+      <h3>Lieu de l'activité</h3>
+      <div class="form-row" style="display: flex; gap: 20px">
+        <div class="form-group">
+          <label for="name">Nom du lieu</label>
+          <input type="text" id="name" v-model="formData.name" placeholder="Ex: Gymnase">
+        </div>
+        <div class="form-group">
+          <label for="address">Adresse</label>
+          <input type="text" id="address" v-model="formData.address" placeholder="Ex: 12 rue Paradis" />
+        </div>
+        <div class="form-group">
+          <label for="city">Ville</label>
+          <input type="text" id="city" v-model="formData.city" placeholder="Ex: Lille" required />
+          <p v-if="errors.city" class="error-text">
+            {{ errors.city }}
+          </p>
+        </div>
+        <div class="form-group">
+          <label for="zipCode">Code Postal</label>
+          <input type="text" id="zipCode" v-model="formData.zipCode" placeholder="Ex: 59000" pattern="[0-9]{5}" title="Entrez 5 chiffres" />
+        </div>
+      </div>
     </div>
 
     <div class="forms-action">
@@ -111,7 +150,14 @@ const formData = ref({
   endTime: "",
   ageMin: "",
   ageMax: "",
+  description: "",
+  // Champs pour la Location
+  name: "",
+  address: "",
+  city: "",
+  zipCode: "",
 })
+
 
 onMounted(async () => {
   console.log("Route actuelle :", route.name);
@@ -127,7 +173,7 @@ onMounted(async () => {
 });
 
 watch(() => props.initialData, (newVal) => {
-  console.log("Watch déclenché, nouvelle valeur :", newVal); // AJOUTE ÇA
+  console.log("Watch déclenché, nouvelle valeur :", newVal);
   if (newVal) {
     formData.value = {
       activityName: newVal.activityName,
@@ -136,7 +182,13 @@ watch(() => props.initialData, (newVal) => {
       endTime: newVal.endTime?.substring(0, 5),
       ageMin: newVal.ageMin,
       ageMax: newVal.ageMax,
-      associationId: newVal.association.id
+      associationId: newVal.association.id,
+      description: newVal.description,
+      // Pour la Location
+      name: newVal.location?.name,
+      address: newVal.location?.address,
+      city: newVal.location?.city,
+      zipCode: newVal.location?.zipCode
     };
   }
 }, { immediate: true });
@@ -210,5 +262,9 @@ button {
 .cancel-btn {
   background-color: #95a5a6;
   color: white;
+}
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>
