@@ -3,6 +3,7 @@ package com.infoasso.api.dto.schedule;
 import com.infoasso.api.dto.association.AssociationSummaryDto;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.DayOfWeek;
+import com.infoasso.api.model.Location;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -33,4 +34,8 @@ public class ScheduleReadDto {
     private Integer ageMax;
 
     private String activityName;
-}
+
+    private String description;
+
+    private Location location;
+    }

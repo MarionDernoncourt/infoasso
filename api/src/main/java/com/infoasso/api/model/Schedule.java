@@ -1,7 +1,6 @@
 package com.infoasso.api.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -48,5 +47,11 @@ public class Schedule {
     @NotBlank(message = "Le nom de l'activité est obligatoire.")
     private String activityName;
 
+    private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="location_id")
+    @NotNull(message = "Le lieu de l'activité est obligatoire, veuillez entrer le nom de la ville au minimum.")
+    private Location location;
 
 }

@@ -6,10 +6,7 @@ import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
 import com.infoasso.api.exceptions.ResourceAlreadyExistsException;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.*;
-import com.infoasso.api.repository.AssociationRepository;
-import com.infoasso.api.repository.CategoryRepository;
-import com.infoasso.api.repository.ScheduleRepository;
-import com.infoasso.api.repository.UserRepository;
+import com.infoasso.api.repository.*;
 import com.infoasso.api.service.impl.ScheduleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,11 +38,14 @@ public class ScheduleServiceIT {
     private UserRepository userRepository;
     @Autowired
     private AssociationRepository associationRepository;
+    @Autowired
+    private LocationRepository locationRepository;
 
     private Schedule schedule;
     private Association association;
     private Category category;
     private User user;
+    private Location location;
     private List<ScheduleReadDto> schedules = new ArrayList<>();
 
     @BeforeEach
@@ -71,6 +71,13 @@ public class ScheduleServiceIT {
         association.setOwner(user);
         associationRepository.save(association);
 
+        location = new Location();
+        location.setName("Stade municipal");
+        location.setAddress("22 rue Pasteur");
+        location.setCity("Lille");
+        location.setZipCode("59000");
+        location = locationRepository.save(location);
+
         schedule = new Schedule();
         schedule.setActivityName("Baby football");
         schedule.setAgeMin(3);
@@ -79,6 +86,8 @@ public class ScheduleServiceIT {
         schedule.setDayOfWeek(DayOfWeek.Lundi);
         schedule.setStartTime(LocalTime.of(15, 00));
         schedule.setEndTime(LocalTime.of(15, 30));
+        schedule.setDescription("Initiation au football. Jeux de ballons, d'équilibre.");
+        schedule.setLocation(location);
         scheduleRepository.save(schedule);
     }
 
@@ -159,6 +168,7 @@ public class ScheduleServiceIT {
             scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
             scheduleCreateDto.setStartTime(LocalTime.of(17, 00));
             scheduleCreateDto.setEndTime(LocalTime.of(18, 30));
+            scheduleCreateDto.setLocation(location);
 
             ScheduleReadDto scheduleReadDto = scheduleService.createSchedule(association.getId(), scheduleCreateDto);
 
@@ -177,6 +187,7 @@ public class ScheduleServiceIT {
         scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
+        scheduleCreateDto.setLocation(location);
 
         assertThrows(ResourceAlreadyExistsException.class, () -> scheduleService.createSchedule(association.getId(), scheduleCreateDto));
     }
