@@ -35,9 +35,10 @@ public class ScheduleController {
             @PathVariable Long id,
             @RequestParam (required = false) Integer age,
             @RequestParam (required = false) DayOfWeek dayOfWeek,
-            @RequestParam (required = false )LocalTime startTime ) {
+            @RequestParam (required = false )LocalTime startTime ,
+            @RequestParam(required = false) String city) {
         logger.info("GET: / : Request received for association with id " + id);
-        List<ScheduleReadDto> schedules = scheduleService.findAll(id, age, dayOfWeek, startTime);
+        List<ScheduleReadDto> schedules = scheduleService.findAll(id, age, dayOfWeek, city);
         logger.info("GET / : Response 200 OK : Nombre de schedules : " + schedules.size());
         return ResponseEntity.status(HttpStatus.OK).body(schedules);
     }

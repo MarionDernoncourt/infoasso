@@ -82,22 +82,22 @@
       <div class="form-row" style="display: flex; gap: 20px">
         <div class="form-group">
           <label for="name">Nom du lieu</label>
-          <input type="text" id="name" v-model="formData.name" placeholder="Ex: Gymnase">
+          <input type="text" id="name" v-model="formData.location.name" placeholder="Ex: Gymnase">
         </div>
         <div class="form-group">
           <label for="address">Adresse</label>
-          <input type="text" id="address" v-model="formData.address" placeholder="Ex: 12 rue Paradis" />
+          <input type="text" id="address" v-model="formData.location.address" placeholder="Ex: 12 rue Paradis" />
         </div>
         <div class="form-group">
           <label for="city">Ville</label>
-          <input type="text" id="city" v-model="formData.city" placeholder="Ex: Lille" required />
+          <input type="text" id="city" v-model="formData.location.city" placeholder="Ex: Lille" required />
           <p v-if="errors.city" class="error-text">
             {{ errors.city }}
           </p>
         </div>
         <div class="form-group">
           <label for="zipCode">Code Postal</label>
-          <input type="text" id="zipCode" v-model="formData.zipCode" placeholder="Ex: 59000" pattern="[0-9]{5}" title="Entrez 5 chiffres" />
+          <input type="text" id="zipCode" v-model="formData.location.zipCode" placeholder="Ex: 59000" pattern="[0-9]{5}" title="Entrez 5 chiffres" />
         </div>
       </div>
     </div>
@@ -152,12 +152,12 @@ const formData = ref({
   ageMax: "",
   description: "",
   // Champs pour la Location
+  location: {
   name: "",
   address: "",
   city: "",
-  zipCode: "",
+  zipCode: "",}
 })
-
 
 onMounted(async () => {
   console.log("Route actuelle :", route.name);

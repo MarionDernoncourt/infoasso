@@ -49,7 +49,7 @@ public class Schedule {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="location_id")
     @NotNull(message = "Le lieu de l'activité est obligatoire, veuillez entrer le nom de la ville au minimum.")
     private Location location;

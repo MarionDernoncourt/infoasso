@@ -41,8 +41,8 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ScheduleReadDto> findAll(Long associationId, Integer age, DayOfWeek dayOfWeek, LocalTime startTime) {
-        logger.info("Searching for schedules for association id {}, age: {}, day: {}, start: {}", associationId, age, dayOfWeek, startTime);
+    public List<ScheduleReadDto> findAll(Long associationId, Integer age, DayOfWeek dayOfWeek, String city) {
+        logger.info("Searching for schedules for association id {}, age: {}, day: {}, city: {}", associationId, age, dayOfWeek, city);
 
         // Verification si association existe
         if (!getAssociationValidated(associationId)) {
@@ -51,10 +51,10 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // Récupération des schedule
         List<Schedule> allSchedules = scheduleRepository.findByAssociationId(associationId);
-
+        allSchedules.forEach(s -> System.out.println("DEBUG: " + s.getActivityName() + " | Desc: " + s.getDescription() + " | Loc: " + s.getLocation()));
         // Filtres
         return allSchedules.stream()
-                .filter(schedule -> isMatch(schedule, age, dayOfWeek, startTime))
+                .filter(schedule -> isMatch(schedule, age, dayOfWeek, city))
                 .map(this::mapToReadDto)
                 .toList();
     }
@@ -122,10 +122,10 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
 
-    private boolean isMatch(Schedule s, Integer age, DayOfWeek day, LocalTime start) {
+    private boolean isMatch(Schedule s, Integer age, DayOfWeek day, String city) {
         return (age == null || (age >= s.getAgeMin() && age <= s.getAgeMax()))
                 && (day == null || s.getDayOfWeek() == day)
-                && (start == null || s.getStartTime().equals(start));
+        && (city == null || s.getLocation().getCity().equalsIgnoreCase(city));
     }
 
     private boolean getAssociationValidated(Long id) {
@@ -143,6 +143,8 @@ public class ScheduleServiceImpl implements IScheduleService {
         readDto.setDayOfWeek(schedule.getDayOfWeek());
         readDto.setAgeMin(schedule.getAgeMin());
         readDto.setAgeMax(schedule.getAgeMax());
+        readDto.setDescription(schedule.getDescription());
+        readDto.setLocation(schedule.getLocation());
         if (schedule.getAssociation() != null) {
             AssociationSummaryDto assoDto = new AssociationSummaryDto();
             assoDto.setId(schedule.getAssociation().getId());
