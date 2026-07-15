@@ -30,6 +30,7 @@
       :class="['activity-card', s.sizeClass]"
         :style="{ gridRow: s.gridRow, gridColumn: s.gridColumn }"
         :title="s.activityName"
+        @click="$emit('select-activity', s)"
 
      >
         <span class="activity-text">{{ s.activityName }}</span>
@@ -86,9 +87,11 @@ const positionedSchedules = computed(() => {
       ...s,
       gridRow: `${(startMinutes / 15) + 2} / span ${(endMinutes - startMinutes) / 15}`,
       gridColumn: `${safeStartCol} / span ${span}`,
-      sizeClass // Maintenant c'est bon !
+      sizeClass
     };
+
   });
+
 });
 
 
@@ -132,10 +135,9 @@ const quarters = computed(() => {
   grid-area: main;
   display: grid;
   grid-template-columns: 80px repeat(28, 1fr);
-  grid-auto-rows: 20px;
+grid-auto-rows: 20px;
   width: 100%;
   min-width: 800px;
-  /* Force une largeur minimale pour éviter l'écrasement */
 
 }
 
@@ -165,7 +167,7 @@ const quarters = computed(() => {
 }
 
 .header-cell:nth-child(n + 2):nth-child(-n + 8) {
-  border-bottom: 1px solid green;
+  border-bottom: 1px solid #2c1a14;
 }
 
 /* 5. Cellules des heures */
@@ -187,15 +189,15 @@ const quarters = computed(() => {
    est aux positions : 2, 6, 10, 14, 18, 22, 26 (parmi les .slot-cell).
 */
 .day-start {
-  border-left: 2px solid green;
+  border-left: 2px solid #2c1a14;
 }
 
 .row-end {
-  border-right: 2px solid green;
+  border-right: 2px solid #2c1a14;
 }
 
 .slot-cell.hour-line {
-  border-top: 1px solid green;
+  border-top: 1px solid  #2c1a14;
 }
 
 .hour-divider-top {
@@ -223,6 +225,8 @@ const quarters = computed(() => {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public interface IScheduleService {
-    List<ScheduleReadDto> findAll(Long id, Integer age, DayOfWeek dayOfWeek, LocalTime startTime);
+    List<ScheduleReadDto> findAll(Long id, Integer age, DayOfWeek dayOfWeek, String city);
     ScheduleReadDto findById(Long id, Long scheduleId);
 
     ScheduleReadDto createSchedule(Long id, ScheduleCreateDto scheduleCreateDto);

@@ -363,7 +363,6 @@ textarea:focus {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.2s ease;
 }
 
 .verify-btn:hover:not(:disabled) {

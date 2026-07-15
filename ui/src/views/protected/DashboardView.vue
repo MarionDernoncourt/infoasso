@@ -35,7 +35,10 @@
         <section class="info-card">
           <div class="card-header">
             <h3>Informations Générales</h3>
-            <button class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la fiche</button>
+            <div class="header-btn">
+              <button type="button" class="schedule-btn" @click="goToSchedulePage(selectedAsso?.id)">Voir le planning</button>
+            <button type="button" class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la fiche</button>
+            </div>
           </div>
           <div class="card-body">
             <div class="asso-profile">
@@ -130,6 +133,14 @@ const goToUpdatePage = (id) => {
     return;
   }
   router.push(`/association/update/${id}`);
+}
+
+const goToSchedulePage = (id) => {
+  if(!id) {
+    console.error("Impossible de rediriger : l'ID de l'association est introuvable ! ");
+    return;
+  }
+  router.push(`/association/${id}/scheduleView`);
 }
 </script>
 
@@ -280,7 +291,7 @@ section {
   font-weight: 800;
 }
 
-.edit-btn {
+.edit-btn,  .schedule-btn {
   background: white;
   border: 1px solid darksalmon;
   color: darksalmon;
