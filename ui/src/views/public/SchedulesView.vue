@@ -1,7 +1,9 @@
 <template>
   <div class="public-schedule-page">
     <div class="filters-container">
-      <ScheduleFilter @submitFilters="handleFilterSearch" @cancel="fetchAllSchedules" />
+      <ScheduleFilter
+      @submitFilters="handleFilterSearch"
+      @cancel="fetchAllSchedules" />
     </div>
 
     <div class="header">
@@ -81,10 +83,23 @@ const filteredSchedules = computed(() => {
 });
 
 const handleFilterSearch = async (filters) => {
+  console.log("Parent recoit: ", filters);
   isLoading.value = true;
 
   try {
-    allSchedules.value = await schedulesService.getAll(assoId, filters)
+
+    const data = await schedulesService.getAll(assoId, filters);
+
+    if(data.length === 0) {
+      alert("Aucune activité trouvée pour ces critères. Affichage du planning complet.");
+
+      allSchedules.value = await schedulesService.getAll(assoId, {});
+
+    } else {
+    allSchedules.value = data;
+
+    }
+
   } catch (error) {
     console.error('Erreur de chargement: ', error);
   } finally {
