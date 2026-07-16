@@ -30,6 +30,7 @@ import TheSidebar from '@/components/layout/TheSidebar.vue';
 import ScheduleForm from '@/components/schedules/ScheduleForm.vue';
 import TheHeader from '@/components/layout/TheHeader.vue';
 import schedulesService from '@/services/schedules.service';
+import assoService from '@/services/asso.service';
 
 const router = useRouter();
 const route = useRoute();
@@ -44,18 +45,30 @@ const handleCancel = () => {
 }
 
 onMounted(async () => {
-  console.log("Route actuelle :", route.name);
   try {
     const assoId = route.params.id;
     const scheduleId = route.params.scheduleId;
 
+    // 1. Vérification de sécurité prioritaire
+    const assoData = await assoService.getById(assoId);
+    const userEmail = localStorage.getItem("user_email");
+
+    if (assoData.ownerEmail !== userEmail) {
+      alert("Vous n'êtes pas autorisé à modifier cette activité !");
+      router.push({ name: 'dashboard' });
+      return;
+    }
+
+    // 2. Si autorisé, on charge les données du schedule
     const response = await schedulesService.getById(assoId, scheduleId);
-initialData.value = response;
+    initialData.value = response;
 
   } catch (error) {
-    console.error("Erreur chargement horaire: ", error);
+    console.error("Erreur chargement : ", error);
+    alert("Impossible de charger les données.");
+    router.push({ name: 'dashboard' });
   }
-})
+});
 
 const handleUpdateSchedule = async (formData) => {
   try {
@@ -92,23 +105,18 @@ const handleUpdateSchedule = async (formData) => {
 .updateSchedule-container {
   display: flex;
   min-height: 100vh;
-  /* Prend toute la hauteur de l'écran */
 }
 
 .updateSchedule-main {
   flex: 1;
-  /* Prend tout l'espace restant à droite de la sidebar */
   padding: 2rem;
   background-color: #f4f7f6;
-  /* Couleur de fond légère */
   overflow-y: auto;
 }
 
 .form-wrapper {
   max-width: 800px;
-  /* Limite la largeur pour ne pas étirer le formulaire */
   margin: 2rem auto;
-  /* Centre le formulaire */
   background: white;
   padding: 2rem;
   border-radius: 12px;

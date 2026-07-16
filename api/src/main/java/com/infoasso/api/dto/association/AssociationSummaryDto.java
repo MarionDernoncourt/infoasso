@@ -18,4 +18,6 @@ public class AssociationSummaryDto {
     private String displayName;
 
     private String categoryLabel;
+
+    private String ownerEmail;
 }
