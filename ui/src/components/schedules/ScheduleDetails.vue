@@ -1,11 +1,12 @@
 <template>
   <div class="overlay" @click.self="$emit('close')">
     <div class="detail-card">
+      <div class="form-group">
       <button class="close-btn" @click="$emit('close')">×</button>
 
       <h2>{{ activity.activityName }}</h2>
       <hr />
-
+</div>
       <div class="description-box">
         <p>{{ activity.description || 'Aucune description fournie.' }}</p>
       </div>
@@ -51,6 +52,13 @@ defineEmits(['close']);
 }
 
 /* La carte blanche centrée */
+.form-group {
+     display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #2c1a14;
+}
 .detail-card {
   background: white;
   padding: 30px;
@@ -108,6 +116,7 @@ defineEmits(['close']);
 .close-btn:hover {
   transform: scale(1.2);
   color: darksalmon;
+  margin: 0px;
 }
 
 h2 {

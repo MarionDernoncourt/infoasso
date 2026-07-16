@@ -5,7 +5,7 @@
       <p class="subtitle">{{ subtitle }}</p>
     </div>
 
-    <router-link v-if="showAddButton" to="/create-asso" class="add-asso-btn">
+    <router-link v-if="showAddButton" to="/association/create" class="add-asso-btn">
       <span>＋</span> Enregistrer une structure
     </router-link>
   </header>

@@ -1,25 +1,27 @@
 <template>
   <div class="filters-area">
-  <h2>Filtrer ma recherche</h2>
+    <h2>Filtrer ma recherche</h2>
 
     <div class="form-section">
       <div class="form-group">
         <label for="dayOfWeek">Jour</label>
-        <select id="dayOfWeek" v-model="filters.dayOfWeek" >
+        <select id="dayOfWeek" v-model="filters.dayOfWeek">
           <option value="">---Choisir un jour---</option>
-          <option v-for="day in dayOfWeek" :key="day" :value="day" >{{ day }}</option>
+          <option v-for="day in dayOfWeek" :key="day" :value="day">{{ day }}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <lable for="age">Age</lable>
-        <input type="numbers" id="age" v-model="filters.age"
-          placeholder="10" />
-
+        <label for="age">Age</label>
+        <input type="number"
+        id="age"
+        v-model="filters.age"
+        placeholder="10"
+        /> ```
       </div>
 
       <div class="form-group">
-        <lable for="city">Ville</lable>
+        <label for="city">Ville</label>
         <input type="text" id="city" v-model="filters.city" placeholder="Lille" />
 
       </div>
@@ -57,23 +59,23 @@ onMounted(async () => {
 
 const applyFilters = () => {
 
-const activeFilters = {};
-console.log("filters: ", filters.value.age );
+  const activeFilters = {};
+
   // On ne prend que les champs qui sont remplis
-  if (filters.value.dayOfWeek) {
-    activeFilters.dayOfWeek = filters.value.dayOfWeek;
-  }
-  if (filters.value.age !== "" && filters.value.age !== null) {
-    activeFilters.age = filters.value.age;
-  }
-  if (filters.value.city) {
-    activeFilters.city = filters.value.city;
+if (filters.value.dayOfWeek) activeFilters.dayOfWeek = filters.value.dayOfWeek;
+
+  // Utilise Number() pour t'assurer que c'est un chiffre
+  if (filters.value.age !== undefined && filters.value.age !== null && filters.value.age !== "") {
+    activeFilters.age = Number(filters.value.age);
   }
 
-  emit('submitFilters', filters.value);
+  if (filters.value.city) activeFilters.city = filters.value.city;
+
+  console.log("Filtres envoyés au parent: ", activeFilters);
+  emit('submitFilters', activeFilters); // Envoie l'objet nettoyé !
 }
 const cancelFilters = () => {
-  filters.value="";
+  filters.value = "";
   emit('cancel');
 }
 </script>
@@ -130,25 +132,32 @@ button {
   border-radius: 10px;
   font-weight: 500;
   margin: 10px;
-    background: #f4f0ed;
+  background: #f4f0ed;
 
-  color: #2c1f18; /* Gris-marron doux */
+  color: #2c1f18;
+  /* Gris-marron doux */
   border: 1px solid #dcd1ca;
 }
 
 .submit-btn:hover,
 .cancel-btn:hover {
   color: #5a4d46;
-    border: 1px solid darksalmon;
+  border: 1px solid darksalmon;
 
 }
+
 /* --- Inputs, Selects, Textareas --- */
-input, select {
+input,
+select {
   padding: 10px 14px;
-  border: 1px solid #e0d8d3; /* Bordure discrète */
-  border-radius: 10px;       /* Plus arrondi */
-  background-color: #fcfbf9; /* Crème très clair */
-  color: #4a403a;            /* Marron foncé doux pour le texte */
+  border: 1px solid #e0d8d3;
+  /* Bordure discrète */
+  border-radius: 10px;
+  /* Plus arrondi */
+  background-color: #fcfbf9;
+  /* Crème très clair */
+  color: #4a403a;
+  /* Marron foncé doux pour le texte */
   transition: all 0.3s ease;
   width: 200px;
 }
@@ -156,6 +165,7 @@ input, select {
 input:focus {
   border-color: #d96c5b;
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(217, 108, 91, 0.1); /* Glow léger */
+  box-shadow: 0 0 0 4px rgba(217, 108, 91, 0.1);
+  /* Glow léger */
 }
 </style>
