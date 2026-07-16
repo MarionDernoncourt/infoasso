@@ -36,8 +36,10 @@
           <div class="card-header">
             <h3>Informations Générales</h3>
             <div class="header-btn">
-              <button type="button" class="schedule-btn" @click="goToSchedulePage(selectedAsso?.id)">Voir le planning</button>
-            <button type="button" class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la fiche</button>
+              <button type="button" class="schedule-btn" @click="goToSchedulePage(selectedAsso?.id)">Voir le
+                planning</button>
+              <button type="button" class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la
+                fiche</button>
             </div>
           </div>
           <div class="card-body">
@@ -68,11 +70,13 @@
           <div class="status-indicators">
             <div class="status-item" :class="{ 'status-on': selectedAsso?.isPublished }">
               <span class="indicator-dot"></span>
-              <span class="status-label">Visibilité : {{ selectedAsso?.isPublished ? 'En ligne (Visible du public)' : 'Hors ligne' }}</span>
+              <span class="status-label">Visibilité : {{ selectedAsso?.isPublished ? 'En ligne (Visible du public)' :
+                'Hors ligne' }}</span>
             </div>
             <div class="status-item" :class="{ 'status-verified': selectedAsso?.isVerified }">
               <span class="indicator-badge">✓</span>
-              <span class="status-label">{{ selectedAsso?.isVerified ? 'Fiche Certifiée (Pastille bleue)' :   'Vérification en cours' }}</span>
+              <span class="status-label">{{ selectedAsso?.isVerified ? 'Fiche Certifiée (Pastille bleue)' :
+                'Vérification en cours' }}</span>
             </div>
           </div>
         </section>
@@ -116,11 +120,15 @@ onMounted(async () => {
   } catch (error) {
     console.error("Erreur lors du chargement du dashboard: ", error);
     hasAssociation.value = false;
+    const status = error.response?.status;
 
-    if (error.response && (error.response.status === 401 || (error.response.status === 500 && error.config.url.includes('my-associations')))) {
-    localStorage.clear();
-    router.push('/login');
-  }
+    if (status === 401 || status === 403) {
+      localStorage.clear();
+      router.push('/login');
+    } else if (error.response?.status === 500 && error.config?.url?.includes('my-associations')) {
+      localStorage.clear();
+      router.push('/login');
+    }
 
   } finally {
     isLoading.value = false;
@@ -136,7 +144,7 @@ const goToUpdatePage = (id) => {
 }
 
 const goToSchedulePage = (id) => {
-  if(!id) {
+  if (!id) {
     console.error("Impossible de rediriger : l'ID de l'association est introuvable ! ");
     return;
   }
@@ -149,16 +157,19 @@ const goToSchedulePage = (id) => {
 .dashboard-container {
   display: flex;
   min-height: 100vh;
-  background-color: #fdfaf8; /* Un fond très légèrement chaud/crème pour le confort visuel */
+  background-color: #fdfaf8;
+  /* Un fond très légèrement chaud/crème pour le confort visuel */
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .dashboard-main {
   flex: 1;
-  margin-left: 260px; /* Crucial : repousse le contenu pour laisser la place à la Sidebar fixe */
+  margin-left: 260px;
+  /* Crucial : repousse le contenu pour laisser la place à la Sidebar fixe */
   padding: 40px;
   box-sizing: border-box;
-  max-width: 1400px; /* Évite que le contenu s'étale trop sur les écrans géants */
+  max-width: 1400px;
+  /* Évite que le contenu s'étale trop sur les écrans géants */
 }
 
 /* --- 2️⃣ ÉTATS INTERMÉDIAIRES (Chargement & Vide) --- */
@@ -182,7 +193,9 @@ const goToSchedulePage = (id) => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state-card {
@@ -234,13 +247,15 @@ const goToSchedulePage = (id) => {
 /* --- 3️⃣ GRILLE DES CARTES (Dashboard Actif) --- */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* 2/3 pour les infos, 1/3 pour le statut */
+  grid-template-columns: 2fr 1fr;
+  /* 2/3 pour les infos, 1/3 pour le statut */
   gap: 30px;
   align-items: start;
 }
 
 .multi-asso-selector {
-  grid-column: 1 / -1; /* Aligné tout en haut sur toute la largeur */
+  grid-column: 1 / -1;
+  /* Aligné tout en haut sur toute la largeur */
   background: #fdf0eb;
   padding: 15px 20px;
   border-radius: 10px;
@@ -291,7 +306,8 @@ section {
   font-weight: 800;
 }
 
-.edit-btn,  .schedule-btn {
+.edit-btn,
+.schedule-btn {
   background: white;
   border: 1px solid darksalmon;
   color: darksalmon;
@@ -327,7 +343,8 @@ section {
   border: 1px solid rgba(233, 150, 122, 0.15);
 }
 
-.asso-official-name, .asso-rna {
+.asso-official-name,
+.asso-rna {
   margin: 4px 0;
   font-size: 0.9rem;
   color: #7c6a63;
@@ -407,6 +424,7 @@ section {
   border-color: #d5ebd5;
   color: #2b542c;
 }
+
 .status-on .indicator-dot {
   background: #4cae4c;
   box-shadow: 0 0 8px rgba(76, 174, 76, 0.6);
@@ -431,6 +449,7 @@ section {
   border-color: #d6e4f7;
   color: #1d4473;
 }
+
 .status-verified .indicator-badge {
   background: #0275d8;
   box-shadow: 0 2px 6px rgba(2, 117, 216, 0.3);

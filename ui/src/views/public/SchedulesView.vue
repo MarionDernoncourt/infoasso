@@ -7,7 +7,7 @@
     <div class="header">
       <h1>Planning des activités</h1>
       <div class="button-action">
-        <button class="add-schedule-btn" @click="goToCreateSchedulePage">Ajouter une activité</button>
+        <button v-if="isOwner" class="add-schedule-btn" @click="goToCreateSchedulePage">Ajouter une activité</button>
         <button class="back-btn" @click="goToAssociationCard">Retour à la fiche</button>
       </div>
     </div>
@@ -42,7 +42,7 @@ const route = useRoute();
 const router = useRouter();
 const allSchedules = ref([]);
 const isLoading = ref(false);
-
+const currentLoggedEmail = localStorage.getItem('user_email');
 const selectedActivity = ref(null);
 const assoId = route.params.id;
 
@@ -54,6 +54,10 @@ console.log("activity: ", selectedActivity.value)
 const closeDetail = () => {
   selectedActivity.value = null;
 };
+const isOwner = computed(() => {
+  if(filteredSchedules.value.length === 0) return false;
+return currentLoggedEmail === filteredSchedules.value[0].association.ownerEmail;
+});
 
 // Récupération des données
 const fetchAllSchedules = async () => {

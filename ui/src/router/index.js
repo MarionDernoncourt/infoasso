@@ -8,4 +8,17 @@ const router = createRouter({
   routes: [...publicRoutes, ...authRoutes, ...protectedRoutes],
 });
 
+/// le garde fou global
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  const isAuth = !!token; //devien true si token présent, false sinon
+
+  // si la route est protégée mais pas de token:
+  if (to.meta.requiresAuth && !isAuth) {
+    next({ name: "login" });
+  } else {
+    next();
+  }
+});
+
 export default router;

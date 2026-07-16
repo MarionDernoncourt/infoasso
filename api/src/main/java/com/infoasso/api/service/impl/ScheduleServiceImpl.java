@@ -18,6 +18,9 @@ import com.infoasso.api.service.ILocationService;
 import com.infoasso.api.service.IScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,9 +103,16 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // 1. Vérification si schedule existe
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));
+        // 2. Vérification owner est bien celui connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = authentication.getName();
 
-        // 2. Mise à jour de l'entité
+        Association association = schedule.getAssociation();
+        if (!association.getOwner().equals(currentEmail)) {
+            throw new AccessDeniedException("Tu n'es pas autorisé à modifier cette association.");
+        }
+        // 3. Mise à jour de l'entité
         Schedule updatedSchedule = scheduleRepository.save(updateEntityFromDto(schedule, scheduleUpdateDto));
 
         return mapToReadDto(updatedSchedule);
@@ -149,6 +159,7 @@ public class ScheduleServiceImpl implements IScheduleService {
             AssociationSummaryDto assoDto = new AssociationSummaryDto();
             assoDto.setId(schedule.getAssociation().getId());
             assoDto.setDisplayName(schedule.getAssociation().getDisplayName());
+            assoDto.setOwnerEmail(schedule.getAssociation().getOwner().getEmail());
             readDto.setAssociation(assoDto);
         }
 

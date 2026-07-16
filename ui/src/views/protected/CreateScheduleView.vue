@@ -23,18 +23,35 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TheSidebar from '@/components/layout/TheSidebar.vue';
 import ScheduleForm from '@/components/schedules/ScheduleForm.vue';
 import TheHeader from '@/components/layout/TheHeader.vue';
 import schedulesService from '@/services/schedules.service';
+import assoService from '@/services/asso.service';
 
 const router = useRouter();
 const route = useRoute();
 
 const isSubmitting = ref(false);
 const backendErrors = ref({});
+
+onMounted(async () => {
+  try {
+    const data = await assoService.getById(route.params.id);
+    const userEmail = localStorage.getItem("user_email");
+
+    if(data.ownerEmail !== userEmail) {
+      alert("Vous n'êtes pas autorisé a créer des activités !")
+      router.push({name : 'dashboard'});
+      return;
+    }
+  } catch (err) {
+    console.error("Erreur: ", err);
+    router.push({ name: 'dashboard'});
+  }
+});
 
 const handleCancel = () => {
   router.push("/dashboard");

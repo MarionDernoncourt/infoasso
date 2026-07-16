@@ -62,7 +62,7 @@ public class SecurityConfig {
                         // 1. Inscription et Connexion
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll() // Doit matcher EXACTEMENT ton Controller
-
+                        .requestMatchers("/api/enums/**").permitAll()
                         //2. Swagger et OpenAPI
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 

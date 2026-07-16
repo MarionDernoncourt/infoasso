@@ -41,6 +41,14 @@ onMounted(async () => {
 
     const assoId = route.params.id; // Récupère l'id depuis l'URL
     const response = await assoService.getById(assoId);
+    const userEmail = localStorage.getItem("user_email");
+
+    if (response.ownerEmail !== userEmail) {
+      alert("Vous n'êtes pas autorisé à modifier cette association.");
+      router.push("/dashboard");
+    }
+
+
 
     asso.value = response;
 
@@ -133,8 +141,15 @@ const handleCancel = () => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
