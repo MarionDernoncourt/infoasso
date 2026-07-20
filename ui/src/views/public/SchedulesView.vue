@@ -39,6 +39,7 @@ import ScheduleTable from '@/components/schedules/ScheduleTable.vue';
 import ScheduleFilter from '@/components/schedules/ScheduleFilter.vue';
 import schedulesService from '@/services/schedules.service';
 import ScheduleDetails from '@/components/schedules/ScheduleDetails.vue';
+import assoService from '@/services/asso.service';
 
 const route = useRoute();
 const router = useRouter();
@@ -47,7 +48,7 @@ const isLoading = ref(false);
 const currentLoggedEmail = localStorage.getItem('user_email');
 const selectedActivity = ref(null);
 const assoId = route.params.id;
-
+const isOwner = ref(false);
 const openDetail = (activity) => {
   selectedActivity.value = activity;
 console.log("activity: ", selectedActivity.value)
@@ -56,11 +57,9 @@ console.log("activity: ", selectedActivity.value)
 const closeDetail = () => {
   selectedActivity.value = null;
 };
-const isOwner = computed(() => {
-  if(filteredSchedules.value.length === 0) return false;
-return currentLoggedEmail === filteredSchedules.value[0].association.ownerEmail;
+const filteredSchedules = computed(() => {
+  return allSchedules.value;
 });
-
 // Récupération des données
 const fetchAllSchedules = async () => {
   isLoading.value = true;
@@ -72,14 +71,20 @@ const fetchAllSchedules = async () => {
     isLoading.value = false;
   }
 };
-
-onMounted(fetchAllSchedules);
-
-// Le computed qui servira à filtrer tes données pour la Table
-const filteredSchedules = computed(() => {
-  // Pour l'instant, on renvoie tout.
-  // Tu ajouteras ta logique de filtrage ici plus tard !
-  return allSchedules.value;
+const checkOwnerShip = async () => {
+  try {
+    const asso = await assoService.getById(assoId);
+    isOwner.value = (currentLoggedEmail && asso?.owner?.email === currentLoggedEmail);
+  } catch(error){
+    console.error("Erreur de vérification propriétaire: ", error);
+    isOwner.value = false;
+  }
+}
+onMounted(async () => {
+  await Promise.all([
+    fetchAllSchedules(),
+    checkOwnerShip()
+  ]);
 });
 
 const handleFilterSearch = async (filters) => {
@@ -110,11 +115,16 @@ const goToCreateSchedulePage = () => {
   router.push(`/association/${assoId}/createSchedule`);
 }
 const goToAssociationCard = () => {
+    if(isOwner.value === true) {
   router.push("/dashboard");
+    } else {
+      router.push(`/association/${assoId}`);
+    }
+
 }
 </script>
 
-<style scopep>
+<style scoped>
 .public-schedule-page {
   margin-left: 260px;
   padding: 40px;
