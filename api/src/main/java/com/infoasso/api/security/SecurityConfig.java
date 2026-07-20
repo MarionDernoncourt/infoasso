@@ -68,7 +68,7 @@ public class SecurityConfig {
 
                         // 3. Lecture publique
                         .requestMatchers(HttpMethod.GET, "/api/associations/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schedules/**").permitAll()
 
                         // 4. Authentification obligatoire pour TOUT LE RESTE (POST, PUT, DELETE)

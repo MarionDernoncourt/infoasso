@@ -23,7 +23,7 @@
 import { ref } from "vue";
 import TheSidebar from '@/components/layout/TheSidebar.vue';
 import TheHeader from '@/components/layout/TheHeader.vue';
-import AssoForm from '@/components/forms/AssoForm.vue';
+import AssoForm from '@/components/asso/AssoForm.vue';
 import { useRouter } from 'vue-router'
 import assoService from '@/services/asso.service';
 

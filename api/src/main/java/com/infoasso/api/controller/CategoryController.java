@@ -66,7 +66,6 @@ public class CategoryController {
     }
 
     @GetMapping("/types")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CategoryType[]> getCategoryType() {
         logger.info("GET / : Request received for category types");
         return ResponseEntity.ok(CategoryType.values());
