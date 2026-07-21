@@ -14,7 +14,6 @@
             <strong>Envie d'explorer ?</strong> Pas besoin de s'inscrire !
             <router-link to="/" class="inline-link-salmon">Trouvez votre bonheur ici</router-link> pour découvrir le tissu associatif local.
           </p>
-
         </div>
 
         <div class="audience-section asso-section">
@@ -43,24 +42,43 @@
         <p class="form-subtitle">Réservé aux membres du bureau ou gestionnaires de l'association.</p>
 
         <form @submit.prevent="register">
+
+          <!-- EMAIL -->
           <div class="form-group">
             <label class="form-line">
-              Email de l'association
-              <input type="email" v-model="userData.email" placeholder="contact@votre-asso.fr">
+              E-mail de gestion (ou de l'association)
+              <input type="email" v-model="userData.email" placeholder="contact@votre-asso.fr" required>
             </label>
             <p v-if="fieldErrors.email" class="error-text"> {{ fieldErrors.email }}</p>
           </div>
 
+          <!-- MOT DE PASSE AVEC OEIL -->
           <div class="form-group">
             <label class="form-line">
               Mot de passe
-              <input type="password" v-model="userData.password" placeholder="••••••••">
+              <div class="password-input-wrapper">
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  v-model="userData.password"
+                  placeholder="••••••••"
+                  required
+                >
+                <button type="button" class="toggle-password-btn" @click="showPassword = !showPassword" tabindex="-1">
+                  {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
             </label>
+
+            <p class="password-hints">
+              Doit contenir au moins 8 caractères, 1 majuscule et 1 caractère spécial.
+            </p>
+
             <p v-if="fieldErrors.password" class="error-text">
               {{ fieldErrors.password }}
             </p>
           </div>
 
+          <!-- GDPR -->
           <div class="form-group gdpr-group">
             <label class="gdpr-label">
               <input type="checkbox" v-model="userData.gdprConsent" required>
@@ -85,11 +103,12 @@
 
     </div>
 
+    <!-- MODAL GDPR -->
     <div v-if="isModalOpen" class="modal-overlay" @click="isModalOpen = false">
       <div class="modal-content" @click.stop>
         <h3>Politique de Confidentialité</h3>
         <hr>
-        <p><strong>1. Données collectées :</strong> Nous collectons uniquement l'adresse email de l'association et le mot de passe (haché de manière sécurisée).</p>
+        <p><strong>1. Données collectées :</strong> Nous collectons uniquement l'adresse email de gestion et le mot de passe (haché de manière sécurisée).</p>
         <p><strong>2. Finalité :</strong> Ces données sont nécessaires pour créer le compte de votre structure et sécuriser l'accès à la gestion de votre page INFO ASSO.</p>
         <p><strong>3. Partage :</strong> Vos données restent strictement confidentielles et ne seront jamais partagées ou vendues à des tiers.</p>
         <p><strong>4. Vos droits :</strong> Vous pouvez demander la suppression du compte de l'association et de ses données à tout moment.</p>
@@ -113,6 +132,7 @@ const userData = ref({
   gdprConsent: false,
 });
 
+const showPassword = ref(false);
 const fieldErrors = ref({});
 const isLoading = ref(false);
 const isModalOpen = ref(false);
@@ -122,15 +142,13 @@ const register = async () => {
   fieldErrors.value = {};
 
   try {
-    const response = await authService.register(userData.value);
+    await authService.register(userData.value);
 
-    // Si l'inscription réussit (201), on enchaîne le login automatique
     await authService.login({
       email: userData.value.email,
       password: userData.value.password
     });
 
-    // Direction le dashboard !
     router.push("/dashboard");
   } catch (error) {
     console.log("Erreur de connexion", error);
@@ -144,7 +162,11 @@ const register = async () => {
         fieldErrors.value = { message: "Une erreur est survenue sur le serveur." };
       }
     } else {
-      fieldErrors.value = { message: "Connexion impossible. Le serveur ne répond pas." };
+      if (error.response?.data?.message) {
+         fieldErrors.value = { message: error.response.data.message };
+      } else {
+         fieldErrors.value = { message: "Connexion impossible. Le serveur ne répond pas." };
+      }
     }
   } finally {
     isLoading.value = false;
@@ -223,10 +245,6 @@ const register = async () => {
   line-height: 1.4;
 }
 
-.audience-features li {
-  text-align: left;
-}
-
 .citizen-section {
   margin-top: 10px;
   margin-bottom: 30px;
@@ -242,10 +260,6 @@ const register = async () => {
   color: #b34e36;
   font-weight: bold;
   text-decoration: underline;
-}
-
-.inline-link-salmon:hover {
-  color: #2c1a14;
 }
 
 .cta-section {
@@ -315,19 +329,61 @@ const register = async () => {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
   padding: 12px 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
   background-color: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 input:focus {
   outline: none;
   border-color: darksalmon;
   background-color: white;
+}
+
+/* --- CHAMP MOT DE PASSE AVEC ŒIL INTÉGRÉ --- */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 45px; /* Laisse l'espace pour ne pas écrire sous l'œil */
+  box-sizing: border-box;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.toggle-password-btn:hover {
+  color: #000;
+}
+
+.password-hints {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 5px 0 0 0;
+  line-height: 1.3;
 }
 
 .gdpr-group {
@@ -450,10 +506,6 @@ button:disabled {
   cursor: pointer;
   margin-top: 10px;
   float: right;
-}
-
-.close-modal-btn:hover {
-  opacity: 0.9;
 }
 
 /* --- RESPONSIVE MOBILE --- */
