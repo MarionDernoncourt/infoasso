@@ -20,6 +20,7 @@ export default {
 
   // Mise à jour d'un schedule via son id
   async update(assoId, scheduleId, scheduleUpdateDto) {
+    console.log("Token envoyé :", localStorage.getItem("token"));
     const response = await apiClient.put(
       `/associations/${assoId}/schedules/${scheduleId}`,
       scheduleUpdateDto,

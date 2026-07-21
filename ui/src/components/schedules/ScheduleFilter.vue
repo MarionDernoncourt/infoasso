@@ -16,13 +16,12 @@
         <input type="number"
         id="age"
         v-model="filters.age"
-        placeholder="10"
         /> ```
       </div>
 
       <div class="form-group">
         <label for="city">Ville</label>
-        <input type="text" id="city" v-model="filters.city" placeholder="Lille" />
+        <input type="text" id="city" v-model="filters.city"  />
 
       </div>
     </div>
@@ -83,7 +82,7 @@ const cancelFilters = () => {
 
 <style scoped>
 .filters-area {
-  width: 260px;
+  width: var(--sidebar-width);
   background-color: #2c1a14;
   color: white;
   display: flex;
@@ -91,9 +90,10 @@ const cancelFilters = () => {
   padding: 30px 20px;
   box-sizing: border-box;
   position: fixed;
-  height: 100vh;
+  top: var(--header-height);
   left: 0;
-  top: 0;
+  height: calc(100vh - var(--header-height));
+  z-index: 100;
 }
 
 .form-section {
@@ -107,7 +107,7 @@ const cancelFilters = () => {
 
 .form-section h2 {
   font-size: 1.2rem;
-  color: #2c1f18;
+  color: var(--text-main);
   margin: 0;
   font-weight: 600;
 }
@@ -134,15 +134,14 @@ button {
   margin: 10px;
   background: #f4f0ed;
 
-  color: #2c1f18;
-  /* Gris-marron doux */
+  color: var(--text-main);
   border: 1px solid #dcd1ca;
 }
 
 .submit-btn:hover,
 .cancel-btn:hover {
   color: #5a4d46;
-  border: 1px solid darksalmon;
+  border: 1px solid var(--primary-color);
 
 }
 

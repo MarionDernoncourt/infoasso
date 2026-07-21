@@ -2,8 +2,7 @@
   <section class="info-card">
     <div class="card-header">
       <h3>Informations Générales</h3>
-      <button class="schedules-btn" @click="goToSchedules">Voir le planning</button>
-
+      <button v-if="!isOwner"  class="schedules-btn" @click="goToSchedules">Voir le planning</button>
       <slot name="actions"></slot>
     </div>
 
@@ -32,16 +31,37 @@
 
 <script setup>
 import { useRouter, useRoute } from "vue-router"
+import { ref, onMounted } from 'vue';
+import assoService from "@/services/asso.service";
 
 const router = useRouter();
 const route = useRoute();
+const currentLoggedEmail = localStorage.getItem('user_email');
+const isOwner = ref(false);
 
-defineProps({
+const props = defineProps({
   asso: { type: Object, required: true }
 });
 const goToSchedules = () => {
   router.push(`/association/${route.params.id}/scheduleView`);
 };
+
+const checkOwnerShip = async () => {
+  try {
+    const asso = await assoService.getById(props.asso.id);
+    isOwner.value = (currentLoggedEmail && asso?.ownerEmail === currentLoggedEmail);
+    console.log(isOwner.value, currentLoggedEmail);
+  } catch(error){
+    console.error("Erreur de vérification propriétaire: ", error);
+    isOwner.value = false;
+  }
+}
+
+onMounted(async () => {
+  checkOwnerShip();
+})
+
+
 
 </script>
 
@@ -67,15 +87,8 @@ const goToSchedules = () => {
   font-size: 1.25rem;
   font-weight: 800;
 }
-.schedules-btn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: darksalmon;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+
+
 
 .asso-profile h4 {
   margin: 0 0 8px 0;

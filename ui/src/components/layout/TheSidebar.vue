@@ -1,8 +1,5 @@
 <template>
   <aside class="dashboard-sidebar">
-    <div class="sidebar-brand">
-      <h2>INFO ASSO</h2>
-    </div>
 
     <nav class="sidebar-menu">
       <router-link to="/dashboard" class="menu-item" active-class="active">Fiche et Créneaux</router-link>
@@ -62,12 +59,16 @@ const logout = async () => {
   color: white;
   display: flex;
   flex-direction: column;
-  padding: 30px 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: var(--header-height);
   box-sizing: border-box;
   position: fixed;
   height: 100vh;
   left: 0;
   top: 0;
+  z-index: 100;
+
 }
 
 .sidebar-brand h2 {
@@ -84,6 +85,7 @@ const logout = async () => {
   flex-direction: column;
   gap: 10px;
   flex: 1;
+  margin: 20px 0px;
 }
 
 .menu-item {
@@ -128,12 +130,18 @@ const logout = async () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 20px;
 }
-
+.user-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .user-email {
   font-size: 0.85rem;
   color: #bbb;
   text-align: center;
+  padding: 10px;
 }
 
 .logout-btn {

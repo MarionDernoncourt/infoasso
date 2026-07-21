@@ -109,7 +109,8 @@ public class ScheduleServiceImpl implements IScheduleService {
         String currentEmail = authentication.getName();
 
         Association association = schedule.getAssociation();
-        if (!association.getOwner().equals(currentEmail)) {
+        if (!association.getOwner().getEmail().equals(currentEmail)) {
+
             throw new AccessDeniedException("Tu n'es pas autorisé à modifier cette association.");
         }
         // 3. Mise à jour de l'entité

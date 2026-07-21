@@ -8,7 +8,8 @@
       <div class="form-wrapper">
         <AssoForm v-if="asso" :initialData="asso" submit-button-text="Enregistrer les modifications"
           :is-submitting="isSubmitting" :errors="backendErrors" :key="asso.id" form-title="Modifier la fiche"
-          @submit="handleUpdateAsso" @cancel="handleCancel" />
+
+          @back="handleBackToDashboard" @submit="handleUpdateAsso" @cancel="handleCancel" />
         <div v-else class="loading-state">
           <p>Chargement des informations de votre structure...</p>
         </div>
@@ -21,7 +22,7 @@
 <script setup>
 import TheSidebar from '@/components/layout/TheSidebar.vue';
 import TheHeader from '@/components/layout/TheHeader.vue';
-import AssoForm from '@/components/forms/AssoForm.vue';
+import AssoForm from '@/components/asso/AssoForm.vue';
 import { useRouter, useRoute } from "vue-router"
 import { ref, onMounted } from "vue"
 import assoService from '@/services/asso.service';
@@ -41,14 +42,12 @@ onMounted(async () => {
 
     const assoId = route.params.id; // Récupère l'id depuis l'URL
     const response = await assoService.getById(assoId);
-    const userEmail = localStorage.getItem("user_email");
+    const userStockedEmail = localStorage.getItem("user_email");
 
-    if (response.ownerEmail !== userEmail) {
+    if (response.ownerEmail !== userStockedEmail) {
       alert("Vous n'êtes pas autorisé à modifier cette association.");
       router.push("/dashboard");
     }
-
-
 
     asso.value = response;
 
@@ -87,6 +86,9 @@ const handleUpdateAsso = async (updateData) => {
     isSubmitting.value = false;
   }
 }
+const handleBackToDashboard = () => {
+  router.push("/dashboard");
+}
 const handleCancel = () => {
   router.push("/dashboard");
 }
@@ -107,6 +109,7 @@ const handleCancel = () => {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  padding: var(--header-height) 20px;
 }
 
 /* 📦 Conteneur du formulaire */

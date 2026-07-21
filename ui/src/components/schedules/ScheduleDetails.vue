@@ -25,7 +25,7 @@
         <p>{{ activity.location?.zipCode }} {{ activity.location?.city }}</p>
       </div>
 
-
+<button class="update-schedule"  @click="$emit('updateSchedule')">Modifier l'activité</button>
     </div>
   </div>
 </template>
@@ -114,7 +114,6 @@ defineEmits(['close']);
 }
 
 .close-btn:hover {
-  transform: scale(1.2);
   color: darksalmon;
   margin: 0px;
 }

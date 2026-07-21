@@ -9,6 +9,7 @@
       <div class="form-wrapper">
         <AssoForm
         submit-button-text="Créer la fiche de votre assocation"
+        :showBackBtn="false"
         :is-submitting="isSubmitting"
           :errors="backendErrors"
           form-title="Créer une nouvelle association"
@@ -30,6 +31,7 @@ import assoService from '@/services/asso.service';
 const router = useRouter();
 const isSubmitting = ref(false);
 const backendErrors = ref({});
+
 
 const handleCancel = () => {
   router.push('/dashboard');

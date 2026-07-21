@@ -94,9 +94,9 @@ const handleCreateSchedule = async (formData) => {
 
 .createSchedule-main {
   flex: 1; /* Prend tout l'espace restant à droite de la sidebar */
-  padding: 2rem;
   background-color: #f4f7f6; /* Couleur de fond légère */
   overflow-y: auto;
+  padding-top: 20px;
 }
 
 .form-wrapper {
