@@ -1,9 +1,11 @@
 <template>
   <form @submit.prevent="handleSubmit" class="schedule-form">
-    <h2 class="form-title">
-      {{ initialData ? " Modifier l'horaire" : "Ajouter une activité " }}
-    </h2>
-
+    <div class="header-title">
+      <h2 class="form-title">
+        {{ initialData ? " Modifier l'horaire" : "Ajouter une activité " }}
+      </h2>
+      <button class="back-btn" @click="goToDashboard">Retour à la fiche</button>
+    </div>
     <div class="form-section">
       <h3>Nom de l'activité</h3>
 
@@ -97,7 +99,8 @@
         </div>
         <div class="form-group">
           <label for="zipCode">Code Postal</label>
-          <input type="text" id="zipCode" v-model="formData.location.zipCode" placeholder="Ex: 59000" pattern="[0-9]{5}" title="Entrez 5 chiffres" />
+          <input type="text" id="zipCode" v-model="formData.location.zipCode" placeholder="Ex: 59000" pattern="[0-9]{5}"
+            title="Entrez 5 chiffres" />
         </div>
       </div>
     </div>
@@ -116,6 +119,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from "vue-router"
 import schedulesService from "@/services/schedules.service";
+import router from '@/router';
 
 const route = useRoute();
 
@@ -153,13 +157,20 @@ const formData = ref({
   description: "",
   // Champs pour la Location
   location: {
-  name: "",
-  address: "",
-  city: "",
-  zipCode: "",}
+    name: "",
+    address: "",
+    city: "",
+    zipCode: "",
+  }
 })
 
+const goToDashboard = () => {
+  router.push("/dashboard");
+}
+
+
 onMounted(async () => {
+
   console.log("Route actuelle :", route.name);
 
   //Récupération des ENUMs pour le Select
@@ -185,10 +196,12 @@ watch(() => props.initialData, (newVal) => {
       associationId: newVal.association.id,
       description: newVal.description,
       // Pour la Location
-      name: newVal.location?.name,
-      address: newVal.location?.address,
-      city: newVal.location?.city,
-      zipCode: newVal.location?.zipCode
+   location: {
+        name: newVal.location?.name || "",
+        address: newVal.location?.address || "",
+        city: newVal.location?.city || "",
+        zipCode: newVal.location?.zipCode || ""
+      }
     };
   }
 }, { immediate: true });
@@ -202,6 +215,13 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
+.header-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .schedule-form h2 {
   margin-bottom: 1.5rem;
   color: #333;
@@ -246,23 +266,17 @@ select {
   margin-top: 2rem;
 }
 
-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  font-weight: bold;
-}
-
-.submit-btn {
-  background-color: #2ecc71;
-  color: white;
-}
-
 .cancel-btn {
-  background-color: #95a5a6;
-  color: white;
+   background-color: transparent;
+  color: #7c6d64;
+  border: 1px solid #dcd1ca;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+    padding: 8px 16px;
 }
+
 .form-row {
   display: flex;
   flex-wrap: wrap;

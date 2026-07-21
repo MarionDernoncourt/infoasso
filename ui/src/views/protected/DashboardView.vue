@@ -34,11 +34,14 @@
         <AssoCard :asso="selectedAsso">
           <template #actions>
             <div class="header-btn">
-              <button type="button" class="schedule-btn" @click="goToSchedulePage(selectedAsso?.id)">Planning</button>
-              <button type="button" class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier</button>
+              <button type="button" class="schedule-btn" @click="goToSchedulePage(selectedAsso?.id)">Accéder le
+                planning</button>
+              <button type="button" class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la
+                fiche</button>
             </div>
           </template>
         </AssoCard>
+        <!--  A AJOUTER A LA V2 !!!!!
 
         <section class="status-card">
           <h3>🛡️ Statut de la structure</h3>
@@ -53,6 +56,8 @@
             </div>
           </div>
         </section>
+        -->
+
       </div>
     </main>
   </div>
@@ -120,7 +125,6 @@ const goToSchedulePage = (id) => {
 
 .dashboard-main {
   flex: 1;
-  margin-left: 260px;
   padding: 40px;
   box-sizing: border-box;
   max-width: 1400px;
@@ -187,6 +191,7 @@ const goToSchedulePage = (id) => {
   grid-template-columns: 2fr 1fr;
   gap: 30px;
   align-items: start;
+  padding-left: calc(var(--sidebar-width) + 20px);
 }
 
 .multi-asso-selector {
@@ -215,21 +220,7 @@ section {
   gap: 10px;
 }
 
-.edit-btn,
-.schedule-btn {
-  background: white;
-  border: 1px solid darksalmon;
-  color: darksalmon;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
 
-.edit-btn:hover,
-.schedule-btn:hover {
-  background: #fdf0eb;
-}
 
 .status-indicators {
   display: flex;

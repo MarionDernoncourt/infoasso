@@ -28,6 +28,7 @@ defineProps({
   margin-bottom: 40px;
   border-bottom: 1px solid #eee;
   padding-bottom: 20px;
+  padding-left: calc(var(--sidebar-width) + 30px);
 }
 
 .main-header h1 {

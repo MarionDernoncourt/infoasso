@@ -1,6 +1,10 @@
 <template>
   <form @submit.prevent="handleSubmit" class="asso-form">
+    <div class="header-main">
     <h2 class="form-title">{{ formTitle }}</h2>
+    <button  class="back-btn" @click="$emit('back')">Retour</button>
+
+  </div>
 
     <div class="form-section">
       <h3>🏢 Identité de la structure</h3>
@@ -151,10 +155,10 @@ const props = defineProps({
   formTitle: {
     type: String,
     default: "Fiche Association"
-  }
+  },
 });
 
-const emit = defineEmits(["submit", "cancel"]);
+const emit = defineEmits(["submit", "cancel", "back"]);
 
 // VARIABLES REACTIVES
 const categoryTypes = ref([]);
@@ -178,6 +182,7 @@ const formData = ref({
 const isCheckingRNA = ref(false);
 const rnaError = ref(false);
 const rnaSuccess = ref(false);
+
 
 // FONCTIONS POUR LES CATÉGORIES
 // 1. Quand on change de secteur, on réinitialise l'activité spécifique
@@ -270,7 +275,12 @@ const handleSubmit = () => {
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-
+.header-main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
 /* --- Sections du formulaire --- */
 .form-section {
   display: flex;
@@ -411,20 +421,20 @@ textarea:focus {
   color: #2c1f18;
 }
 
-.submit-btn {
-  padding: 12px 32px;
-  background-color: #ff7a59;
-  /* Bouton principal d'action */
-  color: #ffffff;
-  border: none;
+.submit-btn,
+.back-btn {
+  background: white;
+  border: 1px solid darksalmon;
+  color: darksalmon;
+  padding: 8px 16px;
   border-radius: 8px;
-  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-weight: 600;
 }
 
-.submit-btn:hover:not(:disabled) {
-  background-color: #e56342;
+.submit-btn:hover:not(:disabled),
+.back-btn:hover {
+  background: #fdf0eb;
 }
 
 .submit-btn:disabled {

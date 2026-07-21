@@ -26,6 +26,8 @@
       v-if="selectedActivity"
       :activity="selectedActivity"
       @close="closeDetail"
+      @updateSchedule="updateSchedule"
+
     />
 
     </div>
@@ -49,10 +51,17 @@ const currentLoggedEmail = localStorage.getItem('user_email');
 const selectedActivity = ref(null);
 const assoId = route.params.id;
 const isOwner = ref(false);
+
+
 const openDetail = (activity) => {
   selectedActivity.value = activity;
 console.log("activity: ", selectedActivity.value)
 };
+
+const updateSchedule = () => {
+  console.log(selectedActivity.value.id);
+  router.push(`/association/${assoId}/updateSchedule/${selectedActivity.value.id}`)
+}
 
 const closeDetail = () => {
   selectedActivity.value = null;
@@ -74,7 +83,8 @@ const fetchAllSchedules = async () => {
 const checkOwnerShip = async () => {
   try {
     const asso = await assoService.getById(assoId);
-    isOwner.value = (currentLoggedEmail && asso?.owner?.email === currentLoggedEmail);
+    isOwner.value = (currentLoggedEmail && asso?.ownerEmail === currentLoggedEmail);
+    console.log(isOwner.value, currentLoggedEmail);
   } catch(error){
     console.error("Erreur de vérification propriétaire: ", error);
     isOwner.value = false;
@@ -114,20 +124,24 @@ const handleFilterSearch = async (filters) => {
 const goToCreateSchedulePage = () => {
   router.push(`/association/${assoId}/createSchedule`);
 }
-const goToAssociationCard = () => {
-    if(isOwner.value === true) {
-  router.push("/dashboard");
-    } else {
-      router.push(`/association/${assoId}`);
-    }
 
+const goToAssociationCard = async () => {
+  await checkOwnerShip();
+
+  console.log("Valeur de isOwner après check :", isOwner.value);
+  console.log("Email stocké :", currentLoggedEmail);
+
+  if (isOwner.value === true) {
+    router.push("/dashboard");
+  } else {
+    router.push(`/association/${assoId}`);
+  }
 }
 </script>
 
 <style scoped>
 .public-schedule-page {
   margin-left: 260px;
-  padding: 40px;
   background-color: #f9f7f6;
   min-height: 100vh;
 }
@@ -142,26 +156,18 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 20px;
 }
 
 .back-btn,
 .add-schedule-btn {
-  background: white;
-  border: 1px solid darksalmon;
-  color: darksalmon;
+
   padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+
   margin: 10px;
 }
 
-.back-btn:hover,
-.add-schedule-btn:hover {
-  background: #fdf0eb;
-  transform: translateY(-1px);
-}
+
 
 h1 {
   color: #2c1a14;

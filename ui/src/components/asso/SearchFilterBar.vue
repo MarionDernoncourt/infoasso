@@ -15,7 +15,7 @@
 
     <button @click="handleSearch">Rechercher</button>
     <button @click="cancelFilters">Réinitialiser les filtres</button>
-  </div>>
+  </div>
 </template>
 
 <script setup>
@@ -82,12 +82,5 @@ select {
   border-radius: 6px;
 }
 
-button {
-  background: darksalmon;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-}
+
 </style>

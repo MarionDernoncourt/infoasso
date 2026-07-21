@@ -23,5 +23,8 @@ export default {
 
   logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_role");
   },
 };

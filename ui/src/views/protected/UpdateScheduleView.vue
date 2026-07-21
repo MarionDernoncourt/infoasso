@@ -14,7 +14,9 @@
         :is-submitting="isSubmitting"
         :errors="backendErrors"
           submit-button-text="Modifier"
-          @submit="handleUpdateSchedule" @cancel="handleCancel" />
+
+          @submit="handleUpdateSchedule"
+          @cancel="handleCancel" />
       </div>
     </div>
   </div>
@@ -82,6 +84,7 @@ const handleUpdateSchedule = async (formData) => {
       ...formData,
       associationId: Number(route.params.id),
     }
+    console.log(assoId, scheduleId, payload);
     await schedulesService.update(assoId, scheduleId, payload);
 
     alert("L'horaire a été modifié avec succès");
