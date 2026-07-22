@@ -34,8 +34,6 @@ Le projet utilise des fichiers de configuration sécurisés pour les variables s
 2. Dupliquez ce fichier et renommez-le en `.env`.
 3. Renseignez les variables requises (identifiants de base de données, clés secrètes JWT, etc.) selon votre environnement local.
 
-> *Note : Le fichier `.env` contenant vos informations personnelles et sensibles est ignoré par Git et ne doit jamais être versionné.*
-
 ---
 
 ## 📦 Installation et Lancement
@@ -50,3 +48,16 @@ Le projet utilise des fichiers de configuration sécurisés pour les variables s
 * Lancez le serveur backend depuis votre IDE ou via votre terminal :  
   ```bash
   ./mvnw spring-boot:run
+
+### 2. Frontend (Vue.js)
+
+* Rendez-vous dans le dossier du frontend : ```cd chemin/vers/frontend```
+* Installation des dépendances : ```npm install```
+* Lancez l'application en mode développement : ```npm run dev```
+
+## 🔒 Sécurité et Bonnes Pratiques
+* **Gestion des Sessions (JWT) :** Stockage sécurisé des tokens et nettoyage automatique de l'ensemble des données utilisateur en local storage (token, user_email, rôle) en cas d'interception d'une réponse 401 Unauthorized.
+
+* **Contrôle d'accès :** Vérification systématique de la propriété d'une structure (isOwner) combinée aux rôles côté back et front pour interdire toute modification non autorisée.
+
+* **Accessibilité Numérique :** Respect des bonnes pratiques d'ergonomie et d'accessibilité (ARIA) pour garantir une navigation fluide aux utilisateurs en situation de handicap (lecteurs d'écran, navigation au clavier).
