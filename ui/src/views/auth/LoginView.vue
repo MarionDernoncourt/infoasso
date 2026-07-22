@@ -1,36 +1,56 @@
 <template>
-  <div class="main-container">
+  <div class="main-container" role="main">
     <div class="form-container">
 
       <h1>INFO ASSO</h1>
 
-      <form @submit.prevent="login">
+      <form @submit.prevent="login" aria-label="Formulaire de connexion">
 
   <div class="form-group">
-    <label class="form-line">
+    <label class="form-line" for="email">
       Email
-      <input type="email" v-model="credentials.email">
+      <input
+      type="email"
+      v-model="credentials.email"
+      id="email"
+      required
+      aria-required="true"
+      autocomplete="email"
+      aria-describedby="emailError"
+      >
     </label>
-    <p v-if="fieldErrors.email" class="error-text">
+    <p v-if="fieldErrors.email" id="emailError" class="error-text">
       {{ fieldErrors.email }}
     </p>
   </div>
 
   <div class="form-group">
-    <label class="form-line">
+    <label class="form-line" for="password">
       Mot de passe
-      <input type="password" v-model="credentials.password">
+      <input
+      type="password"
+      v-model="credentials.password"
+      id="password"
+      required
+      aria-required="true"
+      autocomplete="current-password"
+      aria-describedby="passwordError"
+      >
     </label>
-    <p v-if="fieldErrors.password" class="error-text">
+    <p v-if="fieldErrors.password" id="passwordError" class="error-text">
       {{ fieldErrors.password }}
     </p>
   </div>
 
-  <button type="submit" :disabled="isLoading">
+  <button
+  type="submit"
+  :disabled="isLoading"
+  aria-label="Se connecter à votre compte"
+  >
     {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
   </button>
 
-  <p v-if="fieldErrors.message" class="error-text global-error">
+  <p v-if="fieldErrors.message" class="error-text global-error" role="alert">
     {{ fieldErrors.message }}
   </p>
 

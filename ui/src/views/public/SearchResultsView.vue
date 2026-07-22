@@ -1,17 +1,17 @@
 <template>
-  <div class="search-layout">
+  <div class="search-layout" role="main" aria-label="Page de résultat de recherche d'association">
     <header>
       <SearchFilterBar
       :initial-query="route.query.q" />
     </header>
 
-    <div v-if="isLoading">Chargement en cours...</div>
+    <div v-if="isLoading" role="status" aria-live="polite">Chargement en cours...</div>
 
-    <div v-else class="results-grid">
+    <div v-else-if="results.length > 0" class="results-grid" role="region" aria-label="Résultat des associations trouvées selon la recherche">
       <AssoCardResult v-for="asso in results" :key="asso.id" :asso="asso" />
     </div>
 
-    <div v-if="!isLoading && results.length === 0">
+    <div v-if="!isLoading && results.length === 0" role="status" aria-label="Aucune association trouvée">
       Aucune association trouvée pour ces critères.
     </div>
   </div>

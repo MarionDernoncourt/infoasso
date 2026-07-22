@@ -1,11 +1,11 @@
 <template>
-  <div class="filters-area">
+  <div class="filters-area" role="search" aria-label="Filtres de recherche de créneaux">
     <h2>Filtrer ma recherche</h2>
 
     <div class="form-section">
       <div class="form-group">
         <label for="dayOfWeek">Jour</label>
-        <select id="dayOfWeek" v-model="filters.dayOfWeek">
+        <select id="dayOfWeek" v-model="filters.dayOfWeek" aria-label="Filtrer par jour de la semaine">
           <option value="">---Choisir un jour---</option>
           <option v-for="day in dayOfWeek" :key="day" :value="day">{{ day }}</option>
         </select>
@@ -16,20 +16,21 @@
         <input type="number"
         id="age"
         v-model="filters.age"
+        aria-label="Filtrer par âge du participant"
         /> ```
       </div>
 
       <div class="form-group">
         <label for="city">Ville</label>
-        <input type="text" id="city" v-model="filters.city"  />
+        <input type="text" id="city" v-model="filters.city" aria-label="Filtrer par ville" />
 
       </div>
     </div>
 
 
     <div class="form-action">
-      <button type="button" class="submit-btn" @click="applyFilters">Filtrer</button>
-      <button type="button" class="cancel-btn" @click="cancelFilters">Réinitialiser les filtres</button>
+      <button type="button" class="submit-btn" @click="applyFilters" aria-label="Appliquer les filtres de recherche">Filtrer</button>
+      <button type="button" class="cancel-btn" @click="cancelFilters" aria-label="Réinitialiser tous les filtres">Réinitialiser les filtres</button>
 
     </div>
 

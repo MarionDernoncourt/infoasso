@@ -1,5 +1,5 @@
 <template>
-  <div class="public-schedule-page">
+  <div class="public-schedule-page" role="main" aria-label="Page planning et filtre de recherche d'activité">
     <div class="filters-container">
       <ScheduleFilter
       @submitFilters="handleFilterSearch"
@@ -9,13 +9,27 @@
     <div class="header">
       <h1>Planning des activités</h1>
       <div class="button-action">
-        <button v-if="isOwner" class="add-schedule-btn" @click="goToCreateSchedulePage">Ajouter une activité</button>
-        <button class="back-btn" @click="goToAssociationCard">Retour à la fiche</button>
+        <button
+        type="button"
+        v-if="isOwner"
+        class="add-schedule-btn"
+        @click="goToCreateSchedulePage"
+        aria-label="Ajouter une nouvelle activité au planning"
+        >
+        Ajouter une activité</button>
+        <button
+        type="button"
+        class="back-btn"
+        @click="goToAssociationCard"
+        aria-label="Retourner à la fiche de l'association"
+        >
+        Retour à la fiche</button>
       </div>
     </div>
 
 
-    <div class="main-content">
+    <div class="main-content"
+    aria-label="Planning des activité de l'association">
       <ScheduleTable
       :schedules="filteredSchedules"
       :loading="isLoading"
@@ -27,7 +41,7 @@
       :activity="selectedActivity"
       @close="closeDetail"
       @updateSchedule="updateSchedule"
-
+      :is-owner="isOwner"
     />
 
     </div>

@@ -1,11 +1,12 @@
 <template>
-  <div class="overlay" @click.self="$emit('close')">
+  <div class="overlay" @click.self="$emit('close')"
+  role="dialog" aria-modal="true" aria-labelledby="modal-activity-title">
     <div class="detail-card">
       <div class="form-group">
-      <button class="close-btn" @click="$emit('close')">×</button>
+      <button class="close-btn" @click="$emit('close')" aria-label="Fermer la fenêtre des détails">×</button>
 
-      <h2>{{ activity.activityName }}</h2>
-      <hr />
+      <h2 id="modal-activity-title">{{ activity.activityName }}</h2>
+      <hr aria-hidden="true"/>
 </div>
       <div class="description-box">
         <p>{{ activity.description || 'Aucune description fournie.' }}</p>
@@ -25,14 +26,25 @@
         <p>{{ activity.location?.zipCode }} {{ activity.location?.city }}</p>
       </div>
 
-<button class="update-schedule"  @click="$emit('updateSchedule')">Modifier l'activité</button>
+<button v-if="isOwner" class="update-schedule"  @click="$emit('updateSchedule')" aria-label="Modifier les informations de cette activité">Modifier l'activité</button>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({ activity: Object });
-defineEmits(['close']);
+defineProps({
+  activity: {
+    type: Object,
+    required: true
+  },
+  isOwner: {
+    type: Boolean,
+    default: false
+  }
+});
+defineEmits(['close', 'updateSchedule']);
+
+
 </script>
 
 <style scoped>

@@ -1,16 +1,36 @@
 <template>
-<nav class="navbar">
+<nav class="navbar" aria-label="Navigation principale">
   <div class="nav-container">
-    <router-link to="/" class="logo">INFO ASSO</router-link>
+    <router-link to="/" class="logo" aria-label="Info Asso, retour à l'accueil">INFO ASSO</router-link>
 
-      <div class="nav-links">
-        <router-link to="/search">Recherche</router-link>
-        <router-link to="/register" class="btn-register">Inscription Asso</router-link>
-      </div>
+    <div class="nav-links">
+      <!-- CAS 1 : Utilisateur CONNECTÉ -->
+      <template v-if="isLoggedIn">
+        <router-link to="/dashboard" aria-label="Accéder au tableau de bord">Tableau de bord</router-link>
+        <router-link to="/account" aria-label="Gérer mon compte utilisateur">Mon compte</router-link>
+      </template>
+
+      <!-- CAS 2 : Visiteur / Citoyen NON CONNECTÉ -->
+      <template v-else>
+        <router-link to="/search" aria-label="Rechercher une association ou une activité">Recherche</router-link>
+        <router-link to="/register" class="btn-register" aria-label="Inscrire une nouvelle association">Inscription Asso</router-link>
+      </template>
+    </div>
   </div>
 </nav>
-  </template>
+</template>
 
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const isLoggedIn = ref(false);
+
+onMounted(() => {
+  // Vérifie si un token est présent dans le localStorage
+  const token = localStorage.getItem('token');
+  isLoggedIn.value = !!token;
+});
+</script>
 
 <style scoped>
 .navbar {
@@ -50,7 +70,10 @@ a {
   text-decoration: none;
   color: var(--primary-color);
   font-weight: 500;
+  font-size: 1.5rem;
 }
-
+a:hover {
+  text-decoration: none;
+}
 
 </style>

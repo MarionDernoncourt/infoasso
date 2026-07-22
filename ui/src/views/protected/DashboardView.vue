@@ -1,21 +1,21 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" role="main" aria-label="Page de tableau de bord du responsable d'une association">
     <TheSidebar :userEmail="userEmail" />
 
     <main class="dashboard-main">
       <TheHeader title="Tableau de bord" subtitle="Pilotez les informations et les créneaux de votre structure"
         :show-add-button="hasAssociation" />
 
-      <div v-if="isLoading" class="loading-state">
+      <div v-if="isLoading" class="loading-state" role="status" aria-live="polite">
         <div class="spinner"></div>
         <p>Connexion sécurisée à vos structures en cours...</p>
       </div>
 
       <div v-if="!isLoading && !hasAssociation" class="empty-state-card">
-        <div class="empty-icon">🏢</div>
+        <div class="empty-icon" aria-hidden="true">🏢</div>
         <h3>Vous n'avez pas encore enregistré d'association</h3>
         <p>Pour commencer à proposer vos horaires et à être visible par les citoyens, créer votre fiche association</p>
-        <router-link to="/association/create" class="create-btn-trigger">
+        <router-link to="/association/create" class="create-btn-trigger" aria-label="Créer la fiche de mon association">
           + Créer la fiche de mon association
         </router-link>
       </div>
@@ -24,7 +24,7 @@
 
         <div v-if="associationsList.length > 1" class="multi-asso-selector">
           <label for="asso-select">Changer d'association</label>
-          <select id="asso-select" v-model="selectedAsso">
+          <select id="asso-select" v-model="selectedAsso" aria-label="Sélectionner l'association à administrer">
             <option v-for="asso in associationsList" :key="asso.id" :value="asso">
               {{ asso.displayName }}
             </option>
@@ -34,9 +34,19 @@
         <AssoCard :asso="selectedAsso">
           <template #actions>
             <div class="header-btn">
-              <button type="button" class="schedule-btn" @click="goToSchedulePage(selectedAsso?.id)">Accéder le
+              <button
+              type="button"
+              class="schedule-btn"
+              @click="goToSchedulePage(selectedAsso?.id)"
+              aria-label="Accéder au planning de l'association"
+              >Accéder le
                 planning</button>
-              <button type="button" class="edit-btn" @click="goToUpdatePage(selectedAsso?.id)">Modifier la
+              <button
+              type="button"
+              class="edit-btn"
+              @click="goToUpdatePage(selectedAsso?.id)"
+              aria-label="Modifier la fiche de l'association"
+              >Modifier la
                 fiche</button>
             </div>
           </template>

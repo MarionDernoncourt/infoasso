@@ -1,5 +1,6 @@
 import axios from "axios";
 import router from "../router";
+import authService from "./auth.service";
 
 const apiClient = axios.create({
   baseURL: "http://localhost:8080/api",
@@ -40,7 +41,7 @@ apiClient.interceptors.response.use(
     //Si 401 (token expiré, invalide ou absent sur route protégée)
     if (status === 401) {
       console.warn("Accès non autorisé 401. Redirection vers le Login...");
-      localStorage.removeItem("token");
+      authService.logout();
       router.push({ name: "login" });
     }
     // Si 403 Forbidden (pas le rôle nécessaire pour cette action)

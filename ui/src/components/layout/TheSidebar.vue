@@ -1,9 +1,12 @@
 <template>
-  <aside class="dashboard-sidebar">
+  <aside class="dashboard-sidebar" aria-label="Menu du tableau de bord">
 
-    <nav class="sidebar-menu">
-      <router-link to="/dashboard" class="menu-item" active-class="active">Fiche et Créneaux</router-link>
-      <a href="#" class="menu-item disabled-future">Fil d'actualité <span class="badge-v2">V2</span></a>
+    <nav class="sidebar-menu" aria-label="Navigation secondaire du compte">
+      <router-link to="/dashboard" class="menu-item" active-class="active"> Fiche et Créneaux
+      </router-link>
+      <a href="#" class="menu-item disabled-future" aria-disabled="true">
+        Fil d'actualité
+        <span class="badge-v2" aria-label="Fonctionnalité prévue pour la version 2">V2</span></a>
       <a href="#" class="menu-item">Mon compte</a>
     </nav>
 
@@ -11,16 +14,16 @@
       <!--  Section Profil & Déconnexion -->
       <div class="user-section">
         <span class="user-email">👤 {{ userEmail || 'Mon Compte' }}</span>
-        <button class="logout-btn" @click="logout">Déconnexion</button>
+        <button class="logout-btn" @click="logout" aria-label="Se déconnecter de votre compte">Déconnexion</button>
       </div>
 
       <!-- séparation discrète -->
-      <hr class="footer-divider" />
+      <hr class="footer-divider" aria-hidden="true"/>
 
       <div class="legal-section">
-        <span class="menu-item disabled-future">
+        <span class="menu-item disabled-future" aria-disabled="true">
           Aide & Support
-          <span class="badge-v2">V2</span>
+          <span class="badge-v2" aria-label="Fonctionnalité prévue pour la version 2">V2</span>
         </span>
 
         <p class="copyright">© 2026 Tous droits réservés</p>
@@ -132,11 +135,13 @@ const logout = async () => {
   gap: 12px;
   margin-bottom: 20px;
 }
+
 .user-section {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
+
 .user-email {
   font-size: 0.85rem;
   color: #bbb;

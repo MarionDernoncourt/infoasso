@@ -1,10 +1,16 @@
 <template>
   <form @submit.prevent="handleSubmit" class="asso-form">
     <div class="header-main">
-    <h2 class="form-title">{{ formTitle }}</h2>
-    <button  class="back-btn" @click="$emit('back')">Retour</button>
-
-  </div>
+      <h2 class="form-title">{{ formTitle }}</h2>
+      <button
+        type="button"
+        class="back-btn"
+        @click="$emit('back')"
+        aria-label="Retourner à la page précédente"
+      >
+        Retour
+      </button>
+    </div>
 
     <div class="form-section">
       <h3>🏢 Identité de la structure</h3>
@@ -13,35 +19,70 @@
         <div class="form-group">
           <label for="rnaNumber">Numéro RNA (WXXXXXXXXX) *</label>
           <div class="rna-input-group">
-            <input type="text" id="rnaNumber" v-model="formData.rnaNumber" required placeholder="Ex: W123456789"
-              :class="{ 'input-error': errors.rnaNumber }">
-            <button type="button" class="verify-btn" @click="checkRNA" :disabled="isCheckingRNA || !formData.rnaNumber">
+            <input
+              type="text"
+              id="rnaNumber"
+              v-model="formData.rnaNumber"
+              required
+              placeholder="Ex: W123456789"
+              :class="{ 'input-error': errors.rnaNumber }"
+              aria-required="true"
+              aria-describedby="rnaError rnaSuccess rnaCustomError"
+            >
+            <button
+              type="button"
+              class="verify-btn"
+              @click="checkRNA"
+              :disabled="isCheckingRNA || !formData.rnaNumber"
+              aria-label="Vérifier le numéro RNA auprès du répertoire national"
+            >
               {{ isCheckingRNA ? '...' : '🔍 Vérifier' }}
             </button>
           </div>
-          <span v-if="rnaError" class="error-text">⚠️ Numéro RNA introuvable ou inactive</span>
-          <span v-if="rnaSuccess" class="success-text">✅ Association trouvée avec succès !</span>
-          <p v-if="errors.rnaNumber" class="error-text">{{ errors.rnaNumber }}</p>
+          <span v-if="rnaError" id="rnaError" class="error-text">⚠️ Numéro RNA introuvable ou inactive</span>
+          <span v-if="rnaSuccess" id="rnaSuccess" class="success-text">✅ Association trouvée avec succès !</span>
+          <p v-if="errors.rnaNumber" id="rnaCustomError" class="error-text">{{ errors.rnaNumber }}</p>
         </div>
 
         <div class="form-group">
           <label for="officialName">Nom officiel (Journal Officiel)</label>
-          <input type="text" id="officialName" v-model="formData.officialName" readonly
-            placeholder="Cliquez sur Vérifier pour remplir ce champ" class="readonly-input">
+          <input
+            type="text"
+            id="officialName"
+            v-model="formData.officialName"
+            readonly
+            placeholder="Cliquez sur Vérifier pour remplir ce champ"
+            class="readonly-input"
+            aria-readonly="true"
+          >
         </div>
       </div>
 
       <div class="form-group">
         <label for="displayName">Nom d'usage (affiché sur le site) *</label>
-        <input type="text" id="displayName" v-model="formData.displayName" required placeholder="Ex: Basket Club Loos"
-          :class="{ 'input-error': errors.displayName }">
-        <p v-if="errors.displayName" class="error-text">{{ errors.displayName }}</p>
+        <input
+          type="text"
+          id="displayName"
+          v-model="formData.displayName"
+          required
+          placeholder="Ex: Basket Club Loos"
+          :class="{ 'input-error': errors.displayName }"
+          aria-required="true"
+          aria-describedby="displayNameError"
+        >
+        <p v-if="errors.displayName" id="displayNameError" class="error-text">{{ errors.displayName }}</p>
       </div>
 
       <div class="form-grid">
         <div class="form-group">
-          <label for="categoryType">Secteur d'activité</label>
-          <select id="categoryType" v-model="formData.categoryType" @change="handleTypeChange" required>
+          <label for="categoryType">Secteur d'activité *</label>
+          <select
+            id="categoryType"
+            v-model="formData.categoryType"
+            @change="handleTypeChange"
+            required
+            aria-required="true"
+          >
             <option value="" disabled>-- Choisissez un secteur --</option>
             <option v-for="type in categoryTypes" :key="type" :value="type">
               {{ type }}
@@ -50,11 +91,18 @@
         </div>
 
         <div class="form-group">
-          <label for="categoryLabel">Activité spécifique (ex: Football, Chorale...)</label>
-          <input type="text" id="categoryLabel" v-model="formData.categoryLabel" list="category-suggestions"
-            @input="fetchSuggestions" :disabled="!formData.categoryType" placeholder="Tapez pour chercher ou ajouter..."
-            required />
-
+          <label for="categoryLabel">Activité spécifique (ex: Football, Chorale...) *</label>
+          <input
+            type="text"
+            id="categoryLabel"
+            v-model="formData.categoryLabel"
+            list="category-suggestions"
+            @input="fetchSuggestions"
+            :disabled="!formData.categoryType"
+            placeholder="Tapez pour chercher ou ajouter..."
+            required
+            aria-required="true"
+          />
           <datalist id="category-suggestions">
             <option v-for="suggestion in labelSuggestions" :key="suggestion.id" :value="suggestion.label" />
           </datalist>
@@ -67,43 +115,76 @@
 
       <div class="form-group">
         <label for="streetAddress">Adresse (rue, avenue, ...)</label>
-        <input type="text" id="streetAddress" v-model="formData.streetAddress"
-          placeholder="Ex: 42 rue de la République">
+        <input
+          type="text"
+          id="streetAddress"
+          v-model="formData.streetAddress"
+          placeholder="Ex: 42 rue de la République"
+        >
       </div>
 
       <div class="form-grid">
         <div class="form-group">
           <label for="zipCode">Code postal</label>
-          <input type="text" id="zipCode" v-model="formData.zipCode" placeholder="Ex: 59120">
+          <input
+            type="text"
+            id="zipCode"
+            v-model="formData.zipCode"
+            placeholder="Ex: 59120"
+          >
         </div>
 
         <div class="form-group">
           <label for="city">Ville</label>
-          <input type="text" id="city" v-model="formData.city" placeholder="Ex: Loos"
-            :class="{ 'input-error': errors.city }">
-          <p v-if="errors.city" class="error-text">{{ errors.city }}</p>
+          <input
+            type="text"
+            id="city"
+            v-model="formData.city"
+            placeholder="Ex: Loos"
+            :class="{ 'input-error': errors.city }"
+            aria-describedby="cityError"
+          >
+          <p v-if="errors.city" id="cityError" class="error-text">{{ errors.city }}</p>
         </div>
       </div>
 
       <div class="form-grid">
         <div class="form-group">
           <label for="email">Email de contact *</label>
-          <input type="email" id="email" v-model="formData.email" required placeholder="Ex: contact@monasso.com"
-            :class="{ 'input-error': errors.email }">
-          <p v-if="errors.email" class="error-text">{{ errors.email }}</p>
+          <input
+            type="email"
+            id="email"
+            v-model="formData.email"
+            required
+            placeholder="Ex: contact@monasso.com"
+            :class="{ 'input-error': errors.email }"
+            aria-required="true"
+            aria-describedby="emailError"
+          >
+          <p v-if="errors.email" id="emailError" class="error-text">{{ errors.email }}</p>
         </div>
 
         <div class="form-group">
           <label for="phoneNumber">Numéro de téléphone</label>
-          <input type="tel" id="phoneNumber" v-model="formData.phoneNumber" placeholder="Ex: 03 20 ..."
-            :class="{ 'input-error': errors.phoneNumber }">
-          <p v-if="errors.phoneNumber" class="error-text">{{ errors.phoneNumber }}</p>
+          <input
+            type="tel"
+            id="phoneNumber"
+            v-model="formData.phoneNumber"
+            placeholder="Ex: 03 20 ..."
+            :class="{ 'input-error': errors.phoneNumber }"
+            aria-describedby="phoneError"
+          >
+          <p v-if="errors.phoneNumber" id="phoneError" class="error-text">{{ errors.phoneNumber }}</p>
         </div>
 
         <div class="form-group">
-          <label for="website">Website
-            <input type="text" id="website" v-model="formData.website" placeholder="Ex: www.monasso.fr"/>
-          </label>
+          <label for="website">Site web</label>
+          <input
+            type="text"
+            id="website"
+            v-model="formData.website"
+            placeholder="Ex: www.monasso.fr"
+          />
         </div>
       </div>
     </section>
@@ -113,16 +194,35 @@
 
       <div class="form-group">
         <label for="description">Description de l'association *</label>
-        <textarea id="description" v-model="formData.description" rows="4" required
+        <textarea
+          id="description"
+          v-model="formData.description"
+          rows="4"
+          required
           placeholder="Présentez votre association, ses valeurs, ses horaires..."
-          :class="{ 'input-error': errors.description }"></textarea>
+          :class="{ 'input-error': errors.description }"
+          aria-required="true"
+          aria-describedby="descError"
+        ></textarea>
       </div>
-      <p v-if="errors.description" class="error-text">{{ errors.description }}</p>
+      <p v-if="errors.description" id="descError" class="error-text">{{ errors.description }}</p>
     </section>
 
     <div class="form-actions">
-      <button type="button" class="cancel-btn" @click="$emit('cancel')">Annuler</button>
-      <button type="submit" class="submit-btn" :disabled="isSubmitting || (!rnaSuccess && !formData.officialName)">
+      <button
+        type="button"
+        class="cancel-btn"
+        @click="$emit('cancel')"
+        aria-label="Annuler les modifications et fermer le formulaire"
+      >
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="submit-btn"
+        :disabled="isSubmitting || (!rnaSuccess && !formData.officialName)"
+        aria-label="Enregistrer le formulaire de l'association"
+      >
         {{ isSubmitting ? 'Enregistrement...' : submitButtonText }}
       </button>
     </div>

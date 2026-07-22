@@ -1,5 +1,5 @@
 <template>
-  <div class="updateAsso-container">
+  <div class="updateAsso-container" role="main" aria-label="Page de mdodification de la fiche assocation">
     <TheSidebar :userEmail="userEmail" />
 
     <div class="updateAsso-main">
@@ -10,7 +10,7 @@
           :is-submitting="isSubmitting" :errors="backendErrors" :key="asso.id" form-title="Modifier la fiche"
 
           @back="handleBackToDashboard" @submit="handleUpdateAsso" @cancel="handleCancel" />
-        <div v-else class="loading-state">
+        <div v-else class="loading-state" role="status" aria-live="polite">
           <p>Chargement des informations de votre structure...</p>
         </div>
       </div>
