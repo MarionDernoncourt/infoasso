@@ -1,9 +1,9 @@
 <template>
-  <div class="main-container">
+  <div class="main-container" role="main" aria-label="Page d'accueil et de recherche d'activités">
     <div class="home-wrapper">
 
       <!-- COLONNE GAUCHE -->
-      <div class="info-sidebar">
+      <div class="info-sidebar" aria-label="Informations sur la plateforme">
         <h2>INFO ASSO</h2>
         <p class="intro-text">
           La plateforme de référence pour découvrir la vie associative qui vous entoure.
@@ -38,12 +38,12 @@
 
       <!-- COLONNE DROITE : La Recherche -->
       <div class="search-container-card">
-        <div class="form-header-badge">Recherche rapide</div>
+        <div class="form-header-badge" role="status">Recherche rapide</div>
         <h3>Trouvez une activité</h3>
         <p class="form-subtitle">Filtrez par ville, âge ou type d'activité pour lancer votre recherche.</p>
 
         <!-- Conteneur qui cible ton SearchFilterBar et réorganise ses éléments en mode grille/ligne -->
-        <div class="home-search-wrapper">
+        <div class="home-search-wrapper" aria-label="Zone de filtres de recherche">
           <SearchFilterBar />
         </div>
       </div>

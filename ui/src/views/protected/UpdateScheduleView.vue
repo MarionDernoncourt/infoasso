@@ -1,5 +1,5 @@
 <template>
-  <div class="updateSchedule-container">
+  <div class="updateSchedule-container" role="main" aria-label="Page de modification d'un horaire">
     <TheSidebar :userEmail="userEmail" />
 
     <div class="updateSchedule-main">
@@ -7,7 +7,7 @@
       <TheHeader title="Tableau de bord" subtitle="Modifier l'horaire" />
 
       <div class="form-wrapper">
-        <div v-if="!initialData">Chargement des données...</div>
+        <div v-if="!initialData" role="status" aria-live="polite">Chargement des données...</div>
         <ScheduleForm
         v-if="initialData"
         :initialData="initialData"

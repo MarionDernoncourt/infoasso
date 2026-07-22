@@ -1,8 +1,8 @@
 <template>
-  <section class="info-card">
+  <article class="info-card">
     <div class="card-header">
       <h3>Informations Générales</h3>
-      <button v-if="!isOwner"  class="schedules-btn" @click="goToSchedules">Voir le planning</button>
+      <button v-if="!isOwner" class="schedules-btn" @click="goToSchedules">Voir le planning</button>
       <slot name="actions"></slot>
     </div>
 
@@ -19,14 +19,26 @@
 
     <hr class="divider">
     <div class="asso-details">
-      <p><strong>Adresse : </strong>{{ asso?.streetAddress }} {{ asso?.zipCode }} {{ asso?.city }}</p>
-      <p><strong>Téléphone :</strong> {{ asso?.phoneNumber || 'Non renseigné' }}</p>
-      <p><strong>Email public : </strong> {{ asso?.email }}</p>
-      <p v-if="asso?.website"><strong>Site web : </strong><a :href="asso.website" target="_blank">{{ asso.website }}</a>
+      <p>
+        <strong>Adresse : </strong>
+        {{ asso?.streetAddress }} {{ asso?.zipCode }} {{ asso?.city }}</p>
+
+   <p>
+        <strong>Téléphone :</strong>
+        <a v-if="asso?.phoneNumber" :href="`tel:${asso.phoneNumber}`">{{ asso.phoneNumber }}</a>
+        <span v-else>Non renseigné</span>
       </p>
-      <p class="asso-description"><strong>Description : </strong>{{ asso?.description || "Aucune description pour le moment."}}</p>
+
+      <p>
+        <strong>Email public : </strong>
+        <a v-if="asso?.email" :href="`mailto:${asso.email}`">{{ asso.email }}</a>
+        <span v-else>Non renseigné</span>
+      </p>
+
+      <p class="asso-description"><strong>Description : </strong>{{ asso?.description || "Aucune description pour le moment."}}
+        </p>
     </div>
-  </section>
+  </article>
 </template>
 
 <script setup>
@@ -51,7 +63,7 @@ const checkOwnerShip = async () => {
     const asso = await assoService.getById(props.asso.id);
     isOwner.value = (currentLoggedEmail && asso?.ownerEmail === currentLoggedEmail);
     console.log(isOwner.value, currentLoggedEmail);
-  } catch(error){
+  } catch (error) {
     console.error("Erreur de vérification propriétaire: ", error);
     isOwner.value = false;
   }

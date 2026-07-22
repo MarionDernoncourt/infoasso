@@ -15,12 +15,16 @@
           <span class="city">{{ asso?.city }}</span>
         </div>
 
-        <p class="description">{{ asso?.description }}</p>
+        <p class="description">{{ asso?.description || "Aucune description disponible pour cette association." }}</p>
       </div>
     </div>
 
     <div class="card-footer">
-      <button class="details-btn" @click.stop="goToAssociationDetails">
+      <button
+      class="details-btn"
+      @click.stop="goToAssociationDetails"
+      :aria-label="`Voir les détails de l'association ${asso?.displayName}`"
+      >
         Voir les détails
       </button>
     </div>

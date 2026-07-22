@@ -5,8 +5,13 @@
       <p class="subtitle">{{ subtitle }}</p>
     </div>
 
-    <router-link v-if="showAddButton" to="/association/create" class="add-asso-btn">
-      <span>＋</span> Enregistrer une structure
+    <router-link
+    v-if="showAddButton"
+    to="/association/create"
+    class="add-asso-btn"
+    aria-label="Enregistrer une nouvelle structure associative"
+    >
+    <span aria-hidden="true">＋</span> Enregistrer une structure
     </router-link>
   </header>
 </template>

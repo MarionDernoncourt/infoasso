@@ -1,8 +1,8 @@
 <template>
-  <div class="main-container">
+  <div class="main-container" role="main">
     <div class="register-wrapper">
 
-      <div class="info-sidebar">
+      <aside class="info-sidebar" aria-label="Informations sur la plateforme">
         <h2>INFO ASSO</h2>
         <p class="intro-text">
           La plateforme de référence pour découvrir la vie associative de votre ville.
@@ -34,68 +34,96 @@
             <router-link to="/login" class="inline-link">Identifiez-vous ici</router-link>.
           </p>
         </div>
-      </div>
+      </aside>
+
 
       <div class="form-container">
-        <div class="form-header-badge">Espace Responsables d'Association</div>
+        <div class="form-header-badge" role="status">Espace Responsables d'Association</div>
         <h3>Inscription Association</h3>
         <p class="form-subtitle">Réservé aux membres du bureau ou gestionnaires de l'association.</p>
 
-        <form @submit.prevent="register">
+        <form @submit.prevent="register" aria-label="Formulaire d'inscription d'association">
 
           <!-- EMAIL -->
           <div class="form-group">
-            <label class="form-line">
+            <label class="form-line" for="register-email">
               E-mail de gestion (ou de l'association)
-              <input type="email" v-model="userData.email" placeholder="contact@votre-asso.fr" required>
+              <input
+              type="email"
+              id="register-email"
+              v-model="userData.email"
+              placeholder="contact@votre-asso.fr"
+              required
+              aria-required="true"
+              autocomplete="email"
+              aria-describedby="emailError"
+              >
             </label>
-            <p v-if="fieldErrors.email" class="error-text"> {{ fieldErrors.email }}</p>
+            <p v-if="fieldErrors.email" id="emailError" class="error-text"> {{ fieldErrors.email }}</p>
           </div>
 
           <!-- MOT DE PASSE AVEC OEIL -->
           <div class="form-group">
-            <label class="form-line">
+            <label class="form-line" for="register-password">
               Mot de passe
               <div class="password-input-wrapper">
                 <input
                   :type="showPassword ? 'text' : 'password'"
+                  id="register-password"
                   v-model="userData.password"
                   placeholder="••••••••"
                   required
+                  aria-required="true"
+                  autocomplete="new-password"
+                  aria-describedby="passwordHints passwordError"
                 >
-                <button type="button" class="toggle-password-btn" @click="showPassword = !showPassword" tabindex="-1">
+                <button
+                type="button"
+                class="toggle-password-btn"
+                @click="showPassword = !showPassword"
+                tabindex="-1"
+                :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                >
                   {{ showPassword ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
             </label>
 
-            <p class="password-hints">
+            <p class="password-hints" id="passwordHints">
               Doit contenir au moins 8 caractères, 1 majuscule et 1 caractère spécial.
             </p>
 
-            <p v-if="fieldErrors.password" class="error-text">
+            <p v-if="fieldErrors.password" id="passwordError" class="error-text">
               {{ fieldErrors.password }}
             </p>
           </div>
 
+
           <!-- GDPR -->
           <div class="form-group gdpr-group">
-            <label class="gdpr-label">
-              <input type="checkbox" v-model="userData.gdprConsent" required>
+            <label class="gdpr-label" for="gdprConsent">
+              <input
+              type="checkbox"
+              id="gdprConsent"
+              v-model="userData.gdprConsent"
+              required
+              aria-required="true"
+              aria-describedby="gdprError"
+              >
               <span>
                 J'accepte la <a href="#" @click.prevent="isModalOpen = true" class="gdpr-link">politique de confidentialité</a>.
               </span>
             </label>
-            <p v-if="fieldErrors.gdprConsent" class="error-text">
+            <p v-if="fieldErrors.gdprConsent" id="gdprError" class="error-text">
               {{ fieldErrors.gdprConsent }}
             </p>
           </div>
 
-          <button type="submit" :disabled="isLoading">
+          <button type="submit" :disabled="isLoading" aria-label="Inscrire mon association sur la plateforme">
             {{ isLoading ? 'Création du compte...' : "Inscrire mon association" }}
           </button>
 
-          <p v-if="fieldErrors.message" class="error-text global-error">
+          <p v-if="fieldErrors.message" class="error-text global-error" role="alert">
             {{ fieldErrors.message }}
           </p>
         </form>
@@ -104,16 +132,21 @@
     </div>
 
     <!-- MODAL GDPR -->
-    <div v-if="isModalOpen" class="modal-overlay" @click="isModalOpen = false">
+    <div v-if="isModalOpen" class="modal-overlay" @click="isModalOpen = false" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal-content" @click.stop>
-        <h3>Politique de Confidentialité</h3>
-        <hr>
+        <h3 id="modal-title">Politique de Confidentialité</h3>
+        <hr aria-hidden="true" />
         <p><strong>1. Données collectées :</strong> Nous collectons uniquement l'adresse email de gestion et le mot de passe (haché de manière sécurisée).</p>
         <p><strong>2. Finalité :</strong> Ces données sont nécessaires pour créer le compte de votre structure et sécuriser l'accès à la gestion de votre page INFO ASSO.</p>
         <p><strong>3. Partage :</strong> Vos données restent strictement confidentielles et ne seront jamais partagées ou vendues à des tiers.</p>
         <p><strong>4. Vos droits :</strong> Vous pouvez demander la suppression du compte de l'association et de ses données à tout moment.</p>
 
-        <button type="button" class="close-modal-btn" @click="isModalOpen = false">Fermer</button>
+        <button
+        type="button"
+        class="close-modal-btn"
+        @click="isModalOpen = false"
+        aria-label="Fermer la fenêtre de la politique de confidentialité"
+        >Fermer</button>
       </div>
     </div>
   </div>

@@ -1,8 +1,8 @@
 <template>
-  <div class="public-detail-page">
+  <div class="public-detail-page" role="main" aria-label="Page fiche association">
     <AssoCard v-if="association" :asso="association" />
 
-    <div v-else class="loading">
+    <div v-else class="loading" role="status" aria-live="polite">
       Chargement de la fiche association...
     </div>
 

@@ -1,8 +1,10 @@
 <template>
-  <div class="schedule-container">
+  <div class="schedule-container"
+  role="region"
+  aria-label="Emploi du temps des activités">
 
     <!-- 1. LA GRILLE (FOND) -->
-    <div class="schedule-grid">
+    <div class="schedule-grid" aria-hidden="true">
       <div class="header-cell"></div>
       <div v-for="day in days" :key="day" class="header-cell" style="grid-column: span 4">
         {{ day }}
@@ -23,14 +25,19 @@
     </div>
 
     <!-- 2. LA COUCHE D'ACTIVITÉS (SUPERPOSÉE) -->
-    <div class="activities-layer">
+    <div class="activities-layer" role="list" aria-label="Liste des activités programmées">
       <!-- C'est ICI que tu utilises positionedSchedules -->
       <div v-for="s in positionedSchedules"
       :key="s.id"
       :class="['activity-card', s.sizeClass]"
-        :style="{ gridRow: s.gridRow, gridColumn: s.gridColumn }"
-        :title="s.activityName"
-        @click="$emit('select-activity', s)"
+      :style="{ gridRow: s.gridRow, gridColumn: s.gridColumn }"
+      :title="s.activityName"
+      @click="$emit('select-activity', s)"
+      role="button"
+      tabindex="0"
+      @keydown.enter="$emit('select-activity', s)"
+        @keydown.space.prevent="$emit('select-activity', s)"
+        :aria-label="`Activité : ${s.activityName}`"
 
      >
         <span class="activity-text">{{ s.activityName }}</span>

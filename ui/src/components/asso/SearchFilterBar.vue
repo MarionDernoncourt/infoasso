@@ -1,20 +1,68 @@
 <template>
-  <div class="search-filters">
-    <input v-model="filters.q" placeholder="Nom association..." @keyup.enter="handleSearch" />
+  <div class="search-filters" role="search" aria-label="Filtres de recherche d'associations">
+    <div class="filter-group">
+      <label for="search-name" class="sr-only">Rechercher par nom d'association</label>
+      <input
+        id="search-name"
+        v-model="filters.q"
+        placeholder="Nom association..."
+        @keyup.enter="handleSearch"
+        aria-label="Rechercher par nom d'association"
+      />
+    </div>
 
-    <input v-model="filters.city" placeholder="Ville..." @keyup.enter="handleSearch" />
+    <div class="filter-group">
+      <label for="search-city" class="sr-only">Filtrer par ville</label>
+      <input
+        id="search-city"
+        v-model="filters.city"
+        placeholder="Ville..."
+        @keyup.enter="handleSearch"
+        aria-label="Filtrer par ville"
+      />
+    </div>
 
-    <select id="categoryTypes" v-model="filters.categoryTypes" @change="handleTypeChange" required>
-      <option value="" disabled>-- Choisissez une catégorie --</option>
-      <option v-for="type in categoryTypes" :key="type" :value="type">
-        {{ type }}
-      </option>
-    </select>
+    <div class="filter-group">
+      <label for="categoryTypes" class="sr-only">Sélectionner une catégorie</label>
+      <select
+        id="categoryTypes"
+        v-model="filters.categoryTypes"
+        @change="handleTypeChange"
+        aria-label="Sélectionner une catégorie d'activité"
+      >
+        <option value="" disabled>-- Choisissez une catégorie --</option>
+        <option v-for="type in categoryTypes" :key="type" :value="type">
+          {{ type }}
+        </option>
+      </select>
+    </div>
 
-    <input v-model="filters.age" type="number" placeholder="Âge du participant" @keyup.enter="handleSearch" />
+    <div class="filter-group">
+      <label for="search-age" class="sr-only">Filtrer par âge du participant</label>
+      <input
+        id="search-age"
+        v-model="filters.age"
+        type="number"
+        placeholder="Âge du participant"
+        @keyup.enter="handleSearch"
+        aria-label="Filtrer par âge du participant"
+      />
+    </div>
 
-    <button @click="handleSearch">Rechercher</button>
-    <button @click="cancelFilters">Réinitialiser les filtres</button>
+    <button
+      class="search-btn"
+      @click="handleSearch"
+      aria-label="Lancer la recherche avec les filtres sélectionnés"
+    >
+      Rechercher
+    </button>
+    <button
+      class="reset-btn"
+      @click="cancelFilters"
+      aria-label="Réinitialiser tous les filtres de recherche"
+    >
+      Réinitialiser les filtres
+    </button>
   </div>
 </template>
 
