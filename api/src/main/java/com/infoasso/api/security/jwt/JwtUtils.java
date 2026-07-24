@@ -1,5 +1,7 @@
 package com.infoasso.api.security.jwt;
 
+import com.infoasso.api.model.User;
+import com.infoasso.api.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -8,6 +10,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +30,9 @@ public class JwtUtils {
     @Value("${infoasso.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    @Autowired
+    private UserRepository userRepository;
+
     // 1. Générer la clé de signature
     private SecretKey key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
@@ -36,8 +42,13 @@ public class JwtUtils {
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
+        System.out.println(userPrincipal.getUsername());
+        User user = userRepository.findByEmail(userPrincipal.getUsername())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
+                .claim("id", user.getId())
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())

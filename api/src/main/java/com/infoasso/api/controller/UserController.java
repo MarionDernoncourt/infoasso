@@ -2,6 +2,7 @@ package com.infoasso.api.controller;
 
 import com.infoasso.api.dto.user.UserReadDto;
 import com.infoasso.api.dto.user.UserCreateDto;
+import com.infoasso.api.dto.user.UserUpdateDto;
 import com.infoasso.api.service.IUserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -23,13 +24,21 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserReadDto> getUser(@PathVariable Long id) {
-        logger.info("GET /api/user/{} : Request received for user : {}", id, id);
+        logger.info("GET /api/users/{} : Request received for user : {}", id, id);
         UserReadDto userDTO = userService.findUserById(id);
         logger.info(" Response received : 200 OK : The user {} is found", id);
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+        public ResponseEntity<UserReadDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
+        logger.info("PUT /api/users/{} : Request received for user : {}", id, id);
+        UserReadDto userDTO = userService.updateUser(id, userUpdateDto);
+        logger.info(" Response received : 200 OK : The user {} is updated", id);
+        return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+        }
 
 }
