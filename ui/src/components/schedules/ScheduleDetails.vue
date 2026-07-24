@@ -3,7 +3,7 @@
   role="dialog" aria-modal="true" aria-labelledby="modal-activity-title">
     <div class="detail-card">
       <div class="form-group">
-      <button class="close-btn" @click="$emit('close')" aria-label="Fermer la fenêtre des détails">×</button>
+      <button type="button" class="close-btn" @click="$emit('close')" aria-label="Fermer la fenêtre des détails">×</button>
 
       <h2 id="modal-activity-title">{{ activity.activityName }}</h2>
       <hr aria-hidden="true"/>

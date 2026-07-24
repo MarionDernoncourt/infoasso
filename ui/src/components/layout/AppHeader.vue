@@ -7,8 +7,7 @@
       <!-- CAS 1 : Utilisateur CONNECTÉ -->
       <template v-if="isLoggedIn">
         <router-link to="/dashboard" aria-label="Accéder au tableau de bord">Tableau de bord</router-link>
-        <router-link to="/account" aria-label="Gérer mon compte utilisateur">Mon compte</router-link>
-      </template>
+<a href="#" @click.prevent="openAccountModal" aria-label="Gérer mon compte utilisateur">Mon compte</a>      </template>
 
       <!-- CAS 2 : Visiteur / Citoyen NON CONNECTÉ -->
       <template v-else>
@@ -18,12 +17,24 @@
     </div>
   </div>
 </nav>
+<AccountModal v-if="isModalOpen" @close="closeAccountModal" />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import AccountModal from '../account/AccountModal.vue';
 
 const isLoggedIn = ref(false);
+
+const isModalOpen = ref(false);
+
+function openAccountModal() {
+  isModalOpen.value = true;
+}
+
+function closeAccountModal() {
+  isModalOpen.value = false;
+}
 
 onMounted(() => {
   // Vérifie si un token est présent dans le localStorage
