@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +25,18 @@ public class GlobalExceptionHandler {
         logger.info("RESSOURCE NOT FOUND ERROR : {}", e.getMessage());
                return createErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e){
+        logger.info("ILLEGAL ARGUMENT ERROR : {}", e.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException e){
+        logger.info("ACCESS DENIED ERROR : {}", e.getMessage());
+        return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
+        }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -79,6 +92,7 @@ public class GlobalExceptionHandler {
         logger.error("UNEXPECTED ERROR: {}", e.getMessage());
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
     };
+
     private ResponseEntity<Map<String, Object>> createErrorResponse(HttpStatus status, String message) {
         Map<String, Object> response = new HashMap<>();
         response.put("message", message);

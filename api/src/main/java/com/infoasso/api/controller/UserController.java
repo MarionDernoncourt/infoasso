@@ -1,7 +1,6 @@
 package com.infoasso.api.controller;
 
 import com.infoasso.api.dto.user.UserReadDto;
-import com.infoasso.api.dto.user.UserCreateDto;
 import com.infoasso.api.dto.user.UserUpdateDto;
 import com.infoasso.api.service.IUserService;
 import jakarta.validation.Valid;

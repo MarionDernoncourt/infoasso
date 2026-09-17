@@ -1,6 +1,7 @@
 package com.infoasso.api.dto.user;
 
 
+import com.infoasso.api.validation.ValidPasswordChange;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,10 +12,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ValidPasswordChange
 public class UserUpdateDto {
 
     @Email(message = "Le format de l'email est invalide.")
     private String email;
+
 
     private String oldPassword;
 
