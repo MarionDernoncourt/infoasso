@@ -10,4 +10,6 @@ public interface IUserService {
     UserReadDto findUserById(Long id);
 
     UserReadDto updateUser(Long id, UserUpdateDto updateDto);
+
+    UserReadDto getMyProfile();
 }

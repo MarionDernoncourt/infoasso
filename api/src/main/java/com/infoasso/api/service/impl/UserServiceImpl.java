@@ -55,7 +55,14 @@ public class UserServiceImpl implements IUserService {
         User updatedUser = updateEntityFromDto(currentUser, updateDto);
         User savedUser = userRepository.save(updatedUser);
 
+        logger.info("User updated {}", savedUser.getEmail());
         return mapToUserDTO(savedUser);
+    }
+
+    public UserReadDto getMyProfile() {
+        User currentUser = getAuthenticatedUserOrThrow();
+        logger.info("User found {}", currentUser.getEmail());
+        return mapToUserDTO(currentUser);
     }
 
     private User getAuthenticatedUserOrThrow() {

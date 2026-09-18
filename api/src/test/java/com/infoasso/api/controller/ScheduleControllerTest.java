@@ -11,6 +11,7 @@ import com.infoasso.api.model.Location;
 import com.infoasso.api.service.impl.ScheduleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -65,7 +66,7 @@ public class ScheduleControllerTest {
         schedule.setAgeMin(3);
         schedule.setAgeMax(5);
         schedule.setDayOfWeek(DayOfWeek.Lundi);
-        schedule.setStartTime(LocalTime.of(15, 00));
+        schedule.setStartTime(LocalTime.of(15, 0));
         schedule.setEndTime(LocalTime.of(15, 30));
         schedule.setLocation(location);
         schedule.setAssociation(association);
@@ -84,7 +85,7 @@ public class ScheduleControllerTest {
     @Test
     @WithMockUser
     public void findAll_allParams_whenSuccess() throws Exception {
-        when(scheduleService.findAll(any(Long.class), any(Integer.class), any(DayOfWeek.class), any(LocalTime.class))).thenReturn(List.of(schedule));
+        when(scheduleService.findAll(any(Long.class), any(Integer.class), any(DayOfWeek.class), String.valueOf(ArgumentMatchers.any(LocalTime.class)))).thenReturn(List.of(schedule));
 
         mockMvc.perform(get("/api/associations/1/schedules")
                         .param("age", "4")
@@ -97,7 +98,7 @@ public class ScheduleControllerTest {
     @Test
     @WithMockUser
     public void findAll_whenAssociationNotFound() throws Exception {
-        when(scheduleService.findAll(any(Long.class), any(Integer.class), any(DayOfWeek.class), any(LocalTime.class))).thenThrow(new ResourceNotFoundException("Association", 1L));
+        when(scheduleService.findAll(any(Long.class), any(Integer.class), any(DayOfWeek.class), String.valueOf(ArgumentMatchers.any(LocalTime.class)))).thenThrow(new ResourceNotFoundException("Association", 1L));
 
         mockMvc.perform(get("/api/associations/1/schedules")
                         .param("age", "4")

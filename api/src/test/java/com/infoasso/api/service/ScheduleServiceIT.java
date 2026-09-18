@@ -103,7 +103,7 @@ public class ScheduleServiceIT {
     @Test
     public void findAll_Filters_whenSuccess() {
         Long associationId = association.getId();
-        schedules = scheduleService.findAll(associationId, 3, DayOfWeek.Lundi, LocalTime.of(15, 00));
+        schedules = scheduleService.findAll(associationId, 3, DayOfWeek.Lundi, String.valueOf(LocalTime.of(15, 00)));
 
         assertEquals(1, schedules.size());
     }
@@ -116,7 +116,7 @@ public class ScheduleServiceIT {
     @Test
     public void findAll_whenFiltersDontMatch_shouldReturnEmptyList() {
         Long associationId = association.getId();
-        List<ScheduleReadDto> schedules = scheduleService.findAll(associationId, 20, DayOfWeek.Dimanche, LocalTime.of(10, 0));
+        List<ScheduleReadDto> schedules = scheduleService.findAll(associationId, 20, DayOfWeek.Dimanche, String.valueOf(LocalTime.of(10, 0)));
 
         assertEquals(0, schedules.size());
     }

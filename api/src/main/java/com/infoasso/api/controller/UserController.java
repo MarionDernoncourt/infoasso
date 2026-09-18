@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -20,6 +21,15 @@ public class UserController {
 
     public UserController(IUserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/myprofile")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UserReadDto> getMyProfile() {
+        logger.info("GET /api/users/myprofile : Request received for my-profile");
+        UserReadDto myprofile = userService.getMyProfile();
+        logger.info(" Response received : 200 OK : The user {} is found", myprofile.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(myprofile);
     }
 
     @GetMapping("/{id}")
@@ -33,11 +43,13 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-        public ResponseEntity<UserReadDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
+    public ResponseEntity<UserReadDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
         logger.info("PUT /api/users/{} : Request received for user : {}", id, id);
         UserReadDto userDTO = userService.updateUser(id, userUpdateDto);
         logger.info(" Response received : 200 OK : The user {} is updated", id);
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
-        }
+    }
+
+
 
 }
