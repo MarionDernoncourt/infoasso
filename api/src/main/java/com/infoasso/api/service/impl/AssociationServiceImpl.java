@@ -19,9 +19,11 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
@@ -104,11 +106,17 @@ public class AssociationServiceImpl implements IAssociationService {
 
     @Override
     @Transactional
-    public AssociationReadDto updateAssociation(Long id, AssociationUpdateDto dto) {
+    public AssociationReadDto updateAssociation(Long id, AssociationUpdateDto dto, String userEmail) {
         logger.info("Mise à jour de l'association ID : {}", id);
-
+//Verification si l'asso existe
         Association association = associationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Association", id));
+
+        //Vérification si userEmail === owner de l'association
+        if(userEmail.equalsIgnoreCase(association.getOwner().getEmail())) {
+            throw new AccessDeniedException("Vous n'avez pas les droits pour modifier cette association.");
+        }
+
 // Vérification du nom officiel
         if (dto.getOfficialName() != null && !dto.getOfficialName().equals(association.getOfficialName())) {
             boolean exists = associationRepository.existsByOfficialNameAndIdNot(dto.getOfficialName(), id);

@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -59,9 +60,10 @@ public class AssociationController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<AssociationReadDto> updateAssociation(@PathVariable Long id, @Valid @RequestBody AssociationUpdateDto association) {
+    public ResponseEntity<AssociationReadDto> updateAssociation(@PathVariable Long id, @Valid @RequestBody AssociationUpdateDto association, Principal principal) {
         logger.info("PUT / {} : Request received to update {}", id, association.getOfficialName());
-        AssociationReadDto associationUpdated = associationService.updateAssociation(id, association);
+        String userEmail = principal.getName();
+        AssociationReadDto associationUpdated = associationService.updateAssociation(id, association, userEmail);
         logger.info("PUT/ {} : Response 200 OK : The association {} is updated", id, associationUpdated.getDisplayName());
         return ResponseEntity.status(HttpStatus.OK).body(associationUpdated);
     }

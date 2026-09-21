@@ -17,7 +17,7 @@ public interface IAssociationService {
 
     AssociationReadDto createAssociation(AssociationCreateDto association);
 
-    AssociationReadDto updateAssociation(Long id, AssociationUpdateDto association);
+    AssociationReadDto updateAssociation(Long id, AssociationUpdateDto association, String userEmail);
 
     void deleteAssociation(Long id);
 
