@@ -13,7 +13,7 @@ import java.util.List;
 public interface IAssociationService {
     AssociationReadDto findById(Long id);
 
-    List<AssociationReadDto> findAll(String name, String category);
+    List<AssociationReadDto> findAll(String name, String city, String categoryTypes, Integer age);
 
     AssociationReadDto createAssociation(AssociationCreateDto association);
 

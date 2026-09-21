@@ -14,9 +14,11 @@ import com.infoasso.api.repository.CategoryRepository;
 import com.infoasso.api.repository.UserRepository;
 import com.infoasso.api.service.IAssociationService;
 import com.infoasso.api.service.IRnaService;
+import com.infoasso.api.specifications.AssociationSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,20 +45,17 @@ public class AssociationServiceImpl implements IAssociationService {
     }
 
     @Override
-    public List<AssociationReadDto> findAll(String name, String category) {
-        logger.info("Recherche multi-critères - Nom: {}, Catégorie: {}", name, category);
+    public List<AssociationReadDto> findAll(String name,String city, String categoryTypes, Integer age) {
+        logger.info("Recherche multi-critères - Nom: {}, Catégorie: {}", name, categoryTypes);
 
-        List<Association> associations;
+        // On combine les spécification -> si filtre vide il est ignoré
+        Specification<Association> spec =
+                AssociationSpecifications.hasName(name)
+                .and(AssociationSpecifications.hasCity(city))
+                .and(AssociationSpecifications.hasCategory(categoryTypes))
+                .and(AssociationSpecifications.hasAge(age));
 
-        if (name == null && category == null) {
-            associations = associationRepository.findAll();
-        } else if (category == null) {
-            associations = associationRepository.findByDisplayNameContainingIgnoreCase(name);
-        } else if (name == null) {
-            associations = associationRepository.findByCategoryLabelIgnoreCase(category);
-        } else {
-            associations = associationRepository.findByDisplayNameContainingIgnoreCaseAndCategoryLabelIgnoreCase(name, category);
-        }
+        List<Association> associations = associationRepository.findAll(spec);
 
         return associations.stream()
                 .map(this::mapToReadDto)

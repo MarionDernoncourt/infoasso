@@ -30,10 +30,12 @@ public class AssociationController {
     @GetMapping("")
     public ResponseEntity<List<AssociationReadDto>> findAll(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String categoryTypes,
+            @RequestParam(required = false) Integer age
     ) {
         logger.info("GET / : Request received for all associations");
-        List<AssociationReadDto> associations = associationService.findAll(name, category);
+        List<AssociationReadDto> associations = associationService.findAll(name, city, categoryTypes, age);
         logger.info("GET / : Response 200 OK : Number of associations : " + associations.size());
         return ResponseEntity.status(HttpStatus.OK).body(associations);
     }
