@@ -95,7 +95,7 @@ public class AssociationIT {
 
     @Test
     public void findAll_withNoParams_whenSuccess() {
-        List<AssociationReadDto> associationList = associationService.findAll(null, null);
+        List<AssociationReadDto> associationList = associationService.findAll(null, null, null, null);
         assertEquals(1, associationList.size());
         assertEquals("rugby", associationList.get(0).getCategoryLabel());
     }
@@ -170,7 +170,7 @@ public class AssociationIT {
     // --- UPDATE TESTS ---
 
     @Test
-    @WithMockUser(username = "mario@example.com")
+    @WithMockUser(username = "mario@example.com", roles = {"USER"})
     public void updateAssociation_whenSuccess() {
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
         updateDto.setDisplayName("test");
@@ -178,7 +178,7 @@ public class AssociationIT {
         updateDto.setCategoryLabel("MUSIQUE"); // Nouveau label
         updateDto.setCategoryType(CategoryType.CULTURE);
 
-        AssociationReadDto result = associationService.updateAssociation(association.getId(), updateDto);
+        AssociationReadDto result = associationService.updateAssociation(association.getId(), updateDto, "mario@example.com");
 
         assertEquals("Nouvelle description", result.getDescription());
         assertEquals("MUSIQUE", result.getCategoryLabel());
@@ -201,14 +201,14 @@ public class AssociationIT {
 
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
         updateDto.setOfficialName("NOM_OFFICIEL_UNIQUE");
-        assertThrows(ResourceAlreadyExistsException.class, () -> associationService.updateAssociation(association.getId(), updateDto));
+        assertThrows(ResourceAlreadyExistsException.class, () -> associationService.updateAssociation(association.getId(), updateDto, "mario@example.com"));
     }
 
     @Test
     @WithMockUser(username = "mario@example.com")
     public void deleteAssociation_whenSuccess() {
         Long id = association.getId();
-        associationService.deleteAssociation(id);
+        associationService.deleteAssociation(id, "mario@example.com");
         assertEquals(false, associationRepository.existsById(id));
     }
 }

@@ -67,7 +67,7 @@ public class AssociationControllerTest {
     @Test
     @WithMockUser // Accès public en GET selon ta config
     public void findAll_shouldReturn_200OK() throws Exception {
-        when(associationService.findAll(null, null)).thenReturn(List.of(association));
+        when(associationService.findAll(null, null, null, null)).thenReturn(List.of(association));
 
         mockMvc.perform(get("/api/associations"))
                 .andExpect(status().isOk())
@@ -96,7 +96,7 @@ public class AssociationControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN") // Nécessite d'être ADMIN pour créer
+    @WithMockUser(roles = "USER")
     public void createAssociation_shouldReturn_201Created() throws Exception {
         AssociationCreateDto createDto = new AssociationCreateDto();
         createDto.setDisplayName("Nouveau Nom"); // Champ du CreateDto
@@ -118,7 +118,7 @@ public class AssociationControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "user@test.fr", roles = "USER")
     public void updateAssociation_shouldReturn_200OK() throws Exception {
         AssociationUpdateDto updateDto = new AssociationUpdateDto();
         updateDto.setDisplayName("Nom Modifié");
@@ -130,7 +130,7 @@ public class AssociationControllerTest {
         updatedResponse.setId(1L);
         updatedResponse.setDisplayName("Nom Modifié");
 
-        when(associationService.updateAssociation(eq(1L), any(AssociationUpdateDto.class))).thenReturn(updatedResponse);
+        when(associationService.updateAssociation(eq(1L), any(AssociationUpdateDto.class), eq("user@test.fr"))).thenReturn(updatedResponse);
 
         mockMvc.perform(put("/api/associations/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -141,9 +141,10 @@ public class AssociationControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "user@test.fr", roles = "USER")
     public void deleteAssociation_shouldReturn_204NoContent() throws Exception {
-        doNothing().when(associationService).deleteAssociation(1L);
+        // On met eq(1L) partout pour que Mockito soit content
+        doNothing().when(associationService).deleteAssociation(eq(1L), eq("user@test.fr"));
 
         mockMvc.perform(delete("/api/associations/1")
                         .with(csrf()))
@@ -151,9 +152,10 @@ public class AssociationControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "user@test.fr", roles = "USER")
     public void deleteAssociation_shouldReturn_404NotFound() throws Exception {
-        doThrow(new ResourceNotFoundException("Association", 10L)).when(associationService).deleteAssociation(10L);
+        doThrow(new ResourceNotFoundException("Association", 10L))
+                .when(associationService).deleteAssociation(eq(10L), eq("user@test.fr"));
 
         mockMvc.perform(delete("/api/associations/10")
                         .with(csrf()))

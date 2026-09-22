@@ -19,7 +19,7 @@ public interface IAssociationService {
 
     AssociationReadDto updateAssociation(Long id, AssociationUpdateDto association, String userEmail);
 
-    void deleteAssociation(Long id);
+    void deleteAssociation(Long id, String userEmail);
 
     List<AssociationReadDto> findAllAssociationsByUserEmail(String email);
 }

@@ -79,18 +79,23 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     @Transactional
-    public ScheduleReadDto createSchedule(Long associationId, ScheduleCreateDto scheduleCreateDto) {
+    public ScheduleReadDto createSchedule(Long associationId, ScheduleCreateDto scheduleCreateDto, String userEmail) {
         logger.info("Creating schedule for association id {}", associationId);
 
         // 1. Verification existence association
         Association association = associationRepository.findById(associationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Association", associationId));
 
-        // 2. Verification si Schedule existe dejà
+        // 2. Verification owner est bien celui connecté
+        if (!association.getOwner().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("Tu n'es pas autorisé à créer un schedule pour cette association.");
+        }
+
+        // 3. Verification si Schedule existe dejà
         if (scheduleRepository.existsByAssociationIdAndActivityNameAndDayOfWeekAndStartTime(associationId, scheduleCreateDto.getActivityName(), scheduleCreateDto.getDayOfWeek(), scheduleCreateDto.getStartTime())) {
             throw new ResourceAlreadyExistsException("Un schedule avec ces informations existe déjà :" + scheduleCreateDto.getActivityName());
         }
-        // 3. Creation du schedule
+        // 4. Creation du schedule
         Schedule schedule = mapToEntity(association, scheduleCreateDto);
         scheduleRepository.save(schedule);
 
@@ -98,18 +103,14 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
     @Override
-    public ScheduleReadDto updateSchedule(Long scheduleId, ScheduleUpdateDto scheduleUpdateDto) {
+    public ScheduleReadDto updateSchedule(Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String userEmail) {
         logger.info("Trying to update schedule with id {}", scheduleId);
 
         // 1. Vérification si schedule existe
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));
         // 2. Vérification owner est bien celui connecté
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentEmail = authentication.getName();
-
-        Association association = schedule.getAssociation();
-        if (!association.getOwner().getEmail().equals(currentEmail)) {
+        if (!schedule.getAssociation().getOwner().getEmail().equals(userEmail)) {
 
             throw new AccessDeniedException("Tu n'es pas autorisé à modifier cette association.");
         }
@@ -120,14 +121,17 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
     @Override
-    public void deleteSchedule(Long scheduleId) {
+    public void deleteSchedule(Long scheduleId, String userEmail) {
         logger.info("Trying to delete schedule with id {}", scheduleId);
 
         // 1. Vérification si schedule existe
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
-
-        // 2. Suppression du schedule
+        // 2. Vérification owner est bien celui connecté
+        if (!schedule.getAssociation().getOwner().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("Tu n'es pas autorisé à supprimer cette association.");
+        }
+        // 3. Suppression du schedule
         scheduleRepository.delete(schedule);
 
     }

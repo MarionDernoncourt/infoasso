@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -53,27 +54,30 @@ public class ScheduleController {
 
     @PostMapping("")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ScheduleReadDto> createSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleCreateDto scheduleCreateDto) {
+    public ResponseEntity<ScheduleReadDto> createSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleCreateDto scheduleCreateDto, Principal principal) {
         logger.info("POST: / : Request received for create schedule for association with id " + id);
-        ScheduleReadDto createdSchedule = scheduleService.createSchedule(id, scheduleCreateDto);
+        String userEmail = principal.getName();
+        ScheduleReadDto createdSchedule = scheduleService.createSchedule(id, scheduleCreateDto, userEmail);
         logger.info("POST : / : Response 201 CREATED : Schedule created with id " + createdSchedule.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
     }
 
     @PutMapping("/{scheduleId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long id, @PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
+    public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long id, @PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto, Principal principal) {
         logger.info("PUT: / : Request received for update schedule with id " + scheduleId);
-        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(scheduleId, scheduleUpdateDto);
+        String userEmail = principal.getName();
+        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(scheduleId, scheduleUpdateDto, userEmail);
         logger.info("PUT : / : Response 200 OK : Schedule updated with id " + updatedSchedule.getId());
         return ResponseEntity.status(HttpStatus.OK).body(updatedSchedule);
     }
 
     @DeleteMapping("/{scheduleId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @PathVariable Long scheduleId) {
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @PathVariable Long scheduleId, Principal principal) {
         logger.info("DELETE: / : Request received to delete schedule with id " + scheduleId);
-        scheduleService.deleteSchedule(scheduleId);
+        String userEmail = principal.getName();
+        scheduleService.deleteSchedule(scheduleId, userEmail);
         logger.info("DELETE : / : Response 204 NO CONTENT");
         return ResponseEntity.noContent().build();
     }

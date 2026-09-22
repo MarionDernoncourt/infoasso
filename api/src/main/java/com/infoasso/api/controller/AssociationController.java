@@ -70,9 +70,10 @@ public class AssociationController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> deleteAssociation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteAssociation(@PathVariable Long id, Principal principal) {
         logger.info("DELETE / {} : Request received to delete {}", id, id);
-        associationService.deleteAssociation(id);
+        String userEmail = principal.getName();
+        associationService.deleteAssociation(id, userEmail);
         logger.info("DELETE / {} : Response 204 No Content", id);
         return ResponseEntity.noContent().build();
     }

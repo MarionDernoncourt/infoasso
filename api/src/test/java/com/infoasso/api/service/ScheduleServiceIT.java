@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +57,7 @@ public class ScheduleServiceIT {
         categoryRepository.save(category);
 
         user = new User();
-        user.setEmail("user@mail.com");
+        user.setEmail("user@test.fr");
         user.setPassword("Password123");
         user.setRole(Role.ROLE_USER);
         userRepository.save(user);
@@ -84,7 +85,7 @@ public class ScheduleServiceIT {
         schedule.setAgeMax(5);
         schedule.setAssociation(this.association);
         schedule.setDayOfWeek(DayOfWeek.Lundi);
-        schedule.setStartTime(LocalTime.of(15, 00));
+        schedule.setStartTime(LocalTime.of(15, 0));
         schedule.setEndTime(LocalTime.of(15, 30));
         schedule.setDescription("Initiation au football. Jeux de ballons, d'équilibre.");
         schedule.setLocation(location);
@@ -103,7 +104,7 @@ public class ScheduleServiceIT {
     @Test
     public void findAll_Filters_whenSuccess() {
         Long associationId = association.getId();
-        schedules = scheduleService.findAll(associationId, 3, DayOfWeek.Lundi, String.valueOf(LocalTime.of(15, 00)));
+        schedules = scheduleService.findAll(associationId, 3, DayOfWeek.Lundi, null);
 
         assertEquals(1, schedules.size());
     }
@@ -158,6 +159,7 @@ public class ScheduleServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "user@test.fr")
     public void createSchedule_whenSuccess() {
         ScheduleCreateDto scheduleCreateDto = new ScheduleCreateDto();
         {
@@ -170,7 +172,7 @@ public class ScheduleServiceIT {
             scheduleCreateDto.setEndTime(LocalTime.of(18, 30));
             scheduleCreateDto.setLocation(location);
 
-            ScheduleReadDto scheduleReadDto = scheduleService.createSchedule(association.getId(), scheduleCreateDto);
+            ScheduleReadDto scheduleReadDto = scheduleService.createSchedule(association.getId(), scheduleCreateDto, "user@test.fr");
 
             assertEquals(scheduleReadDto.getActivityName(), scheduleCreateDto.getActivityName());
             assertEquals(2, scheduleRepository.count());
@@ -178,6 +180,7 @@ public class ScheduleServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "user@test.fr")
     public void createSchedule_whenAlreadyExists_shouldThrowConflict() {
         ScheduleCreateDto scheduleCreateDto = new ScheduleCreateDto();
         scheduleCreateDto.setActivityName("Baby football");
@@ -189,27 +192,30 @@ public class ScheduleServiceIT {
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
         scheduleCreateDto.setLocation(location);
 
-        assertThrows(ResourceAlreadyExistsException.class, () -> scheduleService.createSchedule(association.getId(), scheduleCreateDto));
+        assertThrows(ResourceAlreadyExistsException.class, () -> scheduleService.createSchedule(association.getId(), scheduleCreateDto, "user@test.fr"));
     }
 
     @Test
+    @WithMockUser(username = "user@test.fr")
     public void updateSchedule_whenSuccess() {
         ScheduleUpdateDto scheduleUpdateDto = new ScheduleUpdateDto();
         scheduleUpdateDto.setDayOfWeek(DayOfWeek.Vendredi);
 
-        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(schedule.getId(), scheduleUpdateDto);
+        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(schedule.getId(), scheduleUpdateDto, "user@test.fr");
 
         assertEquals(scheduleUpdateDto.getDayOfWeek(), updatedSchedule.getDayOfWeek());
     }
 
     @Test
+    @WithMockUser(username = "user@test.fr")
     public void updateSchedule_whenScheduleNotFound_shouldThrowNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, any(ScheduleUpdateDto.class)));
+        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, any(ScheduleUpdateDto.class), "user@test.fr"));
     }
 
     @Test
+    @WithMockUser(username = "user@test.fr")
     public void deleteSchedule_whenSuccess(){
-        scheduleService.deleteSchedule(schedule.getId());
+        scheduleService.deleteSchedule(schedule.getId(), "user@test.fr");
         assertEquals(0, scheduleRepository.count());
     }
 

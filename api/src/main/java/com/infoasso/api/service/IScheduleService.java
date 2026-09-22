@@ -15,11 +15,11 @@ public interface IScheduleService {
     List<ScheduleReadDto> findAll(Long id, Integer age, DayOfWeek dayOfWeek, String city);
     ScheduleReadDto findById(Long id, Long scheduleId);
 
-    ScheduleReadDto createSchedule(Long id, ScheduleCreateDto scheduleCreateDto);
+    ScheduleReadDto createSchedule(Long id, ScheduleCreateDto scheduleCreateDto, String userEmail);
 
-    ScheduleReadDto updateSchedule(Long id,ScheduleUpdateDto scheduleUpdateDto);
+    ScheduleReadDto updateSchedule(Long id,ScheduleUpdateDto scheduleUpdateDto, String userEmail);
 
-    void deleteSchedule(Long scheduleId);
+    void deleteSchedule(Long scheduleId, String userEmail);
 
 
 }

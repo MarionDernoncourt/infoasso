@@ -113,7 +113,7 @@ public class AssociationServiceImpl implements IAssociationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Association", id));
 
         //Vérification si userEmail === owner de l'association
-        if(userEmail.equalsIgnoreCase(association.getOwner().getEmail())) {
+        if(!userEmail.equalsIgnoreCase(association.getOwner().getEmail())) {
             throw new AccessDeniedException("Vous n'avez pas les droits pour modifier cette association.");
         }
 
@@ -146,10 +146,13 @@ public class AssociationServiceImpl implements IAssociationService {
 
     @Override
     @Transactional
-    public void deleteAssociation(Long id) {
+    public void deleteAssociation(Long id, String userEmail) {
         logger.info("Suppression de l'association ID : {}", id);
-        Association association = associationRepository.findById(id)
+                Association association = associationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Association", id));
+        if (!userEmail.equalsIgnoreCase(association.getOwner().getEmail())) {
+            throw new AccessDeniedException("Vous n'avez pas les droits pour supprimer cette association.");
+        }
         associationRepository.delete(association);
     }
 
