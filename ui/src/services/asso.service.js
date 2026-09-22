@@ -2,8 +2,11 @@ import apiClient from "./api";
 
 export default {
   // Récupération de toutes les associations
-  async getAll() {
-    const response = await apiClient.get("/associations");
+  async getAll(filters = {}) {
+    const response = await apiClient.get("/associations", 
+      { 
+        params: filters, 
+      });
     return response.data;
   },
   // Récuperation d'une seule association via id

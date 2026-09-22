@@ -7,18 +7,17 @@
       <a href="#" class="menu-item disabled-future" aria-disabled="true">
         Fil d'actualité
         <span class="badge-v2" aria-label="Fonctionnalité prévue pour la version 2">V2</span></a>
-      <a href="#" class="menu-item">Mon compte</a>
+      <a href="#" class="menu-item" @click.prevent="isUpdateModalOpen = true">Mon compte</a>
     </nav>
 
     <div class="sidebar-footer">
       <!--  Section Profil & Déconnexion -->
       <div class="user-section">
-        <span class="user-email">👤 {{ userEmail || 'Mon Compte' }}</span>
         <button class="logout-btn" @click="logout" aria-label="Se déconnecter de votre compte">Déconnexion</button>
       </div>
 
       <!-- séparation discrète -->
-      <hr class="footer-divider" aria-hidden="true"/>
+      <hr class="footer-divider" aria-hidden="true" />
 
       <div class="legal-section">
         <span class="menu-item disabled-future" aria-disabled="true">
@@ -30,12 +29,22 @@
       </div>
     </div>
   </aside>
+
+  <AccountModal
+    v-if="isUpdateModalOpen"
+    @close="isUpdateModalOpen = false"
+  />
+
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from "vue-router";
 // 💡 Importe ton vrai service d'authentification (ajuste le chemin si besoin, ex: @/services/auth.service)
 import authService from "@/services/auth.service";
+import AccountModal from "../account/AccountModal.vue";
+
+const isUpdateModalOpen = ref(false);
 
 defineProps({
   userEmail: String

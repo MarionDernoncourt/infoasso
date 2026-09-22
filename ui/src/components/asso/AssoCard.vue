@@ -10,7 +10,7 @@
       <div class="asso-profile">
         <h4>{{ asso?.displayName }}</h4>
         <span class="category-badge">
-          🏷️ {{ asso?.category?.name || 'Association' }}
+          🏷️ {{ asso?.categoryType  || 'Association' }}
         </span>
         <p class="asso-official-name">Nom officiel : {{ asso?.officialName }}</p>
         <p class="asso-rna">RNA : {{ asso?.rnaNumber }}</p>

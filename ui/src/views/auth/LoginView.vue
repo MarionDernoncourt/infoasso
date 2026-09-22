@@ -27,8 +27,9 @@
   <div class="form-group">
     <label class="form-line" for="password">
       Mot de passe
+      <div class="password-input-wrapper">
       <input
-      type="password"
+      :type="showPassword ? 'text' : 'password'"
       v-model="credentials.password"
       id="password"
       required
@@ -36,6 +37,16 @@
       autocomplete="current-password"
       aria-describedby="passwordError"
       >
+      <button
+      type="button"
+      class="toggle-password-btn"
+      @click="showPassword = !showPassword"
+      tabindex="-1"
+      :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+      >
+    {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+    </button>
+      </div>
     </label>
     <p v-if="fieldErrors.password" id="passwordError" class="error-text">
       {{ fieldErrors.password }}
@@ -76,6 +87,7 @@ const credentials = ref({
 const fieldErrors = ref({});
 
 const isLoading = ref(false);
+const showPassword = ref(false);
 
 const login = async () => {
   isLoading.value = true;
@@ -115,7 +127,7 @@ const login = async () => {
 }
 </script>
 
-<style>
+<style scoped>
 .main-container {
   display: flex;
   flex-direction: column;
@@ -170,9 +182,41 @@ input {
   border: 1px solid #ccc;
   border-radius: 6px;
   width: 250px;
+  box-sizing: border-box;
+}
+/* Le wrapper s'adapte à cette même largeur */
+.password-input-wrapper {
+  position: relative;
+  display: inline-flex; /* Pour épouser la largeur fixe de l'input */
+  align-items: center;
 }
 
-button {
+/* L'input à l'intérieur hérite de la même largeur et garde la place pour l'icône */
+.password-input-wrapper input {
+  width: 250px;
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+ .form-container .toggle-password-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.form-container .toggle-password-btn:hover {
+  color: #000;
+}
+button[type="submit"] {
   background-color: darksalmon;
   color: white;
   border: none;
@@ -187,7 +231,7 @@ button {
   transition: background-color 0.2s ease;
 }
 
-button:hover {
+button[type="submit"]:hover {
   background-color: #fca482;
 }
 

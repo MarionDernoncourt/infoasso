@@ -7,7 +7,9 @@
       <!-- CAS 1 : Utilisateur CONNECTÉ -->
       <template v-if="isLoggedIn">
         <router-link to="/dashboard" aria-label="Accéder au tableau de bord">Tableau de bord</router-link>
-<a href="#" @click.prevent="openAccountModal" aria-label="Gérer mon compte utilisateur">Mon compte</a>      </template>
+<a href="#" @click.prevent="openAccountModal" aria-label="Gérer mon compte utilisateur">Mon compte</a>
+<a href="#" @click="logout" aria-label="Se déconnecter">Déconnexion</a>
+</template>
 
       <!-- CAS 2 : Visiteur / Citoyen NON CONNECTÉ -->
       <template v-else>
@@ -17,16 +19,28 @@
     </div>
   </div>
 </nav>
-<AccountModal v-if="isModalOpen" @close="closeAccountModal" />
+<AccountModal v-if="isModalOpen" @click.prevent="isModalOpen = true" @close="closeAccountModal" />
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import AccountModal from '../account/AccountModal.vue';
+import authService from '@/services/auth.service.js';
+import router from '@/router/index.js';
 
 const isLoggedIn = ref(false);
-
 const isModalOpen = ref(false);
+
+const logout = async () => {
+  try {
+  authService.logout();
+  isLoggedIn.value = false;
+  router.push("/login");
+} catch (error) {
+  console.error("Erreur lors de la déconnexion", error);
+
+}
+}
 
 function openAccountModal() {
   isModalOpen.value = true;
@@ -41,6 +55,7 @@ onMounted(() => {
   const token = localStorage.getItem('token');
   isLoggedIn.value = !!token;
 });
+
 </script>
 
 <style scoped>

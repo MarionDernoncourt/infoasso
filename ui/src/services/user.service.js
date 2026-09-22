@@ -15,7 +15,7 @@ function getCurrentUserId() {
 }
 
 export default {
-  async getMyProfile() {
+  async getUserById() {
     const id = getCurrentUserId();
     if (!id) throw new Error("Utilisateur non authentifié");
 
@@ -28,6 +28,11 @@ export default {
     if (!id) throw new Error("Utilisateur non authentifié");
 
     const response = await apiClient.put(`/users/${id}`, userUpdate);
+    return response.data;
+  },
+
+  async getMyProfile() {
+    const response = await apiClient.get("users/myprofile");
     return response.data;
   },
 };

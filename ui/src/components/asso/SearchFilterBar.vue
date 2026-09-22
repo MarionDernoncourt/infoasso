@@ -4,7 +4,7 @@
       <label for="search-name" class="sr-only">Rechercher par nom d'association</label>
       <input
         id="search-name"
-        v-model="filters.q"
+        v-model="filters.name"
         placeholder="Nom association..."
         @keyup.enter="handleSearch"
         aria-label="Rechercher par nom d'association"
@@ -27,7 +27,6 @@
       <select
         id="categoryTypes"
         v-model="filters.categoryTypes"
-        @change="handleTypeChange"
         aria-label="Sélectionner une catégorie d'activité"
       >
         <option value="" disabled>-- Choisissez une catégorie --</option>
@@ -75,7 +74,7 @@ const router = useRouter();
 const categoryTypes = ref([]);
 
 const filters = ref({
-  q: "",
+  name: "",
   city: "",
   categoryTypes: "",
   age: ""

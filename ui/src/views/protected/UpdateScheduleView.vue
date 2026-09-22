@@ -1,6 +1,6 @@
 <template>
   <div class="updateSchedule-container" role="main" aria-label="Page de modification d'un horaire">
-    <TheSidebar :userEmail="userEmail" />
+    <TheSidebar  />
 
     <div class="updateSchedule-main">
 
@@ -53,7 +53,6 @@ onMounted(async () => {
 
     // 1. Vérification de sécurité prioritaire
     const assoData = await assoService.getById(assoId);
-    const userEmail = localStorage.getItem("user_email");
 
     if (assoData.ownerEmail !== userEmail) {
       alert("Vous n'êtes pas autorisé à modifier cette activité !");

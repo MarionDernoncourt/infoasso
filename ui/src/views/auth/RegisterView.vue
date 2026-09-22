@@ -165,8 +165,8 @@ const userData = ref({
   gdprConsent: false,
 });
 
-const showPassword = ref(false);
-const fieldErrors = ref({});
+const showOldPassword = ref(false);
+const showNewPassword = ref(false);const fieldErrors = ref({});
 const isLoading = ref(false);
 const isModalOpen = ref(false);
 

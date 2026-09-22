@@ -3,7 +3,7 @@ import router from "../router";
 import authService from "./auth.service";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -37,12 +37,15 @@ apiClient.interceptors.response.use(
     }
 
     const { status } = error.response;
+    const requestUrl = error.config?.url || "";
 
     //Si 401 (token expiré, invalide ou absent sur route protégée)
     if (status === 401) {
-      console.warn("Accès non autorisé 401. Redirection vers le Login...");
+      if(!requestUrl.includes("/auth/login")) {
+        console.warn("Accès non autorisé 401. Redirection vers le Login...");
       authService.logout();
       router.push({ name: "login" });
+      }
     }
     // Si 403 Forbidden (pas le rôle nécessaire pour cette action)
     else if (status === 403) {

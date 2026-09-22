@@ -1,6 +1,6 @@
 <template>
   <div class="createAsso-container" role="main" aria-label="Page de création d'une association">
-    <TheSidebar :userEmail="userEmail" />
+    <TheSidebar  />
 
     <div class="createAsso-main">
 

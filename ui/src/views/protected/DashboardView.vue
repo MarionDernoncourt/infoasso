@@ -100,7 +100,7 @@ onMounted(async () => {
       userEmail.value = data[0].owner?.email || 'Mon compte';
     } else {
       hasAssociation.value = false;
-      userEmail.value = localStorage.getItem("userEmail") || 'Mon Compte';
+      userEmail.value = localStorage.getItem("user_email") || 'Mon Compte';
     }
   } catch (error) {
     console.error("Erreur lors du chargement du dashboard: ", error);

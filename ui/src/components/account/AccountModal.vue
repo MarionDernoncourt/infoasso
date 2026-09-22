@@ -1,96 +1,81 @@
 <template>
-  <div class="overlay" role="dialog" aria-labelledby="modal-account-title" aria-modal="true">
-    <div class="detail-card">
+  <div class="overlay" @click.self="$emit('close')" role="dialog" aria-modal="true"
+    aria-labelledby="modal-activity-title">
+
+    <div class="update-card">
       <div class="form-group">
-        <h2 id="modal-account-title">
-          Modifier votre compte
-        </h2>
-        <button class="close-btn" type="button" @click="$emit('close')"
-          aria-label="Fermer la fenêtre de modification de votre compte">×</button>
-        <hr aria-hidden="true" />
+        <button type="button" class="close-btn" @click="$emit('close')"
+          aria-label="Fermer la fenêtre des détails">×</button>
+<h2>Modifier le mot de passe</h2>
       </div>
-
-      <div class="account-box">
-        <form @submit.prevent="handleSubmit" class="account-form">
-
-          <!-- Champ Email -->
-          <div class="form-control">
-            <label for="email">Adresse Email</label>
-            <input
-              id="email"
-              type="email"
-              v-model="form.email"
-              aria-required="false"
-              :aria-invalid="!!errors.email"
-              aria-describedby="email-error" />
-            <span id="email-error" class="error-msg" v-if="errors.email">
-              {{ errors.email }}
-            </span>
+      <div class="form-group">
+        <form @submit.prevent="updateProfile" aria-label="formulaire de modification du profil">
+          <div class="form-group">
+            <label class="form-line" for="email">
+              Email
+              <input type="email" v-model="credentials.email" id="email" required aria-required="true"
+                autocomplete="email" aria-describedby="emailError">
+            </label>
+            <p v-if="fieldErrors.email" id="emailError" class="error-text">
+              {{ fieldErrors.email }}
+            </p>
           </div>
 
-          <!-- Section Mot de passe -->
-          <fieldset class="password-section">
-            <legend>Modifier le mot de passe (optionnel)</legend>
+          <div class="form-group">
+            <label class="form-line" for="old-password">
+              Ancien mot de passe
+                             <div class="password-input-wrapper">
 
-            <!-- Ancien mot de passe -->
-            <div class="form-control">
-              <label for="oldPassword">Ancien mot de passe</label>
-              <div class="input-wrapper">
-                <input
-                  :type="showOldPassword ? 'text' : 'password'"
-                  id="oldPassword"
-                  v-model="form.oldPassword"
-                  :aria-invalid="!!errors.oldPassword"
-                  aria-describedby="old-password-error"
-                />
-                <button
-                  type="button"
-                  class="toggle-password-btn"
-                  @click="showOldPassword = !showOldPassword"
-                  tabindex="-1"
-                  :aria-label="showOldPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+              <input :type="showOldPassword ? 'text' : 'password'" v-model="credentials.oldPassword" id="old-password" required aria-required="true"
+                autocomplete="old-password" aria-describedby="oldPasswordError">
+                  <button
+                type="button"
+                class="toggle-password-btn"
+                @click="showOldPassword = !showOldPassword"
+                tabindex="-1"
+                :aria-label="showOldPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                 >
                   {{ showOldPassword ? '👁️' : '👁️‍🗨️' }}
                 </button>
-              </div>
-              <span id="old-password-error" class="error-msg" v-if="errors.oldPassword">
-                {{ errors.oldPassword }}
-              </span>
-            </div>
+                </div>
+            </label>
+            <p v-if="fieldErrors.oldPassword" id="oldPasswordError" class="error-text">
+              {{ fieldErrors.oldPassword }}
+            </p>
+          </div>
 
-            <!-- Nouveau mot de passe -->
-            <div class="form-control">
-              <label for="newPassword">Nouveau mot de passe</label>
-              <div class="input-wrapper">
-                <input
-                  id="newPassword"
-                  :type="showNewPassword ? 'text' : 'password'"
-                  v-model="form.newPassword"
-                  aria-describedby="new-password-error"
-                  :aria-invalid="!!errors.newPassword"
-                />
-                <button
-                  type="button"
-                  class="toggle-password-btn"
-                  @click="showNewPassword = !showNewPassword"
-                  tabindex="-1"
-                  :aria-label="showNewPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          <div class="form-group">
+            <label class="form-line" for="new-password">
+              Nouveau mot de passe
+               <div class="password-input-wrapper">
+              <input :type="showNewPassword ? 'text' : 'password'" v-model="credentials.newPassword" id="new-password" required aria-required="true"
+                autocomplete="new-password" aria-describedby="newPasswordError">
+                  <button
+                type="button"
+                class="toggle-password-btn"
+                @click="showNewPassword = !showNewPassword"
+                tabindex="-1"
+                :aria-label="showNewPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                 >
                   {{ showNewPassword ? '👁️' : '👁️‍🗨️' }}
                 </button>
-              </div>
-              <span id="new-password-error" class="error-msg" v-if="errors.newPassword">
-                {{ errors.newPassword }}
-              </span>
-            </div>
-          </fieldset>
-
-          <!-- Boutons d'action -->
-          <div class="modal-actions">
-            <button type="button" @click="$emit('close')">Annuler</button>
-            <button type="submit" class="btn-primary">Enregistrer les modifications</button>
+                </div>
+            </label>
+                <p class="password-hints" id="passwordHints">
+              Doit contenir au moins 8 caractères, 1 majuscule et 1 caractère spécial.
+            </p>
+            <p v-if="fieldErrors.newPassword" id="newPasswordError" class="error-text">
+              {{ fieldErrors.newPassword }}
+            </p>
           </div>
 
+          <button type="submit" :disabled="isLoading" aria-label="Modifier les informations du profil.">
+            {{ isLoading ? 'Modification en cours...' : 'Modifier' }}
+          </button>
+
+          <p v-if="fieldErrors.message" class="error-text global-error" role="alert">
+            {{ fieldErrors.message }}
+          </p>
         </form>
       </div>
 
@@ -100,63 +85,83 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import userService from '@/services/user.service';
 
-const emit = defineEmits(['close']);
+defineEmits(['close']);
 
+const router = useRouter();
+const isLoading = ref(false);
 const showOldPassword = ref(false);
 const showNewPassword = ref(false);
 
-const form = ref ({
+const credentials = ref({
   email: "",
   oldPassword: "",
   newPassword: "",
 });
 
-const errors = ref({
-  email : null,
-  oldPassword: null,
-  newPassword : null
+const fieldErrors = ref({
+  email: "",
+  oldPassword: "",
+  newPassword: "",
+  message: "",
 });
 
-onMounted(async() => {
+onMounted(async () => {
   try {
-    const userData = await userService.getMyProfile();
-    form.value.email = userData.email;
-  } catch(error) {
-    console.error('Erreur lors du chargement du profil', error);
+    const response = await userService.getMyProfile();
+
+    credentials.value.email = response.email;
+  } catch (error) {
+    console.error("Erreur chargement : ", error);
+    alert("Impossible de charger les données.");
+    router.push({ name: 'dashboard' });
   }
-});
+})
 
-async function handleSubmit() {
-  errors.value.oldPassword = null;
-  errors.value.newPassword = null;
-
-  if (form.value.newPassword && !form.value.oldPassword) {
-    errors.value.oldPassword = "L'ancien mot de passe est requis pour le modifier.";
-    return;
-  }
-
-  if (form.value.oldPassword && !form.value.newPassword) {
-    errors.value.newPassword = "Le nouveau mot de passe est requis.";
-    return;
-  }
-
+const updateProfile = async () => {
+  isLoading.value = true;
+  fieldErrors.value.message = "";
   try {
-    await userService.updateMyProfile({
-      email: form.value.email || null,
-      oldPassword: form.value.oldPassword || null,
-      newPassword: form.value.newPassword || null
-    });
-    alert("Le profil a bien été modifié !");
-    emit('close');
-  } catch(error) {
-    console.error("Erreur lors de la mise à jour : ", error);
+    await userService.updateMyProfile(credentials.value);
+    fieldErrors.value.message = "Le profil a été modifié avec succès !";
+
+  } catch (error) {
+    console.error("Erreur lors de la modification", error);
+    if (error.response) {
+      if (error.response.status === 400 && error.response.data.errors) {
+
+        fieldErrors.value = error.response.data.errors;
+      }
+
+      // Cas B : Erreur 401 ou 403 (Identifiants incorrects)
+      else if (error.response.status === 401 || error.response.status === 403) {
+        fieldErrors.value = {
+          message: error.response.data.message || "Email ou mot de passe incorrect."
+        };
+
+
+        // Cas C : Autre erreur du serveur (ex: 500)
+      } else {
+        fieldErrors.value = { message: "Une erreur est survenue sur le serveur. Réessaye." };
+      }
+
+      // Cas D : Pas de réponse du tout (Le serveur Spring Boot est éteint)
+    } else {
+      fieldErrors.value = { message: "Connexion impossible. Le serveur ne répond pas." };
+    }
+  } finally {
+    isLoading.value = false;
   }
 }
+
+
+
 </script>
 
 <style scoped>
+/* L'overlay couvre tout l'écran avec un effet assombri/flouté */
 .overlay {
   position: fixed;
   top: 0;
@@ -171,125 +176,100 @@ async function handleSubmit() {
   backdrop-filter: blur(4px);
 }
 
-.detail-card {
-  background: white;
-  padding: 30px;
+/* La carte modale reprend le design .form-container */
+.update-card {
+  background-color: white;
   border-radius: 16px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 40px 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 450px;
   position: relative;
   max-height: 80vh;
   overflow-y: auto;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.form-group h2 {
+/* Titre aligné sur ton style h1 */
+h2 {
   color: #2c1a14;
-  margin: 0 0 15px 0;
-  padding-right: 30px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   font-size: 1.5rem;
-}
-
-.form-group hr {
-  border: none;
-  border-bottom: 1px solid #e2d4cf;
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  text-align: center;
   width: 100%;
 }
 
+/* Bouton de fermeture de la modale */
 .close-btn {
   position: absolute;
-  top: -5px;
-  right: 0;
+  top: 15px;
+  right: 20px;
   cursor: pointer;
   border: none;
   background: none;
   font-size: 1.8rem;
   color: #5a3e36;
-  transition: color 0.2s, transform 0.2s;
-  padding: 0px;
+  transition: transform 0.2s;
 }
 
 .close-btn:hover {
   color: darksalmon;
-  transform: scale(1.1);
-  background: none;
 }
 
-.account-form {
+form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  background: #fdf0eb;
-  border: 1px solid #f4d1c1;
-  padding: 20px;
-  border-radius: 12px;
+  width: 100%;
 }
 
-.form-control {
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  width: 100%;
+  margin-bottom: 1.2rem;
 }
 
-.form-control label {
-  font-weight: 600;
-  color: #2c1a14;
-  font-size: 0.95rem;
+.form-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 0;
 }
 
-/* Style spécifique pour l'input email standard */
-.form-control > input {
+/* --- CHAMP MOT DE PASSE AVEC ŒIL INTÉGRÉ --- */
+input {
   padding: 10px 12px;
-  border: 1px solid #e2d4cf;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #2c1a14;
-  background: white;
-  transition: border-color 0.2s;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 260px; /* Ajuste cette valeur selon l'espace souhaité */
+  box-sizing: border-box;
 }
 
-.form-control > input:focus {
-  outline: none;
-  border-color: #5a3e36;
-}
-
-/* Conteneur pour positionner le bouton à l'intérieur des inputs password */
-.input-wrapper {
+/* Le wrapper s'adapte à cette même largeur */
+.password-input-wrapper {
   position: relative;
-  display: flex;
+  display: inline-flex; /* Pour épouser la largeur fixe de l'input */
   align-items: center;
 }
 
-.input-wrapper input {
-  width: 100%;
-  padding: 10px 40px 10px 12px;
-  border: 1px solid #e2d4cf;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #2c1a14;
-  background: white;
-  transition: border-color 0.2s;
+/* L'input à l'intérieur hérite de la même largeur et garde la place pour l'icône */
+.password-input-wrapper input {
+  width: 260px;
+  padding-right: 40px;
+  box-sizing: border-box;
 }
 
-.input-wrapper input:focus {
-  outline: none;
-  border-color: #5a3e36;
-}
-
-/* Style et centrage vertical du bouton œil */
 .toggle-password-btn {
   position: absolute;
   right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
@@ -298,66 +278,52 @@ async function handleSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #666;
 }
 
-.password-section {
-  border: none;
-  padding: 0;
+.toggle-password-btn:hover {
+  color: #000;
+}
+.password-hints {
+  font-size: 0.75rem;
+  color: #666;
   margin: 5px 0 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  line-height: 1.3;
 }
 
-.password-section legend {
-  font-weight: 600;
-  color: #5a3e36;
-  font-size: 0.95rem;
-  padding: 0;
-  margin-bottom: 10px;
-}
 
-.error-msg {
-  color: #d9534f;
-  font-size: 0.85rem;
-  margin-top: 2px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.modal-actions button[type="button"] {
-  background: transparent;
-  border: 1px solid #e2d4cf;
-  color: #5a3e36;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.modal-actions button[type="button"]:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.btn-primary {
-  background-color: #5a3e36;
+/* Bouton de soumission identique à ta charte */
+button[type="submit"] {
+  background-color: darksalmon;
   color: white;
   border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: bold;
+  margin-top: 20px;
+  align-self: center;
+  width: auto;
+  min-width: 160px;
+  transition: background-color 0.2s ease;
 }
 
-.btn-primary:hover {
-  background-color: #724f46;
+button[type="submit"]:hover {
+  background-color: #fca482;
+}
+
+.error-text {
+  color: #de4747;
+  font-size: 0.8rem;
+  margin: 4px 0 0 0;
+  align-self: flex-end;
+  font-weight: 500;
+}
+
+.global-error {
+  align-self: center;
+  text-align: center;
+  margin-top: 15px;
+  max-width: 90%;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="createSchedule-container" role="main" aria-label="Page d'ajout d'un horaire d'activité">
-    <TheSidebar :userEmail="userEmail" />
+    <TheSidebar  />
 
     <div class="createSchedule-main">
 

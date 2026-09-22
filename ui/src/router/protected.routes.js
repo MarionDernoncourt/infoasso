@@ -29,4 +29,5 @@ export default [
     component: () => import("@/views/protected/UpdateAssoView.vue"),
     meta: { requiresAuth: true },
   },
+
 ];

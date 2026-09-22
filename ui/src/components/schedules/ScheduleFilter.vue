@@ -17,7 +17,7 @@
         id="age"
         v-model="filters.age"
         aria-label="Filtrer par âge du participant"
-        /> ```
+        /> 
       </div>
 
       <div class="form-group">
@@ -75,7 +75,7 @@ if (filters.value.dayOfWeek) activeFilters.dayOfWeek = filters.value.dayOfWeek;
   emit('submitFilters', activeFilters); // Envoie l'objet nettoyé !
 }
 const cancelFilters = () => {
-  filters.value = "";
+  filters.value = {};
   emit('cancel');
 }
 </script>
