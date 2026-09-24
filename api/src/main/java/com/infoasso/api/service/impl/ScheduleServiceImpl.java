@@ -34,9 +34,9 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final AssociationRepository associationRepository;
-    private final ILocationService  locationService;
+    private final ILocationService locationService;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AssociationRepository associationRepository, ILocationService  locationService) {
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AssociationRepository associationRepository, ILocationService locationService) {
         this.scheduleRepository = scheduleRepository;
         this.associationRepository = associationRepository;
         this.locationService = locationService;
@@ -63,6 +63,7 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
     @Override
+    @Transactional
     public ScheduleReadDto findById(Long associationId, Long scheduleId) {
         logger.info("Searching for schedule with id {} for association with id {}", scheduleId, associationId);
 
@@ -71,8 +72,8 @@ public class ScheduleServiceImpl implements IScheduleService {
             throw new ResourceNotFoundException("Association", associationId);
         }
         // Récupération du schedule
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
+        Schedule schedule = scheduleRepository.findByIdAndAssociationId(scheduleId, associationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));
 
         return mapToReadDto(schedule);
     }
@@ -103,35 +104,43 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
     @Override
-    public ScheduleReadDto updateSchedule(Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String userEmail) {
+    @Transactional
+    public ScheduleReadDto updateSchedule(Long id, Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String userEmail) {
         logger.info("Trying to update schedule with id {}", scheduleId);
 
-        // 1. Vérification si schedule existe
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));
-        // 2. Vérification owner est bien celui connecté
-        if (!schedule.getAssociation().getOwner().getEmail().equals(userEmail)) {
+        // 1. Vérification de l'association et du propriétaire
+        Association association = associationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Association", id));
 
+        if (!association.getOwner().getEmail().equals(userEmail)) {
             throw new AccessDeniedException("Tu n'es pas autorisé à modifier cette association.");
         }
-        // 3. Mise à jour de l'entité
+
+        // 2. Vérification que le schedule appartient bien à CETTE association (anti-IDOR)
+        Schedule schedule = scheduleRepository.findByIdAndAssociationId(scheduleId, id)
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));        // 3. Mise à jour de l'entité
         Schedule updatedSchedule = scheduleRepository.save(updateEntityFromDto(schedule, scheduleUpdateDto));
 
         return mapToReadDto(updatedSchedule);
     }
 
     @Override
-    public void deleteSchedule(Long scheduleId, String userEmail) {
+    public void deleteSchedule(Long id, Long scheduleId, String userEmail) {
         logger.info("Trying to delete schedule with id {}", scheduleId);
 
-        // 1. Vérification si schedule existe
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Association", scheduleId));
-        // 2. Vérification owner est bien celui connecté
-        if (!schedule.getAssociation().getOwner().getEmail().equals(userEmail)) {
+        // 1. Vérification de l'association et du propriétaire
+        Association association = associationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Association", id));
+
+        if (!association.getOwner().getEmail().equals(userEmail)) {
             throw new AccessDeniedException("Tu n'es pas autorisé à supprimer cette association.");
         }
-        // 3. Suppression du schedule
+
+        // 2. Vérification que le schedule appartient bien à CETTE association (anti-IDOR)
+        Schedule schedule = scheduleRepository.findByIdAndAssociationId(scheduleId, id)
+                .orElseThrow(() ->new ResourceNotFoundException("Schedule", scheduleId));
+
+        // 3. Suppression
         scheduleRepository.delete(schedule);
 
     }
@@ -140,7 +149,7 @@ public class ScheduleServiceImpl implements IScheduleService {
     private boolean isMatch(Schedule s, Integer age, DayOfWeek day, String city) {
         return (age == null || (age >= s.getAgeMin() && age <= s.getAgeMax()))
                 && (day == null || s.getDayOfWeek() == day)
-        && (city == null || s.getLocation().getCity().equalsIgnoreCase(city));
+                && (city == null || s.getLocation().getCity().equalsIgnoreCase(city));
     }
 
     private boolean getAssociationValidated(Long id) {
@@ -214,7 +223,7 @@ public class ScheduleServiceImpl implements IScheduleService {
             schedule.setDescription(dto.getDescription());
         }
 
-        if(dto.getLocation() != null) {
+        if (dto.getLocation() != null) {
             // Vérification Location existe ou création
             Location locationEntity = locationService.findOrCreateEntity(dto.getLocation());
             schedule.setLocation(locationEntity);

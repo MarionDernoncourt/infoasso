@@ -17,9 +17,9 @@ public interface IScheduleService {
 
     ScheduleReadDto createSchedule(Long id, ScheduleCreateDto scheduleCreateDto, String userEmail);
 
-    ScheduleReadDto updateSchedule(Long id,ScheduleUpdateDto scheduleUpdateDto, String userEmail);
+    ScheduleReadDto updateSchedule(Long id, Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String userEmail);
 
-    void deleteSchedule(Long scheduleId, String userEmail);
+    void deleteSchedule(Long id, Long scheduleId, String userEmail);
 
 
 }

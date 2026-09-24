@@ -67,7 +67,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleReadDto> updateSchedule(@PathVariable Long id, @PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto, Principal principal) {
         logger.info("PUT: / : Request received for update schedule with id " + scheduleId);
         String userEmail = principal.getName();
-        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(scheduleId, scheduleUpdateDto, userEmail);
+        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(id, scheduleId, scheduleUpdateDto, userEmail);
         logger.info("PUT : / : Response 200 OK : Schedule updated with id " + updatedSchedule.getId());
         return ResponseEntity.status(HttpStatus.OK).body(updatedSchedule);
     }
@@ -77,7 +77,7 @@ public class ScheduleController {
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @PathVariable Long scheduleId, Principal principal) {
         logger.info("DELETE: / : Request received to delete schedule with id " + scheduleId);
         String userEmail = principal.getName();
-        scheduleService.deleteSchedule(scheduleId, userEmail);
+        scheduleService.deleteSchedule(id, scheduleId, userEmail);
         logger.info("DELETE : / : Response 204 NO CONTENT");
         return ResponseEntity.noContent().build();
     }

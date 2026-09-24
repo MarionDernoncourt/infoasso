@@ -201,7 +201,7 @@ public class ScheduleServiceIT {
         ScheduleUpdateDto scheduleUpdateDto = new ScheduleUpdateDto();
         scheduleUpdateDto.setDayOfWeek(DayOfWeek.Vendredi);
 
-        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(schedule.getId(), scheduleUpdateDto, "user@test.fr");
+        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(association.getId(), schedule.getId(),  scheduleUpdateDto, "user@test.fr");
 
         assertEquals(scheduleUpdateDto.getDayOfWeek(), updatedSchedule.getDayOfWeek());
     }
@@ -209,13 +209,13 @@ public class ScheduleServiceIT {
     @Test
     @WithMockUser(username = "user@test.fr")
     public void updateSchedule_whenScheduleNotFound_shouldThrowNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, any(ScheduleUpdateDto.class), "user@test.fr"));
+        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, association.getId(), any(ScheduleUpdateDto.class), "user@test.fr"));
     }
 
     @Test
     @WithMockUser(username = "user@test.fr")
     public void deleteSchedule_whenSuccess(){
-        scheduleService.deleteSchedule(schedule.getId(), "user@test.fr");
+        scheduleService.deleteSchedule(association.getId(), schedule.getId(), "user@test.fr");
         assertEquals(0, scheduleRepository.count());
     }
 

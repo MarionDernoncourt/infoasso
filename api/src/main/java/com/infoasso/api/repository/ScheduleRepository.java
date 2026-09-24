@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
@@ -18,4 +19,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     boolean existsByAssociationIdAndActivityNameAndDayOfWeekAndStartTime(
             Long associationId, String activityName, DayOfWeek day, LocalTime start
     );
+
+    Optional<Schedule> findByIdAndAssociationId(Long scheduleId, Long associationId);
 }

@@ -239,7 +239,7 @@ public class ScheduleControllerTest {
 
         String json = objectMapper.writeValueAsString(scheduleUpdateDto);
 
-        when(scheduleService.updateSchedule(any(Long.class), any(ScheduleUpdateDto.class), eq("user"))).thenReturn(schedule);
+        when(scheduleService.updateSchedule(any(Long.class), any(Long.class), any(ScheduleUpdateDto.class), eq("user"))).thenReturn(schedule);
         Long scheduleId = schedule.getId();
 
         mockMvc.perform(put("/api/associations/1/schedules/" + scheduleId)
@@ -276,7 +276,7 @@ public class ScheduleControllerTest {
 
         String json = objectMapper.writeValueAsString(scheduleUpdateDto);
 
-        when(scheduleService.updateSchedule(any(Long.class), any(ScheduleUpdateDto.class), eq("user"))).thenReturn(schedule);
+        when(scheduleService.updateSchedule(any(Long.class), any(Long.class), any(ScheduleUpdateDto.class), eq("user"))).thenReturn(schedule);
         Long scheduleId = schedule.getId();
 
         mockMvc.perform(put("/api/associations/1/schedules/" + scheduleId)
@@ -289,7 +289,7 @@ public class ScheduleControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
     public void deleteSchedule_whenSuccess() throws Exception {
-        doNothing().when(scheduleService).deleteSchedule(any(Long.class), eq("user"));
+        doNothing().when(scheduleService).deleteSchedule(any(Long.class), any(Long.class), eq("user"));
 
         mockMvc.perform(delete("/api/associations/1/schedules/1").with(csrf()))
                 .andExpect(status().isNoContent());
@@ -298,7 +298,7 @@ public class ScheduleControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
     public void deleteSchedule_whenScheduleNotFound() throws Exception {
-        doThrow(new ResourceNotFoundException("Schedule", 999L)).when(scheduleService).deleteSchedule(eq(999L), eq("user"));
+        doThrow(new ResourceNotFoundException("Schedule", 999L)).when(scheduleService).deleteSchedule(any(Long.class), any(Long.class), eq("user"));
 
         mockMvc.perform(delete("/api/associations/1/schedules/999").with(csrf()))
                 .andExpect(status().isNotFound());
