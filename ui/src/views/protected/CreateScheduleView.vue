@@ -12,6 +12,7 @@
         :is-submitting="isSubmitting"
         :errors="backendErrors"
         :existingLocations="existingLocations"
+        @back="goToDashboard"
         @submit="handleCreateSchedule"
         @cancel="handleCancel" />
       </div>
@@ -66,6 +67,10 @@ onMounted(async () => {
 });
 
 const handleCancel = () => {
+  router.push("/dashboard");
+}
+
+const goToDashboard = () => {
   router.push("/dashboard");
 }
 

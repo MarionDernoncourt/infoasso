@@ -7,7 +7,7 @@
       <button
       type="button"
       class="back-btn"
-      @click="goToDashboard"
+      @click="$emit('back')"
       aria-label="Retourner à la fiche de l'association"
       >Retour à la fiche</button>
     </div>
@@ -127,7 +127,6 @@
           v-model="formData.ageMin"
           min="0" max="100"
           placeholder="Ex : 8"
-          required
           aria-required="true"
           aria-describedby="ageMinError"
           />
@@ -143,7 +142,6 @@
           v-model="formData.ageMax"
           min="0" max="100"
           placeholder="Ex: 10"
-          required
           aria-required="true"
           aria-describedby="ageMaxError"
           />
@@ -279,7 +277,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['cancel', 'submit']);
+const emit = defineEmits(['cancel', 'submit', 'back']);
 
 const startHour = ref("");
 const startMinute = ref("");
@@ -307,11 +305,6 @@ location: {
   city: "",
   zipCode: "",
 }});
-
-// Fonction pour aller sur la page de dashboard
-const goToDashboard = () => {
-  router.push("/dashboard");
-}
 
 
 onMounted(async () => {
