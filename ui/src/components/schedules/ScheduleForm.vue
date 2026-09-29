@@ -81,8 +81,8 @@
               <option value="45">45</option>
             </select>
           </div>
-          <p v-if="errors.startTime" class="error-text">
-            {{ errors.startTime }}
+          <p v-if="errors.timeRangeValid" class="error-text">
+            {{ errors.timeRangeValid }}
           </p>
         </div>
 
@@ -107,8 +107,8 @@
               <option value="45">45</option>
             </select>
           </div>
-          <p v-if="errors.endTime" class="error-text">
-            {{ errors.endTime }}
+          <p v-if="errors.timeRangeValid" class="error-text">
+            {{ errors.timeRangeValid }}
           </p>
         </div>
       </div>
@@ -131,8 +131,8 @@
           aria-required="true"
           aria-describedby="ageMinError"
           />
-          <p v-if="errors.ageMin" id="ageMinError" class="error-text">
-            {{ errors.ageMin }}
+          <p v-if="errors.ageRangeValid" id="ageMinError" class="error-text">
+            {{ errors.ageRangeValid }}
           </p>
         </div>
         <div class="form-group">
@@ -147,8 +147,8 @@
           aria-required="true"
           aria-describedby="ageMaxError"
           />
-          <p v-if="errors.ageMax" id="ageMaxError" class="error-text">
-            {{ errors.ageMax }}
+          <p v-if="errors.ageRangeValid" id="ageMaxError" class="error-text">
+            {{ errors.ageRangeValid }}
           </p>
         </div>
       </div>
@@ -287,7 +287,7 @@ const endHour = ref("");
 const endMinute = ref("");
 
 const dayOfWeek = ref([]);
-const locationMode = ref(false);
+const locationMode = ref('existing');
 
 
 
@@ -340,7 +340,7 @@ watch(() => props.initialData, (newVal) => {
   if (newVal) {
     const hasExistingLocation = newVal.value.locationId !== null && newVal.value.locationId !== undefined;
 
-    locationMode.value = !hasExistingLocation;
+    locationMode.value = hasExistingLocation ? 'existing' : 'new';
 
     formData.value = {
       activityName: newVal.activityName || "",
@@ -375,20 +375,19 @@ watch(() => props.initialData, (newVal) => {
   }
 }, { immediate: true });
 
-// SOUMISSION FORMULAIRE
 const handleSubmit = () => {
-  // On reconstruit les chaînes "HH:mm" attendues par ton API
   formData.value.startTime = `${startHour.value}:${startMinute.value}`;
   formData.value.endTime = `${endHour.value}:${endMinute.value}`;
 
   const payload = { ...formData.value };
-  if(locationMode.value) {
-    delete payload.locationId;
-  }else{ 
+
+  // On vérifie explicitement la valeur string
+  if (locationMode.value === 'existing') {
     delete payload.location;
-    }
-  //Mode création : XX locationId pour qu'il soit à null
-  console.log("Formulaire soumis, envoi au parent...");
+  } else {
+    delete payload.locationId;
+  }
+
   emit("submit", payload);
 }
 

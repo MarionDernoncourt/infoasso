@@ -87,7 +87,7 @@ const handleCreateSchedule = async (formData) => {
     console.error("Erreur lors de la création de l'horaire: ", error);
     if (error.response && error.response.status === 400) {
       backendErrors.value
-        = error.response.data;
+        = error.response.data.errors;
     } else {
       alert("Une erreur inattendue est survenue.");
     }
