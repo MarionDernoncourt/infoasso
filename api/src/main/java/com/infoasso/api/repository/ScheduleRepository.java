@@ -20,5 +20,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             Long associationId, String activityName, DayOfWeek day, LocalTime start
     );
 
+    boolean existsByAssociationIdAndLocationId(@Param("associationId") Long associationId, @Param("locationId") Long locationId);
     Optional<Schedule> findByIdAndAssociationId(Long scheduleId, Long associationId);
 }

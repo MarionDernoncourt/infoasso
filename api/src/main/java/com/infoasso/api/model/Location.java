@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="location")
+@Table(name="locations")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,5 +26,7 @@ public class Location {
 
     private String zipCode;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "association_id", nullable = false)
+    private Association association;
 }

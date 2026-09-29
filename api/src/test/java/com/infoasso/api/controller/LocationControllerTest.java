@@ -5,7 +5,6 @@ import com.infoasso.api.dto.location.LocationCreateDto;
 import com.infoasso.api.dto.location.LocationReadDto;
 import com.infoasso.api.dto.location.LocationUpdateDto;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
-import com.infoasso.api.security.SecurityConfig;
 import com.infoasso.api.security.jwt.AuthEntryPointJwt;
 import com.infoasso.api.security.jwt.JwtUtils;
 import com.infoasso.api.security.services.UserDetailsServiceImpl;
@@ -14,47 +13,44 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LocationController.class)
 public class LocationControllerTest {
 
-
-    @Autowired
-    private LocationController locationController;
-    @MockitoBean
-    private ILocationService locationService;
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
-    private LocationReadDto location;
 
+    @MockitoBean
+    private ILocationService locationService;
 
     @MockitoBean
     private UserDetailsServiceImpl userDetailsService;
+
     @MockitoBean
     private JwtUtils jwtUtils;
+
     @MockitoBean
     private AuthEntryPointJwt authEntryPointJwt;
 
+    private LocationReadDto location;
+    private final Long associationId = 1L;
 
     @BeforeEach
     public void setUp() {
@@ -70,9 +66,9 @@ public class LocationControllerTest {
     @Test
     @WithMockUser
     public void findAll_WhenSuccess() throws Exception {
-        when(locationService.findAllLocation()).thenReturn(List.of(location));
+        when(locationService.findAllByAssociationId(associationId)).thenReturn(List.of(location));
 
-        mockMvc.perform(get("/api/locations"))
+        mockMvc.perform(get("/api/associations/" + associationId + "/locations"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
@@ -80,9 +76,9 @@ public class LocationControllerTest {
     @Test
     @WithMockUser
     public void findById_WhenSuccess() throws Exception {
-        when(locationService.findById(1L)).thenReturn(location);
+        when(locationService.findByIdAndAssociationId(eq(associationId), eq(1L))).thenReturn(location);
 
-        mockMvc.perform(get("/api/locations/1"))
+        mockMvc.perform(get("/api/associations/" + associationId + "/locations/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Gymnase"));
     }
@@ -90,21 +86,24 @@ public class LocationControllerTest {
     @Test
     @WithMockUser
     public void findById_WhenNotFound() throws Exception {
-        when(locationService.findById(any(Long.class))).thenThrow(new ResourceNotFoundException("Location", any(Long.class)));
+        when(locationService.findByIdAndAssociationId(eq(associationId), any(Long.class)))
+                .thenThrow(new ResourceNotFoundException("Location", 12L));
 
-        mockMvc.perform(get("/api/locations/12"))
+        mockMvc.perform(get("/api/associations/" + associationId + "/locations/12"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void create_WhenSuccess() throws Exception {
-        LocationReadDto newLoc = new LocationReadDto(2L, "Stade", "1 rue principale", "Lille", "59000");
-        String jsonLocation = objectMapper.writeValueAsString(newLoc);
+        LocationCreateDto newLocDto = new LocationCreateDto("Stade", "1 rue principale", "Lille", "59000");
+        String jsonLocation = objectMapper.writeValueAsString(newLocDto);
 
-        when(locationService.findOrCreateLocation(any(LocationCreateDto.class))).thenReturn(newLoc);
+        // On mocke createLocation avec les bons arguments (associationId, dto, username)
+        when(locationService.createLocation(eq(associationId), any(LocationCreateDto.class), any(String.class)))
+                .thenReturn(location);
 
-        mockMvc.perform(post("/api/locations")
+        mockMvc.perform(post("/api/associations/" + associationId + "/locations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonLocation)
                         .with(csrf()))
@@ -113,12 +112,11 @@ public class LocationControllerTest {
 
     @Test
     public void create_WhenNotAuthorize() throws Exception {
-        LocationReadDto newLoc = new LocationReadDto(2L, "Stade", "1 rue principale", "Lille", "59000");
-        String jsonLocation = objectMapper.writeValueAsString(newLoc);
+        LocationCreateDto newLocDto = new LocationCreateDto("Stade", "1 rue principale", "Lille", "59000");
+        String jsonLocation = objectMapper.writeValueAsString(newLocDto);
 
-        when(locationService.findOrCreateLocation(any(LocationCreateDto.class))).thenReturn(newLoc);
-
-        mockMvc.perform(post("/api/locations")
+        // Pas d'utilisateur authentifié, la requête doit être rejetée par Spring Security
+        mockMvc.perform(post("/api/associations/" + associationId + "/locations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonLocation)
                         .with(csrf()))
@@ -128,37 +126,33 @@ public class LocationControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     public void create_whenRequestBodyNotValid() throws Exception {
-        LocationCreateDto newLoc = new LocationCreateDto("Stade", "1 rue principale", "", "59000");
-        String jsonLocation = objectMapper.writeValueAsString(newLoc);
+        // Ville vide pour déclencher une erreur @Valid du Controller (@NotBlank)
+        LocationCreateDto invalidDto = new LocationCreateDto("Stade", "1 rue principale", "", "59000");
+        String jsonLocation = objectMapper.writeValueAsString(invalidDto);
 
-        when(locationService.findOrCreateLocation(any(LocationCreateDto.class))).thenReturn(location);
-
-        mockMvc.perform(post("/api/locations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonLocation)
-                .with(csrf()))
+        mockMvc.perform(post("/api/associations/" + associationId + "/locations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonLocation)
+                        .with(csrf()))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     public void update_WhenSuccess() throws Exception {
-        LocationUpdateDto updateLoc = new LocationUpdateDto("", "", "", "59800");
+        LocationUpdateDto updateLoc = new LocationUpdateDto("Gymnase", "12 rue paradis", "Lille", "59800");
         String jsonUpdate = objectMapper.writeValueAsString(updateLoc);
 
-        LocationReadDto updatedLoc = new LocationReadDto(1L, "Gymnase",
-                "12 rue paradis",
-                "Lille",
-                "59800" );
+        LocationReadDto updatedLoc = new LocationReadDto(1L, "Gymnase", "12 rue paradis", "Lille", "59800");
 
-        when(locationService.updateLocation(any(Long.class), any(LocationUpdateDto.class))).thenReturn(updatedLoc);
+        when(locationService.updateLocation(eq(associationId), eq(1L), any(LocationUpdateDto.class), any(String.class)))
+                .thenReturn(updatedLoc);
 
- mockMvc.perform(put("/api/locations/1")
-         .contentType(MediaType.APPLICATION_JSON)
-         .content(jsonUpdate)
-         .with(csrf()))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.zipCode").value("59800"));
+        mockMvc.perform(put("/api/associations/" + associationId + "/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonUpdate)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.zipCode").value("59800"));
     }
-
 }

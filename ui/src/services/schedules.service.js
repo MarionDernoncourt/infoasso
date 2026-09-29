@@ -37,4 +37,9 @@ export default {
   async getDaysOfWeek() {
     return await apiClient.get("/enums/daysOfWeek");
   },
+  // Récupération des lieux existants
+  async getLocationsByAssociationId(assoId) {
+    const response = await apiClient.get(`/associations/${assoId}/locations`);
+    return response.data;
+  },
 };

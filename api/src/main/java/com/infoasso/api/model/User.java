@@ -1,12 +1,11 @@
 package com.infoasso.api.model;
 
+import com.infoasso.api.dto.association.AssociationSummaryDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,6 +43,8 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "owner")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Association> associations;
 
     @Column(nullable = false)

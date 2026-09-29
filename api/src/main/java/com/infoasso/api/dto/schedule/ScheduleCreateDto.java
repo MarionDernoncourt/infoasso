@@ -2,10 +2,8 @@ package com.infoasso.api.dto.schedule;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.infoasso.api.model.Association;
+import com.infoasso.api.dto.location.LocationCreateDto;
 import com.infoasso.api.model.DayOfWeek;
-import com.infoasso.api.model.Location;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,10 +18,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleCreateDto {
-
-
-    @NotNull
-    private Long associationId;
 
     @NotBlank(message = "Le nom de l'activité est obligatoire.")
     private String activityName;
@@ -46,11 +40,13 @@ public class ScheduleCreateDto {
 
     private String description;
 
-    @NotNull(message="Le nom de la ville est obligatoire.")
-    private Location location;
+    // Cas 1 : L'ID d'une location existante
+    private Long locationId;
+
+    // Cas 2 : Un DTO de création si on souhaite en créer une nouvelle
+    private LocationCreateDto location;
 
     // --- Validations de cohérence ---
-
     @JsonIgnore
     @AssertTrue(message = "L'âge maximum doit être supérieur ou égal à l'âge minimum.")
     public boolean isAgeRangeValid() {

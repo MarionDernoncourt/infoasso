@@ -35,11 +35,13 @@ public class ScheduleServiceImpl implements IScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final AssociationRepository associationRepository;
     private final ILocationService locationService;
+    private final LocationRepository locationRepository;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AssociationRepository associationRepository, ILocationService locationService) {
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AssociationRepository associationRepository, ILocationService locationService, LocationRepository locationRepository) {
         this.scheduleRepository = scheduleRepository;
         this.associationRepository = associationRepository;
         this.locationService = locationService;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -83,21 +85,32 @@ public class ScheduleServiceImpl implements IScheduleService {
     public ScheduleReadDto createSchedule(Long associationId, ScheduleCreateDto scheduleCreateDto, String userEmail) {
         logger.info("Creating schedule for association id {}", associationId);
 
-        // 1. Verification existence association
+        // 1. Verification existence association & Owner (anti IDOR)
         Association association = associationRepository.findById(associationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Association", associationId));
 
-        // 2. Verification owner est bien celui connecté
         if (!association.getOwner().getEmail().equals(userEmail)) {
             throw new AccessDeniedException("Tu n'es pas autorisé à créer un schedule pour cette association.");
+        }
+
+        // 2. Verification Location existe ou creation
+        Location locationEntity;
+        if (scheduleCreateDto.getLocationId() != null) {
+            locationEntity = locationRepository.findById(scheduleCreateDto.getLocationId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Location", scheduleCreateDto.getLocationId()));
+        } else if (scheduleCreateDto.getLocation() != null) {
+            locationEntity = locationService.findOrCreateLocation(association, scheduleCreateDto.getLocation());
+        } else {
+            throw new IllegalArgumentException("Une location (existante ou nouvelle) doit être spécifiée.");
         }
 
         // 3. Verification si Schedule existe dejà
         if (scheduleRepository.existsByAssociationIdAndActivityNameAndDayOfWeekAndStartTime(associationId, scheduleCreateDto.getActivityName(), scheduleCreateDto.getDayOfWeek(), scheduleCreateDto.getStartTime())) {
             throw new ResourceAlreadyExistsException("Un schedule avec ces informations existe déjà :" + scheduleCreateDto.getActivityName());
         }
+
         // 4. Creation du schedule
-        Schedule schedule = mapToEntity(association, scheduleCreateDto);
+        Schedule schedule = mapToEntity(association, scheduleCreateDto, locationEntity);
         scheduleRepository.save(schedule);
 
         return mapToReadDto(schedule);
@@ -105,7 +118,8 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     @Transactional
-    public ScheduleReadDto updateSchedule(Long id, Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String userEmail) {
+    public ScheduleReadDto updateSchedule(Long id, Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String
+            userEmail) {
         logger.info("Trying to update schedule with id {}", scheduleId);
 
         // 1. Vérification de l'association et du propriétaire
@@ -119,7 +133,7 @@ public class ScheduleServiceImpl implements IScheduleService {
         // 2. Vérification que le schedule appartient bien à CETTE association (anti-IDOR)
         Schedule schedule = scheduleRepository.findByIdAndAssociationId(scheduleId, id)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));        // 3. Mise à jour de l'entité
-        Schedule updatedSchedule = scheduleRepository.save(updateEntityFromDto(schedule, scheduleUpdateDto));
+        Schedule updatedSchedule = scheduleRepository.save(updateEntityFromDto(association, schedule, scheduleUpdateDto));
 
         return mapToReadDto(updatedSchedule);
     }
@@ -138,7 +152,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // 2. Vérification que le schedule appartient bien à CETTE association (anti-IDOR)
         Schedule schedule = scheduleRepository.findByIdAndAssociationId(scheduleId, id)
-                .orElseThrow(() ->new ResourceNotFoundException("Schedule", scheduleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));
 
         // 3. Suppression
         scheduleRepository.delete(schedule);
@@ -168,7 +182,7 @@ public class ScheduleServiceImpl implements IScheduleService {
         readDto.setAgeMin(schedule.getAgeMin());
         readDto.setAgeMax(schedule.getAgeMax());
         readDto.setDescription(schedule.getDescription());
-        readDto.setLocation(schedule.getLocation());
+        readDto.setLocation(new LocationReadDto(schedule.getLocation().getId(), schedule.getLocation().getName(), schedule.getLocation().getAddress(), schedule.getLocation().getCity(), schedule.getLocation().getZipCode(), schedule.getLocation().getAssociation().getId()));
         if (schedule.getAssociation() != null) {
             AssociationSummaryDto assoDto = new AssociationSummaryDto();
             assoDto.setId(schedule.getAssociation().getId());
@@ -180,7 +194,7 @@ public class ScheduleServiceImpl implements IScheduleService {
         return readDto;
     }
 
-    private Schedule mapToEntity(Association association, ScheduleCreateDto createDto) {
+    private Schedule mapToEntity(Association association, ScheduleCreateDto createDto, Location locationEntity) {
         Schedule schedule = new Schedule();
         schedule.setActivityName(createDto.getActivityName());
         schedule.setDayOfWeek(createDto.getDayOfWeek());
@@ -190,8 +204,6 @@ public class ScheduleServiceImpl implements IScheduleService {
         schedule.setAgeMax(createDto.getAgeMax());
         schedule.setDescription(createDto.getDescription());
 
-        // Vérification Location existe ou création
-        Location locationEntity = locationService.findOrCreateEntity(createDto.getLocation());
         schedule.setLocation(locationEntity);
 
         schedule.setAssociation(association);
@@ -200,7 +212,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     }
 
-    private Schedule updateEntityFromDto(Schedule schedule, ScheduleUpdateDto dto) {
+    private Schedule updateEntityFromDto(Association association, Schedule schedule, ScheduleUpdateDto dto) {
         if (dto.getActivityName() != null) {
             schedule.setActivityName(dto.getActivityName());
         }
@@ -223,9 +235,15 @@ public class ScheduleServiceImpl implements IScheduleService {
             schedule.setDescription(dto.getDescription());
         }
 
-        if (dto.getLocation() != null) {
-            // Vérification Location existe ou création
-            Location locationEntity = locationService.findOrCreateEntity(dto.getLocation());
+        // Gestion de la mise à jour de la location (Approche Hybride)
+        if (dto.getLocationId() != null) {
+            // Cas 1 : On associe un ID existant
+            Location locationEntity = locationRepository.findById(dto.getLocationId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Location", dto.getLocationId()));
+            schedule.setLocation(locationEntity);
+        } else if (dto.getLocation() != null) {
+            // Cas 2 : On crée ou récupère via le DTO de création
+            Location locationEntity = locationService.findOrCreateLocation(association, dto.getLocation());
             schedule.setLocation(locationEntity);
         }
 

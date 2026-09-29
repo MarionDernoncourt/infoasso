@@ -7,5 +7,6 @@ public record LocationUpdateDto(
         String address,
         String city,
         String zipCode
+
 ) {
 }

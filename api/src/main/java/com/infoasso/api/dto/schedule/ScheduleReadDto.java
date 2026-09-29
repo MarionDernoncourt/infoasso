@@ -1,6 +1,7 @@
 package com.infoasso.api.dto.schedule;
 
 import com.infoasso.api.dto.association.AssociationSummaryDto;
+import com.infoasso.api.dto.location.LocationReadDto;
 import com.infoasso.api.model.Association;
 import com.infoasso.api.model.DayOfWeek;
 import com.infoasso.api.model.Location;
@@ -37,5 +38,5 @@ public class ScheduleReadDto {
 
     private String description;
 
-    private Location location;
+    private LocationReadDto location;
     }

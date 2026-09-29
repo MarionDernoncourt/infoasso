@@ -1,12 +1,11 @@
 package com.infoasso.api.model;
 
+import com.infoasso.api.dto.association.AssociationSummaryDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalTime;
 
@@ -27,6 +26,8 @@ public class Schedule {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "association_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Association association;
 
     @Enumerated(EnumType.STRING)

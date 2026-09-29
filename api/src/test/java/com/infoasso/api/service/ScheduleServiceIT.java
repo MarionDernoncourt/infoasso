@@ -1,5 +1,6 @@
 package com.infoasso.api.service;
 
+import com.infoasso.api.dto.location.LocationCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
@@ -77,6 +78,7 @@ public class ScheduleServiceIT {
         location.setAddress("22 rue Pasteur");
         location.setCity("Lille");
         location.setZipCode("59000");
+        location.setAssociation(association);
         location = locationRepository.save(location);
 
         schedule = new Schedule();
@@ -94,7 +96,6 @@ public class ScheduleServiceIT {
 
     @Test
     public void findAll_noFilters_whenSuccess() {
-
         Long associationId = association.getId();
         schedules = scheduleService.findAll(associationId, null, null, null);
 
@@ -127,10 +128,8 @@ public class ScheduleServiceIT {
         Long associationId = association.getId();
         Long scheduleId = schedule.getId();
 
-        // Exécution du vrai service connecté à la BDD de test
         ScheduleReadDto foundSchedule = scheduleService.findById(associationId, scheduleId);
 
-        // Assertions
         assertEquals(scheduleId, foundSchedule.getId());
         assertEquals("Baby football", foundSchedule.getActivityName());
         assertEquals(DayOfWeek.Lundi, foundSchedule.getDayOfWeek());
@@ -138,10 +137,9 @@ public class ScheduleServiceIT {
 
     @Test
     public void findById_whenAssociationNotFound_shouldThrowNotFound() {
-        Long invalidAssociationId = 999L; // Cet ID n'existe pas en BDD
+        Long invalidAssociationId = 999L;
         Long scheduleId = schedule.getId();
 
-        // On vérifie que la validation de l'association bloque bien la requête
         assertThrows(ResourceNotFoundException.class, () -> {
             scheduleService.findById(invalidAssociationId, scheduleId);
         });
@@ -150,9 +148,8 @@ public class ScheduleServiceIT {
     @Test
     public void findById_whenScheduleNotFound_shouldThrowNotFound() {
         Long associationId = association.getId();
-        Long invalidScheduleId = 999L; // Ce schedule n'existe pas en BDD
+        Long invalidScheduleId = 999L;
 
-        // On vérifie que le .orElseThrow() du Repository fait bien son job
         assertThrows(ResourceNotFoundException.class, () -> {
             scheduleService.findById(associationId, invalidScheduleId);
         });
@@ -162,21 +159,20 @@ public class ScheduleServiceIT {
     @WithMockUser(username = "user@test.fr")
     public void createSchedule_whenSuccess() {
         ScheduleCreateDto scheduleCreateDto = new ScheduleCreateDto();
-        {
-            scheduleCreateDto.setActivityName("Junior football");
-            scheduleCreateDto.setAgeMin(6);
-            scheduleCreateDto.setAgeMax(8);
-            scheduleCreateDto.setAssociationId(association.getId());
-            scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
-            scheduleCreateDto.setStartTime(LocalTime.of(17, 00));
-            scheduleCreateDto.setEndTime(LocalTime.of(18, 30));
-            scheduleCreateDto.setLocation(location);
+        scheduleCreateDto.setActivityName("Junior football");
+        scheduleCreateDto.setAgeMin(6);
+        scheduleCreateDto.setAgeMax(8);
+        scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
+        scheduleCreateDto.setStartTime(LocalTime.of(17, 00));
+        scheduleCreateDto.setEndTime(LocalTime.of(18, 30));
 
-            ScheduleReadDto scheduleReadDto = scheduleService.createSchedule(association.getId(), scheduleCreateDto, "user@test.fr");
+        // Utilisation de la sélection par ID existant (approche hybride)
+        scheduleCreateDto.setLocationId(location.getId());
 
-            assertEquals(scheduleReadDto.getActivityName(), scheduleCreateDto.getActivityName());
-            assertEquals(2, scheduleRepository.count());
-        }
+        ScheduleReadDto scheduleReadDto = scheduleService.createSchedule(association.getId(), scheduleCreateDto, "user@test.fr");
+
+        assertEquals(scheduleReadDto.getActivityName(), scheduleCreateDto.getActivityName());
+        assertEquals(2, scheduleRepository.count());
     }
 
     @Test
@@ -186,11 +182,13 @@ public class ScheduleServiceIT {
         scheduleCreateDto.setActivityName("Baby football");
         scheduleCreateDto.setAgeMin(3);
         scheduleCreateDto.setAgeMax(5);
-        scheduleCreateDto.setAssociationId(association.getId());
         scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
-        scheduleCreateDto.setLocation(location);
+
+        // Utilisation de l'approche hybride via DTO de création si on veut tester le doublon avec un nouveau lieu
+        LocationCreateDto locDto = new LocationCreateDto("Stade municipal", "22 rue Pasteur", "Lille", "59000");
+        scheduleCreateDto.setLocation(locDto);
 
         assertThrows(ResourceAlreadyExistsException.class, () -> scheduleService.createSchedule(association.getId(), scheduleCreateDto, "user@test.fr"));
     }
@@ -201,7 +199,7 @@ public class ScheduleServiceIT {
         ScheduleUpdateDto scheduleUpdateDto = new ScheduleUpdateDto();
         scheduleUpdateDto.setDayOfWeek(DayOfWeek.Vendredi);
 
-        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(association.getId(), schedule.getId(),  scheduleUpdateDto, "user@test.fr");
+        ScheduleReadDto updatedSchedule = scheduleService.updateSchedule(association.getId(), schedule.getId(), scheduleUpdateDto, "user@test.fr");
 
         assertEquals(scheduleUpdateDto.getDayOfWeek(), updatedSchedule.getDayOfWeek());
     }
@@ -209,7 +207,7 @@ public class ScheduleServiceIT {
     @Test
     @WithMockUser(username = "user@test.fr")
     public void updateSchedule_whenScheduleNotFound_shouldThrowNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(999L, association.getId(), any(ScheduleUpdateDto.class), "user@test.fr"));
+        assertThrows(ResourceNotFoundException.class, () -> scheduleService.updateSchedule(association.getId(), 999L, new ScheduleUpdateDto(), "user@test.fr"));
     }
 
     @Test
@@ -218,10 +216,4 @@ public class ScheduleServiceIT {
         scheduleService.deleteSchedule(association.getId(), schedule.getId(), "user@test.fr");
         assertEquals(0, scheduleRepository.count());
     }
-
-
-
-
-
-
 }

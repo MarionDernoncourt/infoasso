@@ -2,6 +2,7 @@ package com.infoasso.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infoasso.api.dto.association.AssociationSummaryDto;
+import com.infoasso.api.dto.location.LocationCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
@@ -191,8 +192,7 @@ public class ScheduleControllerTest {
         scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 30));
-        scheduleCreateDto.setAssociationId(association.getId());
-        scheduleCreateDto.setLocation(new Location(3L, "stade football", "12 rue du port","Lille", "59000"));
+        scheduleCreateDto.setLocation(new LocationCreateDto( "stade football", "12 rue du port","Lille", "59000"));
 
         String json = objectMapper.writeValueAsString(scheduleCreateDto);
 
@@ -215,8 +215,7 @@ public class ScheduleControllerTest {
         scheduleCreateDto.setDayOfWeek(DayOfWeek.Lundi);
         scheduleCreateDto.setStartTime(LocalTime.of(15, 00));
         scheduleCreateDto.setEndTime(LocalTime.of(15, 00));
-        scheduleCreateDto.setAssociationId(association.getId());
-        scheduleCreateDto.setLocation(location);
+        scheduleCreateDto.setLocation(new LocationCreateDto( "stade football", "12 rue du port","", "59000"));
 
 
         String json = objectMapper.writeValueAsString(scheduleCreateDto);

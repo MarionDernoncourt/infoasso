@@ -1,6 +1,7 @@
 package com.infoasso.api.dto.schedule;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.infoasso.api.dto.location.LocationCreateDto;
 import com.infoasso.api.model.DayOfWeek;
 import com.infoasso.api.model.Location;
 import jakarta.validation.constraints.AssertTrue;
@@ -32,7 +33,11 @@ public class ScheduleUpdateDto {
 
     private String description;
 
-    private Location location;
+    // Option A : Mettre à jour avec l'ID d'une location existante
+    private Long locationId;
+
+    // Option B : Mettre à jour en créant/fournissant un nouveau lieu
+    private LocationCreateDto location;
 
 
     @JsonIgnore

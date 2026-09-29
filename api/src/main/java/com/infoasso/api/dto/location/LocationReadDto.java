@@ -8,5 +8,6 @@ public record LocationReadDto(
         String name,
         String address,
         @NotBlank(message = "Le nom de la ville est obligatoire.") String city,
-        String zipCode) {
+        String zipCode,
+        Long associationId) {
 }

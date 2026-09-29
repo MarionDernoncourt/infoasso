@@ -156,48 +156,74 @@
 
 
     <div class="form-section">
-      <h3>Lieu de l'activité</h3>
+  <h3>Lieu de l'activité</h3>
 
-      <div class="form-row" style="display: flex; gap: 20px">
-        <div class="form-group">
-          <label for="locationName">Nom du lieu</label>
-          <input type="text" id="locationName" v-model="formData.location.name" placeholder="Ex: Gymnase" aria-label="Nom du lieu de l'activité">
-        </div>
-
-        <div class="form-group">
-          <label for="address">Adresse</label>
-          <input type="text" id="address" v-model="formData.location.address" placeholder="Ex: 12 rue Paradis" aria-label="Adresse du lieu de l'activité" />
-        </div>
-        <div class="form-group">
-          <label for="city">Ville</label>
-          <input
-          type="text"
-          id="city"
-          v-model="formData.location.city"
-          placeholder="Ex: Lille"
-          required
-          aria-required="true"
-          aria-describedby="cityError"
-          aria-label="Ville du lieu de l'activité"
-          />
-          <p v-if="errors.city" id="cityError" class="error-text">
-            {{ errors.city }}
-          </p>
-        </div>
-
-        <div class="form-group">
-          <label for="zipCode">Code Postal</label>
-          <input
-          type="text"
-          id="zipCode"
-          v-model="formData.location.zipCode"
-          placeholder="Ex: 59000" pattern="[0-9]{5}"
-          title="Entrez 5 chiffres"
-          aria-label="Code postal du lieu de l'activité"
-          />
-        </div>
-      </div>
+  <!-- Choix du mode : Existant vs Nouveau -->
+  <div class="form-group" style="margin-bottom: 15px;">
+    <label>Type de sélection du lieu</label>
+    <div style="display: flex; gap: 20px;">
+      <label>
+        <input type="radio" value="existing" v-model="locationMode" /> Choisir un lieu existant
+      </label>
+      <label>
+        <input type="radio" value="new" v-model="locationMode" /> Créer un nouveau lieu
+      </label>
     </div>
+  </div>
+
+  <!-- CAS 1 : Sélection d'un lieu existant (Dropdown) -->
+  <div v-if="locationMode === 'existing'" class="form-group">
+    <label for="existingLocation">Lieu enregistré</label>
+    <select id="existingLocation" v-model="formData.locationId" aria-label="Sélectionner un lieu existant">
+      <option value="" disabled>-- Sélectionner un lieu --</option>
+      <option v-for="loc in existingLocations" :key="loc.id" :value="loc.id">
+        {{ loc.name }} - {{ loc.address }}, {{ loc.city }}
+      </option>
+    </select>
+  </div>
+
+  <!-- CAS 2 : Formulaire de création d'un nouveau lieu -->
+  <div v-if="locationMode === 'new'" class="form-row" style="display: flex; gap: 20px">
+    <div class="form-group">
+      <label for="locationName">Nom du lieu</label>
+      <input type="text" id="locationName" v-model="formData.location.name" placeholder="Ex: Gymnase" aria-label="Nom du lieu de l'activité">
+    </div>
+
+    <div class="form-group">
+      <label for="address">Adresse</label>
+      <input type="text" id="address" v-model="formData.location.address" placeholder="Ex: 12 rue Paradis" aria-label="Adresse du lieu de l'activité" />
+    </div>
+    
+    <div class="form-group">
+      <label for="city">Ville</label>
+      <input
+        type="text"
+        id="city"
+        v-model="formData.location.city"
+        placeholder="Ex: Lille"
+        required
+        aria-required="true"
+        aria-describedby="cityError"
+        aria-label="Ville du lieu de l'activité"
+      />
+      <p v-if="errors.city" id="cityError" class="error-text">
+        {{ errors.city }}
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="zipCode">Code Postal</label>
+      <input
+        type="text"
+        id="zipCode"
+        v-model="formData.location.zipCode"
+        placeholder="Ex: 59000" pattern="[0-9]{5}"
+        title="Entrez 5 chiffres"
+        aria-label="Code postal du lieu de l'activité"
+      />
+    </div>
+  </div>
+</div>
 
 
     <div class="forms-action">
@@ -247,6 +273,10 @@ const props = defineProps({
     type: String,
     default: "Enregistrer"
   },
+  existingLocations: {
+    type: Array,
+    default: () => []
+  }
 });
 
 const emit = defineEmits(['cancel', 'submit']);
@@ -256,8 +286,11 @@ const startMinute = ref("");
 const endHour = ref("");
 const endMinute = ref("");
 
-//VARIABLE REACTIVE
 const dayOfWeek = ref([]);
+const locationMode = ref(false);
+
+
+
 const formData = ref({
   activityName: "",
   dayOfWeek: "",
@@ -266,15 +299,16 @@ const formData = ref({
   ageMin: "",
   ageMax: "",
   description: "",
-  // Champs pour la Location
-  location: {
-    name: "",
-    address: "",
-    city: "",
-    zipCode: "",
-  }
-})
+// Le choix de l'utilisateur
+locationId: null,
+location: {
+  name: "",
+  address: "",
+  city: "",
+  zipCode: "",
+}});
 
+// Fonction pour aller sur la page de dashboard
 const goToDashboard = () => {
   router.push("/dashboard");
 }
@@ -284,31 +318,46 @@ onMounted(async () => {
 
   console.log("Route actuelle :", route.name);
 
-  //Récupération des ENUMs pour le Select
+  //Récupération des ENUMs pour le Select du jour de la semaine
   try {
     const response = await schedulesService.getDaysOfWeek();
     dayOfWeek.value = response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des jours de la semaine: ", error);
   }
+  //Récupération des lieux existants
+  try {
+    const response = await schedulesService.getLocationsByAssociationId(route.params.id);
+    console.log("addresses : ", response);
+    existingLocations.value = response;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des lieux existants: ", error);
+  }
 
 });
 
 watch(() => props.initialData, (newVal) => {
   if (newVal) {
+    const hasExistingLocation = newVal.value.locationId !== null && newVal.value.locationId !== undefined;
+
+    locationMode.value = !hasExistingLocation;
+
     formData.value = {
-      activityName: newVal.activityName,
-      dayOfWeek: newVal.dayOfWeek,
-      ageMin: newVal.ageMin,
-      ageMax: newVal.ageMax,
-      associationId: newVal.association?.id,
-      description: newVal.description,
-      location: {
+      activityName: newVal.activityName || "",
+      dayOfWeek: newVal.dayOfWeek || "",
+      ageMin: newVal.ageMin || "",
+      ageMax: newVal.ageMax || "",
+      associationId: newVal.association?.id || newVal.associationId,
+      description: newVal.description || "",
+      // Si mode existant, on met le locationId, sinon null
+      locationId: hasExistingLocation ? newVal.locationId : null,
+      // Si mode nouveau, on remplit le DTO location, sinon null
+      location: !hasExistingLocation ? {
         name: newVal.location?.name || "",
         address: newVal.location?.address || "",
         city: newVal.location?.city || "",
         zipCode: newVal.location?.zipCode || ""
-      }
+      } : null
     };
 
     // Découpage de l'heure de début existante (ex: "14:30" -> "14" et "30")
@@ -332,8 +381,15 @@ const handleSubmit = () => {
   formData.value.startTime = `${startHour.value}:${startMinute.value}`;
   formData.value.endTime = `${endHour.value}:${endMinute.value}`;
 
+  const payload = { ...formData.value };
+  if(locationMode.value) {
+    delete payload.locationId;
+  }else{ 
+    delete payload.location;
+    }
+  //Mode création : XX locationId pour qu'il soit à null
   console.log("Formulaire soumis, envoi au parent...");
-  emit("submit", formData.value);
+  emit("submit", payload);
 }
 
 </script>

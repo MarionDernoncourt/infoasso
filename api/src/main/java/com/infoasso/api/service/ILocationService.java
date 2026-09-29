@@ -3,7 +3,9 @@ package com.infoasso.api.service;
 import com.infoasso.api.dto.location.LocationCreateDto;
 import com.infoasso.api.dto.location.LocationReadDto;
 import com.infoasso.api.dto.location.LocationUpdateDto;
+import com.infoasso.api.model.Association;
 import com.infoasso.api.model.Location;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,11 +14,13 @@ import java.util.List;
 public interface ILocationService {
     List<LocationReadDto> findAllLocation();
 
-    LocationReadDto findById(Long id);
+    Location findOrCreateLocation(Association association, LocationCreateDto dto);
 
-    LocationReadDto findOrCreateLocation(LocationCreateDto dto);
+    List<LocationReadDto> findAllByAssociationId(Long associationId);
 
-    Location findOrCreateEntity(Location dto);
+    LocationReadDto updateLocation(Long id, Long associationId, LocationUpdateDto updateDto, String userEmail);
 
-    LocationReadDto updateLocation(Long id, LocationUpdateDto updateDto);
+    LocationReadDto findByIdAndAssociationId(Long associationId, Long locationId);
+
+    LocationReadDto createLocation(Long associationId, @Valid LocationCreateDto createDto, String userEmail);
 }

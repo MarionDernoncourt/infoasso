@@ -12,52 +12,60 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/locations")
+@RequestMapping("/api/associations/{associationId}/locations")
 public class LocationController {
 
     private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
-    private ILocationService locationService;
+    private final ILocationService locationService;
 
     public LocationController(ILocationService locationService) {
         this.locationService = locationService;
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<LocationReadDto>> findAllLocation() {
-        logger.info("GET / / Request received for all Locations");
-                List<LocationReadDto> locations = locationService.findAllLocation();
-                logger.info("GET / : Response 200 OK : Number of Location : {}", locations.size());
-                return ResponseEntity.status(HttpStatus.OK).body(locations);
+    @GetMapping
+    public ResponseEntity<List<LocationReadDto>> findAllByAssociation(@PathVariable Long associationId) {
+        logger.info("REST request to get all locations for association id : {}", associationId);
+        List<LocationReadDto> locations = locationService.findAllByAssociationId(associationId);
+        return ResponseEntity.ok(locations);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<LocationReadDto> getLocationById(@PathVariable Long id) {
-        logger.info("GET / / Request received for Location with id {}", id);
-        LocationReadDto location = locationService.findById(id);
-        logger.info("GET / : Response 200 OK : Location : {}", location);
-        return ResponseEntity.status(HttpStatus.OK).body(location);
+    @GetMapping("/{locationId}")
+    public ResponseEntity<LocationReadDto> findById(
+            @PathVariable Long associationId,
+            @PathVariable Long locationId) {
+        logger.info("REST request to get location id : {} for association id : {}", locationId, associationId);
+        LocationReadDto location = locationService.findByIdAndAssociationId(associationId, locationId);
+        return ResponseEntity.ok(location);
     }
 
-    @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<LocationReadDto> createLocation(@Valid @RequestBody LocationCreateDto dto) {
-        logger.info("POST / : Request received to create Location : {}", dto.name());
-        LocationReadDto newLocation = locationService.findOrCreateLocation(dto);
-        logger.info("POST / : Response 201 CREATED : Location : {}", newLocation);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newLocation);
+    @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<LocationReadDto> createLocation(
+            @PathVariable Long associationId,
+            @Valid @RequestBody LocationCreateDto createDto,
+            Principal principal) {
+        logger.info("REST request to create a location for association id : {}", associationId);
+        String userEmail = principal.getName();
+        LocationReadDto createdLocation = locationService.createLocation(associationId, createDto, userEmail);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdLocation);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<LocationReadDto> updateLocation(@PathVariable Long id, @Valid @RequestBody LocationUpdateDto dto) {
-        logger.info("PUT / : Request received to update Location with id {}", id);
-        LocationReadDto updatedLocation = locationService.updateLocation(id, dto);
-        logger.info("PUT / : Response 200 OK : Location : {}", updatedLocation);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedLocation);
+    @PutMapping("/{locationId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<LocationReadDto> update(
+            @PathVariable Long associationId,
+            @PathVariable Long locationId,
+            @Valid @RequestBody LocationUpdateDto updateDto,
+            Principal principal) {
+        logger.info("REST request to update location id : {} for association id : {}", locationId, associationId);
+        String userEmail = principal.getName();
+        LocationReadDto updatedLocation = locationService.updateLocation(associationId, locationId, updateDto, userEmail);
+        return ResponseEntity.ok(updatedLocation);
     }
 
 
