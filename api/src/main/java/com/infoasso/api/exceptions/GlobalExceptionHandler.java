@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleReadableException(HttpMessageNotReadableException ex) {
         logger.error("READABLE ERROR: {}", ex.getMessage());
-        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Format de requête JSON invalide ou mal formé.");
     }
 
     @ExceptionHandler(BadRequestException.class)
@@ -89,9 +89,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception e) {
-        logger.error("UNEXPECTED ERROR: {}", e.getMessage());
+        // IMPORTANT : On passe 'e' en 2ème argument pour logger la stack trace complète (très utile en prod/debug)
+        logger.error("UNEXPECTED ERROR: {}", e.getMessage(), e);
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
-    };
+    }
 
     private ResponseEntity<Map<String, Object>> createErrorResponse(HttpStatus status, String message) {
         Map<String, Object> response = new HashMap<>();

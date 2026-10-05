@@ -56,7 +56,6 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // Récupération des schedule
         List<Schedule> allSchedules = scheduleRepository.findByAssociationId(associationId);
-        allSchedules.forEach(s -> System.out.println("DEBUG: " + s.getActivityName() + " | Desc: " + s.getDescription() + " | Loc: " + s.getLocation()));
         // Filtres
         return allSchedules.stream()
                 .filter(schedule -> isMatch(schedule, age, dayOfWeek, city))
@@ -139,6 +138,7 @@ public class ScheduleServiceImpl implements IScheduleService {
     }
 
     @Override
+    @Transactional
     public void deleteSchedule(Long id, Long scheduleId, String userEmail) {
         logger.info("Trying to delete schedule with id {}", scheduleId);
 
