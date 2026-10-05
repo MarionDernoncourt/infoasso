@@ -27,9 +27,5 @@ public interface AssociationRepository extends JpaRepository<Association,Long>, 
 
     List<Association> findByOwnerEmail(String email);
 
-// Pour le grand public
-List<Association> findByIsPublishedTrue();
 
-// Pour le back-office Mairie
-List<Association> findByIsPublishedFalse();
 }

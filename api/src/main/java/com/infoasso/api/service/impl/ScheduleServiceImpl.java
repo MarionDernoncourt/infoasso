@@ -96,7 +96,7 @@ public class ScheduleServiceImpl implements IScheduleService {
         // 2. Verification Location existe ou creation
         Location locationEntity;
         if (scheduleCreateDto.getLocationId() != null) {
-            locationEntity = locationRepository.findById(scheduleCreateDto.getLocationId())
+            locationEntity = locationRepository.findByIdAndAssociationId(scheduleCreateDto.getLocationId(), associationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Location", scheduleCreateDto.getLocationId()));
         } else if (scheduleCreateDto.getLocation() != null) {
             locationEntity = locationService.findOrCreateLocation(association, scheduleCreateDto.getLocation());
@@ -238,7 +238,7 @@ public class ScheduleServiceImpl implements IScheduleService {
         // Gestion de la mise à jour de la location (Approche Hybride)
         if (dto.getLocationId() != null) {
             // Cas 1 : On associe un ID existant
-            Location locationEntity = locationRepository.findById(dto.getLocationId())
+            Location locationEntity = locationRepository.findByIdAndAssociationId(dto.getLocationId(), association.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Location", dto.getLocationId()));
             schedule.setLocation(locationEntity);
         } else if (dto.getLocation() != null) {

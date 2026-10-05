@@ -15,4 +15,5 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
 
     List<Location> findAllByAssociationId(Long associationId);
     Optional<Location> findByNameIgnoreCaseAndAddressIgnoreCaseAndCityIgnoreCase(String name, String address, String city);
+    Optional<Location> findByIdAndAssociationId(Long id, Long associationId);
 }

@@ -38,9 +38,6 @@ public class Association {
     private String zipCode;
     private String city;
 
-    private boolean isPublished = false; // Visibilité sur le site
-    private boolean isVerified = false;  // La fameuse pastille bleue
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude

@@ -25,7 +25,7 @@ public class ScheduleController {
 
     private final static Logger logger =  LoggerFactory.getLogger(ScheduleController.class);
 
-    private IScheduleService scheduleService;
+    private final IScheduleService scheduleService;
 
     public ScheduleController(IScheduleService scheduleService) {
         this.scheduleService = scheduleService;

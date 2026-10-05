@@ -30,8 +30,11 @@ public class JwtUtils {
     @Value("${infoasso.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public JwtUtils(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // 1. Générer la clé de signature
     private SecretKey key() {

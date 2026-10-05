@@ -20,7 +20,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private final static Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;

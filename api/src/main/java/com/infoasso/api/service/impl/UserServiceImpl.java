@@ -72,7 +72,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     private void checkUserAccess(User currentUser, Long targetId) {
-        boolean isAdmin = currentUser.getRole().name().equals("ADMIN");
+        boolean isAdmin = currentUser.getRole().name().equals("ROLE_ADMIN");
         if (!currentUser.getId().equals(targetId) && !isAdmin) {
             throw new AccessDeniedException("Access denied");
         }

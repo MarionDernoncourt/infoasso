@@ -121,11 +121,19 @@ public class LocationServiceImpl implements ILocationService {
     @Override
     public LocationReadDto updateLocation(Long id, Long associationId, LocationUpdateDto updateDto, String userEmail) {
         logger.info("Trying to update a location with id: {}", id);
-// Petite sécurité anti-IDOR à ajouter pour la V2 : vérifier que la location appartient bien à l'association
-        // et que le user est bien le propriétaire de l'associati
-        Location location = locationRepository.findById(id)
+
+        // 1. Vérification optionnelle de sécurité (propriétaire de l'association)
+        Association association = associationRepository.findById(associationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Association", associationId));
+
+        if (!association.getOwner().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("Tu n'es pas autorisé à ajouter une location pour cette association.");
+        }
+        // 2. Récupération du lieu en vérifiant qu'il appartient bien à CETTE association
+        Location location = locationRepository.findByIdAndAssociationId(id, associationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Location", id));
 
+        // 3. Mise à jour des champs de la location
         updateEntityFromDto(location, updateDto);
         Location updatedLocation = locationRepository.save(location);
 

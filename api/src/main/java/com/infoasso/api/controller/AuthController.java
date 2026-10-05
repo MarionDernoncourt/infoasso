@@ -21,7 +21,7 @@ public class AuthController {
 
     private final static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    private IAuthService authService;
+    private final IAuthService authService;
 
     public AuthController(IAuthService authService) {
         this.authService = authService;

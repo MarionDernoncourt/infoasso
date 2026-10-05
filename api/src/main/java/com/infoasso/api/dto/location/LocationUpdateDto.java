@@ -6,7 +6,8 @@ public record LocationUpdateDto(
         String name,
         String address,
         String city,
-        String zipCode
+        String zipCode,
+        Long associationId
 
 ) {
 }

@@ -36,7 +36,6 @@ public class AssociationServiceImpl implements IAssociationService {
     private final AssociationRepository associationRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final IRnaService rnaService;
 
     @Override
     public AssociationReadDto findById(Long id) {
