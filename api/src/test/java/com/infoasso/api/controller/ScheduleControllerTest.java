@@ -3,6 +3,7 @@ package com.infoasso.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infoasso.api.dto.association.AssociationSummaryDto;
 import com.infoasso.api.dto.location.LocationCreateDto;
+import com.infoasso.api.dto.location.LocationReadDto;
 import com.infoasso.api.dto.schedule.ScheduleCreateDto;
 import com.infoasso.api.dto.schedule.ScheduleReadDto;
 import com.infoasso.api.dto.schedule.ScheduleUpdateDto;
@@ -69,7 +70,14 @@ public class ScheduleControllerTest {
         schedule.setDayOfWeek(DayOfWeek.Lundi);
         schedule.setStartTime(LocalTime.of(15, 0));
         schedule.setEndTime(LocalTime.of(15, 30));
-        schedule.setLocation(location);
+        schedule.setLocation(new LocationReadDto(
+                location.getId(),
+                location.getName(),
+                location.getAddress(),
+                location.getCity(),
+                location.getZipCode(),
+                association.getId()
+        ));
         schedule.setAssociation(association);
     }
 

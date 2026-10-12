@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class LocationServiceImpl implements ILocationService {
         }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LocationReadDto> findAllLocation() {
         logger.info("Trying to find all locations");
         List<Location> locations = locationRepository.findAll();
@@ -42,7 +44,7 @@ public class LocationServiceImpl implements ILocationService {
                 .toList();
     }
     @Override
-
+    @Transactional(readOnly = true)
     public List<LocationReadDto> findAllByAssociationId(Long associationId) {
         logger.info("Trying to find all locations for association id: {}", associationId);
 
@@ -59,6 +61,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LocationReadDto findByIdAndAssociationId(Long associationId, Long locationId) {
         logger.info("Trying to find location with id: {} for association id: {}", locationId, associationId);
         // Récupère la location par son id
@@ -74,6 +77,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    @Transactional
     public Location findOrCreateLocation(Association association, LocationCreateDto dto) {
         logger.info("Processing location creation or lookup for name: {}, city: {}", dto.name(), dto.city());
 
@@ -98,6 +102,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    @Transactional
     public LocationReadDto createLocation(Long associationId, LocationCreateDto createDto, String userEmail) {
         logger.info("Creating or linking location for association id : {}", associationId);
 
@@ -119,6 +124,7 @@ public class LocationServiceImpl implements ILocationService {
 
 
     @Override
+    @Transactional
     public LocationReadDto updateLocation(Long id, Long associationId, LocationUpdateDto updateDto, String userEmail) {
         logger.info("Trying to update a location with id: {}", id);
 

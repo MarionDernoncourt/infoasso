@@ -115,7 +115,7 @@ public class LocationServiceIT {
     @WithMockUser(username = "user@test.fr")
     public void update_WhenSuccess() {
         Long id = location.getId();
-        LocationUpdateDto dtoToUpdate = new LocationUpdateDto("", "", "Manchester", "");
+        LocationUpdateDto dtoToUpdate = new LocationUpdateDto("", "", "Manchester", "", location.getId());
 
         // Utilisation de la signature avec associationId et userEmail si requis par ton service
         LocationReadDto updatedLoc = locationService.updateLocation(id, association.getId(), dtoToUpdate, "user@test.fr");

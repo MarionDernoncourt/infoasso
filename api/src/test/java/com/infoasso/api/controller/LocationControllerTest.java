@@ -59,7 +59,8 @@ public class LocationControllerTest {
                 "Gymnase",
                 "12 rue paradis",
                 "Lille",
-                "59000"
+                "59000",
+                associationId
         );
     }
 
@@ -140,10 +141,10 @@ public class LocationControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void update_WhenSuccess() throws Exception {
-        LocationUpdateDto updateLoc = new LocationUpdateDto("Gymnase", "12 rue paradis", "Lille", "59800");
+        LocationUpdateDto updateLoc = new LocationUpdateDto("Gymnase", "12 rue paradis", "Lille", "59800", associationId);
         String jsonUpdate = objectMapper.writeValueAsString(updateLoc);
 
-        LocationReadDto updatedLoc = new LocationReadDto(1L, "Gymnase", "12 rue paradis", "Lille", "59800");
+        LocationReadDto updatedLoc = new LocationReadDto(1L, "Gymnase", "12 rue paradis", "Lille", "59800", associationId);
 
         when(locationService.updateLocation(eq(associationId), eq(1L), any(LocationUpdateDto.class), any(String.class)))
                 .thenReturn(updatedLoc);
