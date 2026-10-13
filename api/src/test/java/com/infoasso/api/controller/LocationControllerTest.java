@@ -77,7 +77,7 @@ public class LocationControllerTest {
     @Test
     @WithMockUser
     public void findById_WhenSuccess() throws Exception {
-        when(locationService.findByIdAndAssociationId(eq(associationId), eq(1L))).thenReturn(location);
+        when(locationService.findByIdAndAssociationId(eq(1L), eq(associationId))).thenReturn(location);
 
         mockMvc.perform(get("/api/associations/" + associationId + "/locations/1"))
                 .andExpect(status().isOk())
@@ -87,7 +87,7 @@ public class LocationControllerTest {
     @Test
     @WithMockUser
     public void findById_WhenNotFound() throws Exception {
-        when(locationService.findByIdAndAssociationId(eq(associationId), any(Long.class)))
+        when(locationService.findByIdAndAssociationId(eq(12L), eq(associationId)))
                 .thenThrow(new ResourceNotFoundException("Location", 12L));
 
         mockMvc.perform(get("/api/associations/" + associationId + "/locations/12"))
@@ -146,7 +146,7 @@ public class LocationControllerTest {
 
         LocationReadDto updatedLoc = new LocationReadDto(1L, "Gymnase", "12 rue paradis", "Lille", "59800", associationId);
 
-        when(locationService.updateLocation(eq(associationId), eq(1L), any(LocationUpdateDto.class), any(String.class)))
+        when(locationService.updateLocation(eq(1L), eq(associationId), any(LocationUpdateDto.class), any(String.class)))
                 .thenReturn(updatedLoc);
 
         mockMvc.perform(put("/api/associations/" + associationId + "/locations/1")

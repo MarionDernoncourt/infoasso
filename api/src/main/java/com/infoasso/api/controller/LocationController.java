@@ -39,7 +39,7 @@ public class LocationController {
             @PathVariable Long associationId,
             @PathVariable Long locationId) {
         logger.info("REST request to get location id : {} for association id : {}", locationId, associationId);
-        LocationReadDto location = locationService.findByIdAndAssociationId(associationId, locationId);
+        LocationReadDto location = locationService.findByIdAndAssociationId(locationId, associationId);
         return ResponseEntity.ok(location);
     }
 
@@ -64,7 +64,7 @@ public class LocationController {
             Principal principal) {
         logger.info("REST request to update location id : {} for association id : {}", locationId, associationId);
         String userEmail = principal.getName();
-        LocationReadDto updatedLocation = locationService.updateLocation(associationId, locationId, updateDto, userEmail);
+        LocationReadDto updatedLocation = locationService.updateLocation(locationId, associationId, updateDto, userEmail);
         return ResponseEntity.ok(updatedLocation);
     }
 

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,24 +88,23 @@ public class LocationServiceIT {
     }
 
     @Test
-    public void findById_WhenSuccess() {
-        Long id = location.getId();
-        LocationReadDto loc = locationService.findByIdAndAssociationId(association.getId(), id);
-
-        assertEquals("test", loc.name());
+    public void findByIdAndAssociationId_WhenSuccess() {
+        LocationReadDto found = locationService.findByIdAndAssociationId(location.getId(), association.getId());
+        assertNotNull(found);
+        assertEquals("London", found.city());
     }
 
     @Test
     public void findById_WhenNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> locationService.findByIdAndAssociationId(association.getId(), 45L));
+        // Test avec un ID de lieu inexistant (999L) pour la bonne association
+        assertThrows(ResourceNotFoundException.class, () -> locationService.findByIdAndAssociationId(999L, association.getId()));
     }
 
     @Test
     public void findOrCreate_WhenSuccess() {
         LocationCreateDto newLocDto = new LocationCreateDto("Stade", "grand place", "Lille", "59000");
 
-        // findOrCreateLocation retourne l'entité Location
-        Location createdLoc = locationService.findOrCreateLocation(association, newLocDto );
+        Location createdLoc = locationService.findOrCreateLocation(association, newLocDto);
         List<LocationReadDto> listLocations = locationService.findAllLocation();
 
         assertEquals(2, listLocations.size());
@@ -112,14 +112,43 @@ public class LocationServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "user@test.fr")
+    public void createLocation_WhenSuccess() {
+        LocationCreateDto createDto = new LocationCreateDto("Salle Polyvalente", "Rue de la Paix", "Paris", "75001");
+        LocationReadDto created = locationService.createLocation(association.getId(), createDto, "user@test.fr");
+
+        assertNotNull(created);
+        assertEquals("Paris", created.city());
+    }
+
+    @Test
+    public void createLocation_WhenAccessDenied() {
+        // Un utilisateur non propriétaire essaie d'ajouter un lieu
+        LocationCreateDto createDto = new LocationCreateDto("Salle Pirate", "Rue du Port", "Marseille", "13001");
+
+        assertThrows(AccessDeniedException.class, () ->
+                locationService.createLocation(association.getId(), createDto, "other@test.fr")
+        );
+    }
+
+    @Test
     public void update_WhenSuccess() {
         Long id = location.getId();
-        LocationUpdateDto dtoToUpdate = new LocationUpdateDto("", "", "Manchester", "", location.getId());
+        LocationUpdateDto dtoToUpdate = new LocationUpdateDto("Updated Name", "Updated Address", "Manchester", "M1 1AA", association.getId());
 
-        // Utilisation de la signature avec associationId et userEmail si requis par ton service
+        // Signature : locationId, associationId, dto, userEmail
         LocationReadDto updatedLoc = locationService.updateLocation(id, association.getId(), dtoToUpdate, "user@test.fr");
 
         assertEquals("Manchester", updatedLoc.city());
+        assertEquals("Updated Name", updatedLoc.name());
+    }
+
+    @Test
+    public void update_WhenAccessDenied() {
+        Long id = location.getId();
+        LocationUpdateDto dtoToUpdate = new LocationUpdateDto("Hacked", "Hacked", "Lyon", "69001", association.getId());
+
+        assertThrows(AccessDeniedException.class, () ->
+                locationService.updateLocation(id, association.getId(), dtoToUpdate, "other@test.fr")
+        );
     }
 }

@@ -62,17 +62,13 @@ public class LocationServiceImpl implements ILocationService {
 
     @Override
     @Transactional(readOnly = true)
-    public LocationReadDto findByIdAndAssociationId(Long associationId, Long locationId) {
+    public LocationReadDto findByIdAndAssociationId(Long locationId, Long associationId) {
         logger.info("Trying to find location with id: {} for association id: {}", locationId, associationId);
-        // Récupère la location par son id
-        Location location = locationRepository.findById(locationId)
+
+        // On interroge  le repository avec le lien direct Location <-> Association
+        Location location = locationRepository.findByIdAndAssociationId(locationId, associationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Location", locationId));
-        // Vérifie si cette location est associée à l'association donnée via les plannings
-        boolean isAssociated = scheduleRepository.existsByAssociationIdAndLocationId(associationId, locationId);
-        if (!isAssociated) {
-            logger.warn("Location with id: {} is not associated with association id: {}", locationId, associationId);
-            throw new ResourceNotFoundException("Location", locationId);
-        }
+
         return mapToDto(location);
     }
 
@@ -125,8 +121,8 @@ public class LocationServiceImpl implements ILocationService {
 
     @Override
     @Transactional
-    public LocationReadDto updateLocation(Long id, Long associationId, LocationUpdateDto updateDto, String userEmail) {
-        logger.info("Trying to update a location with id: {}", id);
+    public LocationReadDto updateLocation(Long locationId, Long associationId, LocationUpdateDto updateDto, String userEmail) {
+        logger.info("Trying to update a location with id: {}", locationId);
 
         // 1. Vérification optionnelle de sécurité (propriétaire de l'association)
         Association association = associationRepository.findById(associationId)
@@ -136,14 +132,14 @@ public class LocationServiceImpl implements ILocationService {
             throw new AccessDeniedException("Tu n'es pas autorisé à ajouter une location pour cette association.");
         }
         // 2. Récupération du lieu en vérifiant qu'il appartient bien à CETTE association
-        Location location = locationRepository.findByIdAndAssociationId(id, associationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Location", id));
+        Location location = locationRepository.findByIdAndAssociationId(locationId, associationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Location", locationId));
 
         // 3. Mise à jour des champs de la location
         updateEntityFromDto(location, updateDto);
         Location updatedLocation = locationRepository.save(location);
 
-        logger.info("Location with id {} updated successfully !", id);
+        logger.info("Location with id {} updated successfully !", locationId);
         return mapToDto(updatedLocation);
     }
 
