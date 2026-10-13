@@ -43,7 +43,7 @@ public class UserControllerTest {
 
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "USER")
     public void findUserById_shouldReturn_200Ok() throws Exception {
         UserReadDto user = new UserReadDto();
         user.setId(1L);
@@ -58,7 +58,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "USER")
     public void findUserById_shouldReturn_500InternalServerError() throws Exception {
         when(userService.findUserById(any(Long.class))).thenThrow(new RuntimeException("Une erreur interne est survenue"));
 
@@ -68,11 +68,34 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "USER")
     public void findUserById_shouldReturn_404NotFound() throws Exception {
         when(userService.findUserById(any(Long.class))).thenThrow(new ResourceNotFoundException("User", 1L));
 
         mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "test@asso.com", roles = {"USER"})
+    public void getMyProfile_shouldReturn_200Ok() throws Exception {
+        UserReadDto user = new UserReadDto();
+        user.setId(1L);
+        user.setEmail("test@asso.com");
+
+        when(userService.getMyProfile()).thenReturn(user);
+
+        mockMvc.perform(get("/api/users/myprofile"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("test@asso.com"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@asso.com", roles = {"USER"})
+    public void getMyProfile_shouldReturn_404NotFound() throws Exception {
+        when(userService.getMyProfile()).thenThrow(new ResourceNotFoundException("User", 1L));
+
+        mockMvc.perform(get("/api/users/myprofile"))
                 .andExpect(status().isNotFound());
     }
 
