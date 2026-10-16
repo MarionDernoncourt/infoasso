@@ -74,11 +74,16 @@ const handleUpdateAsso = async (updateData) => {
 
   } catch (error) {
     console.error("Erreur lors de la modification : ", error);
-    if (error.response && error.response.status === 400) {
-      backendErrors.value = error.response.data;
+    const data = error.response.data;
+
+    if(data.errors){
+      backendErrors.value = data.errors;
+    } else if (data.message) {
+      alert(data.message);
     } else {
       alert("Une erreur inattendue est survenue.");
     }
+    
   } finally {
     isSubmitting.value = false;
   }

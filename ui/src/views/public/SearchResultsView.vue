@@ -36,7 +36,6 @@ const performSearch = async () => {
     // On récupère les filtres depuis l'URL
     const filters = route.query;
     results.value = await assoService.getAll(filters);
-    console.log(results.value);
   } catch (error) {
     console.error("Erreur recherche:", error);
   } finally {

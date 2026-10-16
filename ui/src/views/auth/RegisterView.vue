@@ -187,19 +187,19 @@ const register = async () => {
     console.log("Erreur de connexion", error);
 
     if (error.response) {
-      if (error.response.status === 400 && error.response.data.errors) {
-        fieldErrors.value = error.response.data.errors;
-      } else if (error.response.status === 404 || error.response.status === 409) {
-        fieldErrors.value = { message: error.response.data.message || "Cet email est déjà utilisé." };
+  const { status, data } = error.response;
+
+  if (status === 400 && data.errors) {
+        // Erreurs de validation par champ renvoyées par le backend
+        fieldErrors.value = data.errors;
+      } else if (status === 404 || status === 409 || status === 400) {
+        // Erreurs métiers (ex: doublon d'email ou message global)
+        fieldErrors.value = { message: data.message || "Cet email est déjà utilisé ou les données sont invalides." };
       } else {
         fieldErrors.value = { message: "Une erreur est survenue sur le serveur." };
       }
     } else {
-      if (error.response?.data?.message) {
-         fieldErrors.value = { message: error.response.data.message };
-      } else {
-         fieldErrors.value = { message: "Connexion impossible. Le serveur ne répond pas." };
-      }
+      fieldErrors.value = { message: "Connexion impossible. Le serveur ne répond pas." };
     }
   } finally {
     isLoading.value = false;
