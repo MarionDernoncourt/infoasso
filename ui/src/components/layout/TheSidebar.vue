@@ -46,10 +46,6 @@ import AccountModal from "../account/AccountModal.vue";
 
 const isUpdateModalOpen = ref(false);
 
-defineProps({
-  userEmail: String
-});
-
 const router = useRouter();
 
 const logout = async () => {

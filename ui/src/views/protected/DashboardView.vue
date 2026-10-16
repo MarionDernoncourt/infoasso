@@ -97,7 +97,7 @@ onMounted(async () => {
       associationsList.value = data;
       selectedAsso.value = data[0];
       hasAssociation.value = true;
-      userEmail.value = data[0].owner?.email || 'Mon compte';
+      userEmail.value = data[0].ownerEmail || 'Mon compte';
     } else {
       hasAssociation.value = false;
       userEmail.value = localStorage.getItem("user_email") || 'Mon Compte';

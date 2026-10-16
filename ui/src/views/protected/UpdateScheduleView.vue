@@ -42,6 +42,8 @@ const backendErrors = ref({});
 
 const initialData = ref(null);
 
+const currentUserEmail = localStorage.getItem("user_email");
+
 const handleCancel = () => {
   router.push("/dashboard");
 }
@@ -54,7 +56,7 @@ onMounted(async () => {
     // 1. Vérification de sécurité prioritaire
     const assoData = await assoService.getById(assoId);
 
-    if (assoData.ownerEmail !== userEmail) {
+    if (assoData.ownerEmail !== currentUserEmail) {
       alert("Vous n'êtes pas autorisé à modifier cette activité !");
       router.push({ name: 'dashboard' });
       return;

@@ -1,6 +1,6 @@
 <template>
   <div class="updateAsso-container" role="main" aria-label="Page de mdodification de la fiche assocation">
-    <TheSidebar :userEmail="userEmail" />
+    <TheSidebar />
 
     <div class="updateAsso-main">
       <TheHeader title="Tableau de bord" subtitle="" />
@@ -34,7 +34,6 @@ const route = useRoute();
 const isSubmitting = ref(false);
 const backendErrors = ref({});
 const asso = ref(null);
-const userEmail = ref('Mon Compte');
 
 // APPEL AU BACK LORS DU CHARGEMENT DE LA PAGE //
 onMounted(async () => {
@@ -51,9 +50,7 @@ onMounted(async () => {
 
     asso.value = response;
 
-    if (asso.value?.ownerEmail) {
-      userEmail.value = asso.value.ownerEmail;
-    }
+  
 
   } catch (error) {
     console.error("Erreur lors de la récupération de l'association : ", error);

@@ -171,10 +171,10 @@
 
   <!-- CAS 1 : Sélection d'un lieu existant (Dropdown) -->
   <div v-if="locationMode === 'existing'" class="form-group">
-    <label for="existingLocation">Lieu enregistré</label>
-    <select id="existingLocation" v-model="formData.locationId" aria-label="Sélectionner un lieu existant">
+    <label for="existingLocations">Lieu enregistré</label>
+    <select id="existingLocations" v-model="formData.locationId" aria-label="Sélectionner un lieu existant">
       <option value="" disabled>-- Sélectionner un lieu --</option>
-      <option v-for="loc in existingLocations" :key="loc.id" :value="loc.id">
+      <option v-for="loc in existingLocations.filter(l => l && l.id)" :key="loc.id" :value="loc.id">
         {{ loc.name }} - {{ loc.address }}, {{ loc.city }}
       </option>
     </select>
@@ -270,10 +270,6 @@ const props = defineProps({
   submitButtonText: {
     type: String,
     default: "Enregistrer"
-  },
-  existingLocations: {
-    type: Array,
-    default: () => []
   }
 });
 
@@ -286,6 +282,7 @@ const endMinute = ref("");
 
 const dayOfWeek = ref([]);
 const locationMode = ref('existing');
+const existingLocations = ref([]);
 
 
 
@@ -331,7 +328,8 @@ onMounted(async () => {
 
 watch(() => props.initialData, (newVal) => {
   if (newVal) {
-    const hasExistingLocation = newVal.value.locationId !== null && newVal.value.locationId !== undefined;
+    const locId = newVal.locationId || newVal.location?.id;
+    const hasExistingLocation = locId !== null && locId !== undefined;
 
     locationMode.value = hasExistingLocation ? 'existing' : 'new';
 
@@ -343,14 +341,13 @@ watch(() => props.initialData, (newVal) => {
       associationId: newVal.association?.id || newVal.associationId,
       description: newVal.description || "",
       // Si mode existant, on met le locationId, sinon null
-      locationId: hasExistingLocation ? newVal.locationId : null,
-      // Si mode nouveau, on remplit le DTO location, sinon null
-      location: !hasExistingLocation ? {
+      locationId: hasExistingLocation ? locId : null,      // Si mode nouveau, on remplit le DTO location, sinon null
+      location: {
         name: newVal.location?.name || "",
         address: newVal.location?.address || "",
         city: newVal.location?.city || "",
         zipCode: newVal.location?.zipCode || ""
-      } : null
+      }
     };
 
     // Découpage de l'heure de début existante (ex: "14:30" -> "14" et "30")

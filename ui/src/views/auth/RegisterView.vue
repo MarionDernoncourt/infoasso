@@ -90,7 +90,7 @@
             </label>
 
             <p class="password-hints" id="passwordHints">
-              Doit contenir au moins 8 caractères, 1 majuscule et 1 caractère spécial.
+              Doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre..
             </p>
 
             <p v-if="fieldErrors.password" id="passwordError" class="error-text">
