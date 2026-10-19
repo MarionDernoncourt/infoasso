@@ -117,8 +117,7 @@ public class ScheduleServiceImpl implements IScheduleService {
 
     @Override
     @Transactional
-    public ScheduleReadDto updateSchedule(Long id, Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String
-            userEmail) {
+    public ScheduleReadDto updateSchedule(Long id, Long scheduleId, ScheduleUpdateDto scheduleUpdateDto, String userEmail) {
         logger.info("Trying to update schedule with id {}", scheduleId);
 
         // 1. Vérification de l'association et du propriétaire
@@ -131,10 +130,21 @@ public class ScheduleServiceImpl implements IScheduleService {
 
         // 2. Vérification que le schedule appartient bien à CETTE association (anti-IDOR)
         Schedule schedule = scheduleRepository.findByIdAndAssociationId(scheduleId, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));        // 3. Mise à jour de l'entité
-        Schedule updatedSchedule = scheduleRepository.save(updateEntityFromDto(association, schedule, scheduleUpdateDto));
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule", scheduleId));
 
-        return mapToReadDto(updatedSchedule);
+        // 3. Fusion de l'entité avec le DTO
+        Schedule updatedEntity = updateEntityFromDto(association, schedule, scheduleUpdateDto);
+
+        // 4. Contrôle de sécurité sur l'entité APRÈS fusion complète :
+        if (updatedEntity.getStartTime() != null && updatedEntity.getEndTime() != null) {
+            if (!updatedEntity.getEndTime().isAfter(updatedEntity.getStartTime())) {
+                throw new IllegalArgumentException("L'heure de fin doit être après l'heure de début.");
+            }
+        }
+
+        // 5. Sauvegarde et mapping
+        Schedule savedSchedule = scheduleRepository.save(updatedEntity);
+        return mapToReadDto(savedSchedule);
     }
 
     @Override
@@ -161,9 +171,19 @@ public class ScheduleServiceImpl implements IScheduleService {
 
 
     private boolean isMatch(Schedule s, Integer age, DayOfWeek day, String city) {
-        return (age == null || (age >= s.getAgeMin() && age <= s.getAgeMax()))
-                && (day == null || s.getDayOfWeek() == day)
-                && (city == null || s.getLocation().getCity().equalsIgnoreCase(city));
+        boolean ageMatches = age == null || (
+                (s.getAgeMin() == null || age >= s.getAgeMin()) &&
+                        (s.getAgeMax() == null || age <= s.getAgeMax())
+        );
+
+        boolean dayMatches = day == null || s.getDayOfWeek() == day;
+
+        boolean cityMatches = city == null || (
+                s.getLocation() != null &&
+                        s.getLocation().getCity() != null &&
+                        s.getLocation().getCity().equalsIgnoreCase(city)
+        );
+        return ageMatches && dayMatches && cityMatches;
     }
 
     private boolean getAssociationValidated(Long id) {

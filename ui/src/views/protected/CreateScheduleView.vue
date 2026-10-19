@@ -11,7 +11,6 @@
         submit-button-text="Ajouter"
         :is-submitting="isSubmitting"
         :errors="backendErrors"
-        :existingLocations="existingLocations"
         @back="goToDashboard"
         @submit="handleCreateSchedule"
         @cancel="handleCancel" />
@@ -37,17 +36,8 @@ const route = useRoute();
 
 const isSubmitting = ref(false);
 const backendErrors = ref({});
-const existingLocations = ref([]);
 
-const getExistingLocations = async () => {
-  try {
-    const response = await schedulesService.getLocationsByAssociationId(route.params.id);
-    console.log("Location trouvées : ", response);
-    existingLocations.value = response;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des lieux: ", error);
-  }
-}
+
 
 onMounted(async () => {
   try {
@@ -59,7 +49,6 @@ onMounted(async () => {
       router.push({name : 'dashboard'});
       return;
     }
-    await getExistingLocations();
   } catch (err) {
     console.error("Erreur: ", err);
     router.push({ name: 'dashboard'});

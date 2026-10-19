@@ -16,7 +16,7 @@
               <input type="email" v-model="credentials.email" id="email" required aria-required="true"
                 autocomplete="email" aria-describedby="emailError">
             </label>
-            <p v-if="fieldErrors.email" id="emailError" class="error-text">
+            <p v-if="fieldErrors.email" id="emailError" class="error-text" role="alert">
               {{ fieldErrors.email }}
             </p>
           </div>
@@ -39,7 +39,7 @@
                 </button>
                 </div>
             </label>
-            <p v-if="fieldErrors.oldPassword" id="oldPasswordError" class="error-text">
+            <p v-if="fieldErrors.oldPassword" id="oldPasswordError" class="error-text" role="alert">
               {{ fieldErrors.oldPassword }}
             </p>
           </div>
@@ -64,12 +64,12 @@
                 <p class="password-hints" id="passwordHints">
               Doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre..
             </p>
-            <p v-if="fieldErrors.newPassword" id="newPasswordError" class="error-text">
+            <p v-if="fieldErrors.newPassword" id="newPasswordError" class="error-text" role="alert">
               {{ fieldErrors.newPassword }}
             </p>
           </div>
 
-          <button type="submit" :disabled="isLoading" aria-label="Modifier les informations du profil.">
+          <button type="submit" :disabled="isLoading" aria-label="Modifier les informations du profil." :aria-busy="isLoading">
             {{ isLoading ? 'Modification en cours...' : 'Modifier' }}
           </button>
 
@@ -124,7 +124,16 @@ const updateProfile = async () => {
   isLoading.value = true;
   fieldErrors.value.message = "";
   try {
-    await userService.updateMyProfile(credentials.value);
+    const reponse = await userService.updateMyProfile(credentials.value);
+
+    if(response.updatedToken){
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_email');
+
+      localStorage.setItem('token', response.updatedToken);
+      localStorage.setItem('user_email', response.email);
+    }
+    
     fieldErrors.value.message = "Le profil a été modifié avec succès !";
 
   } catch (error) {

@@ -41,7 +41,7 @@
         placeholder="Ex: Initiation à la gym, parcours de motricité, ...."
         aria-describedby="descriptionError"
         />
-        <p v-if="errors.description" id="descriptionError" class="error-text">
+        <p v-if="errors.description" id="descriptionError" class="error-text" role="alert">
           {{ errors.description }}
         </p>
       </div>
@@ -62,10 +62,10 @@
 
  <!-- HEURE DE DÉBUT -->
         <div class="form-group" style="flex: 1;">
-          <label>Début</label>
-          <div style="display: flex; gap: 5px; align-items: center;" aria-label="Heure de début">
+          <label id="start-time-label">Début</label>
+          <div style="display: flex; gap: 5px; align-items: center;" aria-labelledby="start-time-label">
             <!-- Select Heures (00 à 23) -->
-            <select v-model="startHour" required aria-label="Heure de début (heures)">
+            <select v-model="startHour" required aria-label="Heure de début (heures)" aria-describedby="startTimeError">
               <option value="" disabled>Heure</option>
               <option v-for="h in 24" :key="h-1" :value="String(h-1).padStart(2, '0')">
                 {{ String(h-1).padStart(2, '0') }}
@@ -73,7 +73,7 @@
             </select>
             <span>:</span>
             <!-- Select Minutes (00, 15, 30, 45) -->
-            <select v-model="startMinute" required aria-label="Heure de début (minutes)">
+            <select v-model="startMinute" required aria-label="Heure de début (minutes)" aria-describedby="startTimeError">
               <option value="" disabled>Min</option>
               <option value="00">00</option>
               <option value="15">15</option>
@@ -81,17 +81,17 @@
               <option value="45">45</option>
             </select>
           </div>
-          <p v-if="errors.timeRangeValid" class="error-text">
+          <p v-if="errors.timeRangeValid" id="startTimeError" class="error-text" role="alert">
             {{ errors.timeRangeValid }}
           </p>
         </div>
 
         <!-- HEURE DE FIN -->
         <div class="form-group" style="flex: 1;">
-          <label>Fin</label>
-          <div style="display: flex; gap: 5px; align-items: center;" aria-label="Heure de fin">
+          <label id="end-time-label">Fin</label>
+          <div style="display: flex; gap: 5px; align-items: center;" aria-labelledby="end-time-label">
             <!-- Select Heures (00 à 23) -->
-            <select v-model="endHour" required aria-label="Heure de fin (heures)">
+            <select v-model="endHour" required aria-label="Heure de fin (heures)" aria-describedby="endTimeError">
               <option value="" disabled>Heure</option>
               <option v-for="h in 24" :key="h-1" :value="String(h-1).padStart(2, '0')">
                 {{ String(h-1).padStart(2, '0') }}
@@ -99,7 +99,7 @@
             </select>
             <span>:</span>
             <!-- Select Minutes (00, 15, 30, 45) -->
-            <select v-model="endMinute" required aria-label="Heure de fin (minutes)">
+            <select v-model="endMinute" required aria-label="Heure de fin (minutes)" aria-describedby="endTimeError">
               <option value="" disabled>Min</option>
               <option value="00">00</option>
               <option value="15">15</option>
@@ -107,7 +107,7 @@
               <option value="45">45</option>
             </select>
           </div>
-          <p v-if="errors.timeRangeValid" class="error-text">
+          <p v-if="errors.timeRangeValid" id="endTimeError" class="error-text" role="alert">
             {{ errors.timeRangeValid }}
           </p>
         </div>
@@ -130,7 +130,7 @@
           aria-required="true"
           aria-describedby="ageMinError"
           />
-          <p v-if="errors.ageRangeValid" id="ageMinError" class="error-text">
+          <p v-if="errors.ageRangeValid" id="ageMinError" class="error-text" role="alert">
             {{ errors.ageRangeValid }}
           </p>
         </div>
@@ -145,7 +145,7 @@
           aria-required="true"
           aria-describedby="ageMaxError"
           />
-          <p v-if="errors.ageRangeValid" id="ageMaxError" class="error-text">
+          <p v-if="errors.ageRangeValid" id="ageMaxError" class="error-text" role="alert">
             {{ errors.ageRangeValid }}
           </p>
         </div>
@@ -158,19 +158,19 @@
 
   <!-- Choix du mode : Existant vs Nouveau -->
   <div class="form-group" style="margin-bottom: 15px;">
-    <label>Type de sélection du lieu</label>
-    <div style="display: flex; gap: 20px;">
-      <label>
-        <input type="radio" value="existing" v-model="locationMode" /> Choisir un lieu existant
-      </label>
-      <label>
-        <input type="radio" value="new" v-model="locationMode" /> Créer un nouveau lieu
-      </label>
-    </div>
+  <label id="location-mode-label">Type de sélection du lieu</label>
+  <div style="display: flex; gap: 20px;" role="radiogroup" aria-labelledby="location-mode-label">
+    <label>
+      <input type="radio" value="existing" v-model="locationMode" name="locationMode" /> Choisir un lieu existant
+    </label>
+    <label>
+      <input type="radio" value="new" v-model="locationMode" name="locationMode" /> Créer un nouveau lieu
+    </label>
   </div>
+</div>
 
-  <!-- CAS 1 : Sélection d'un lieu existant (Dropdown) -->
-  <div v-if="locationMode === 'existing'" class="form-group">
+<!-- CAS 1 : Sélection d'un lieu existant (Dropdown) -->
+<div v-if="locationMode === 'existing'" class="form-group">
     <label for="existingLocations">Lieu enregistré</label>
     <select id="existingLocations" v-model="formData.locationId" aria-label="Sélectionner un lieu existant">
       <option value="" disabled>-- Sélectionner un lieu --</option>
@@ -183,37 +183,37 @@
   <!-- CAS 2 : Formulaire de création d'un nouveau lieu -->
   <div v-if="locationMode === 'new'" class="form-row" style="display: flex; gap: 20px">
     <div class="form-group">
-      <label for="locationName">Nom du lieu</label>
-      <input type="text" id="locationName" v-model="formData.location.name" placeholder="Ex: Gymnase" aria-label="Nom du lieu de l'activité">
+      <label for="loc-name">Nom du lieu</label>
+      <input type="text" id="loc-name" v-model="formData.location.name" placeholder="Ex: Gymnase" aria-label="Nom du lieu de l'activité">
     </div>
 
     <div class="form-group">
-      <label for="address">Adresse</label>
-      <input type="text" id="address" v-model="formData.location.address" placeholder="Ex: 12 rue Paradis" aria-label="Adresse du lieu de l'activité" />
+      <label for="loc-address">Adresse</label>
+      <input type="text" id="loc-address" v-model="formData.location.address" placeholder="Ex: 12 rue Paradis" aria-label="Adresse du lieu de l'activité" />
     </div>
     
     <div class="form-group">
-      <label for="city">Ville</label>
+      <label for="loc-city">Ville *</label>
       <input
         type="text"
-        id="city"
+        id="loc-city"
         v-model="formData.location.city"
         placeholder="Ex: Lille"
         required
         aria-required="true"
-        aria-describedby="cityError"
+        aria-describedby="locCityError"
         aria-label="Ville du lieu de l'activité"
       />
-      <p v-if="errors.city" id="cityError" class="error-text">
+      <p v-if="errors.city" id="locCityError" class="error-text" role="alert">
         {{ errors.city }}
       </p>
     </div>
 
     <div class="form-group">
-      <label for="zipCode">Code Postal</label>
+      <label for="loc-zipCode">Code Postal</label>
       <input
         type="text"
-        id="zipCode"
+        id="loc-zipCode"
         v-model="formData.location.zipCode"
         placeholder="Ex: 59000" pattern="[0-9]{5}"
         title="Entrez 5 chiffres"
@@ -221,8 +221,6 @@
       />
     </div>
   </div>
-</div>
-
 
     <div class="forms-action">
       <button
@@ -237,6 +235,7 @@
       class="submit-btn"
       :disabled="isSubmitting"
       aria-label="Enregistrer l'activité"
+      :aria-busy="isSubmitting"
       >
         {{ isSubmitting ? 'Enregistrement...' : submitButtonText || "Enregistrer" }}</button>
 

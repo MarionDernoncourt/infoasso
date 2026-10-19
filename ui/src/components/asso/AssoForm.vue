@@ -39,9 +39,9 @@
               {{ isCheckingRNA ? '...' : '🔍 Vérifier' }}
             </button>
           </div>
-          <span v-if="rnaError" id="rnaError" class="error-text">⚠️ Numéro RNA introuvable ou inactive</span>
-          <span v-if="rnaSuccess" id="rnaSuccess" class="success-text">✅ Association trouvée avec succès !</span>
-          <p v-if="errors.rnaNumber" id="rnaCustomError" class="error-text">{{ errors.rnaNumber }}</p>
+          <span v-if="rnaError" id="rnaError" class="error-text" role="alert">⚠️ Numéro RNA introuvable ou inactive</span>
+          <span v-if="rnaSuccess" id="rnaSuccess" class="success-text" role="alert">✅ Association trouvée avec succès !</span>
+          <p v-if="errors.rnaNumber" id="rnaCustomError" class="error-text" role="alert">{{ errors.rnaNumber }}</p>
         </div>
 
         <div class="form-group">
@@ -70,7 +70,7 @@
           aria-required="true"
           aria-describedby="displayNameError"
         >
-        <p v-if="errors.displayName" id="displayNameError" class="error-text">{{ errors.displayName }}</p>
+        <p v-if="errors.displayName" id="displayNameError" class="error-text" role="alert">{{ errors.displayName }}</p>
       </div>
 
       <div class="form-grid">
@@ -144,7 +144,7 @@
             :class="{ 'input-error': errors.city }"
             aria-describedby="cityError"
           >
-          <p v-if="errors.city" id="cityError" class="error-text">{{ errors.city }}</p>
+          <p v-if="errors.city" id="cityError" class="error-text" role="alert">{{ errors.city }}</p>
         </div>
       </div>
 
@@ -161,7 +161,7 @@
             aria-required="true"
             aria-describedby="emailError"
           >
-          <p v-if="errors.email" id="emailError" class="error-text">{{ errors.email }}</p>
+          <p v-if="errors.email" id="emailError" class="error-text" role="alert">{{ errors.email }}</p>
         </div>
 
         <div class="form-group">
@@ -174,7 +174,7 @@
             :class="{ 'input-error': errors.phoneNumber }"
             aria-describedby="phoneError"
           >
-          <p v-if="errors.phoneNumber" id="phoneError" class="error-text">{{ errors.phoneNumber }}</p>
+          <p v-if="errors.phoneNumber" id="phoneError" class="error-text" role="alert">{{ errors.phoneNumber }}</p>
         </div>
 
         <div class="form-group">
@@ -205,7 +205,7 @@
           aria-describedby="descError"
         ></textarea>
       </div>
-      <p v-if="errors.description" id="descError" class="error-text">{{ errors.description }}</p>
+      <p v-if="errors.description" id="descError" class="error-text" role="alert">{{ errors.description }}</p>
     </section>
 
     <div class="form-actions">
@@ -222,6 +222,7 @@
         class="submit-btn"
         :disabled="isSubmitting || (!rnaSuccess && !formData.officialName)"
         aria-label="Enregistrer le formulaire de l'association"
+        :aria-busy="isSubmitting"
       >
         {{ isSubmitting ? 'Enregistrement...' : submitButtonText }}
       </button>

@@ -19,7 +19,7 @@
       aria-describedby="emailError"
       >
     </label>
-    <p v-if="fieldErrors.email" id="emailError" class="error-text">
+    <p v-if="fieldErrors.email" id="emailError" class="error-text" role="alert">
       {{ fieldErrors.email }}
     </p>
   </div>
@@ -48,7 +48,7 @@
     </button>
       </div>
     </label>
-    <p v-if="fieldErrors.password" id="passwordError" class="error-text">
+    <p v-if="fieldErrors.password" id="passwordError" class="error-text" role="alert">
       {{ fieldErrors.password }}
     </p>
   </div>
@@ -57,6 +57,7 @@
   type="submit"
   :disabled="isLoading"
   aria-label="Se connecter à votre compte"
+  :aria-busy="isLoading"
   >
     {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
   </button>

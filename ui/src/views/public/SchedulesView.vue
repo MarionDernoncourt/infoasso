@@ -122,7 +122,7 @@ const handleFilterSearch = async (filters) => {
     if(data.length === 0) {
       alert("Aucune activité trouvée pour ces critères. Affichage du planning complet.");
 
-      allSchedules.value = await schedulesService.getAll(assoId, {});
+      allSchedules.value = [];
 
     } else {
     allSchedules.value = data;

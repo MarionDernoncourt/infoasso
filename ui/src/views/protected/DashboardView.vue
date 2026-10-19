@@ -51,22 +51,7 @@
             </div>
           </template>
         </AssoCard>
-        <!--  A AJOUTER A LA V2 !!!!!
-
-        <section class="status-card">
-          <h3>🛡️ Statut de la structure</h3>
-          <div class="status-indicators">
-            <div class="status-item" :class="{ 'status-on': selectedAsso?.isPublished }">
-              <span class="indicator-dot"></span>
-              <span class="status-label">Visibilité : {{ selectedAsso?.isPublished ? 'En ligne (Visible du public)' : 'Hors ligne' }}</span>
-            </div>
-            <div class="status-item" :class="{ 'status-verified': selectedAsso?.isVerified }">
-              <span class="indicator-badge">✓</span>
-              <span class="status-label">{{ selectedAsso?.isVerified ? 'Fiche Certifiée (Pastille bleue)' : 'Vérification en cours' }}</span>
-            </div>
-          </div>
-        </section>
-        -->
+      
 
       </div>
     </main>

@@ -2,13 +2,16 @@ package com.infoasso.api.service.impl;
 
 import com.infoasso.api.dto.user.UserReadDto;
 import com.infoasso.api.dto.user.UserUpdateDto;
+import com.infoasso.api.dto.user.UserUpdateResponseDto;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.User;
 import com.infoasso.api.repository.UserRepository;
+import com.infoasso.api.security.jwt.JwtUtils;
 import com.infoasso.api.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,10 +23,12 @@ public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
 
@@ -43,7 +48,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserReadDto updateUser(Long id, UserUpdateDto updateDto) {
+    public UserUpdateResponseDto updateUser(Long id, UserUpdateDto updateDto) {
         logger.info("Trying to update user {}", id);
         // 1. Récupérer l'utilisateur connecté depuis le contexte de sécurité
         User currentUser = getAuthenticatedUserOrThrow();
@@ -55,8 +60,19 @@ public class UserServiceImpl implements IUserService {
         User updatedUser = updateEntityFromDto(currentUser, updateDto);
         User savedUser = userRepository.save(updatedUser);
 
+        //4. Mettre à jour le Spring Security Context avec le nouveau username (email) si l'email a été modifié
+        if (!currentUser.getEmail().equals(savedUser.getEmail())) {
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    savedUser.getEmail(),
+                    null,
+                    SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        String newToken = jwtUtils.generateToken(SecurityContextHolder.getContext().getAuthentication());
         logger.info("User updated {}", savedUser.getEmail());
-        return mapToUserDTO(savedUser);
+        return mapToUserUpdateResponseDto(savedUser, newToken);
     }
 
     public UserReadDto getMyProfile() {
@@ -77,25 +93,31 @@ public class UserServiceImpl implements IUserService {
             throw new AccessDeniedException("Access denied");
         }
     }
+
     private User updateEntityFromDto(User user, UserUpdateDto dto) {
         // 1. Pour email
-        if(dto.getEmail() != null) {
+        if (dto.getEmail() != null && !dto.getEmail().equalsIgnoreCase(user.getEmail())) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw new IllegalArgumentException("L'email est déjà utilisé.");
+            }
             user.setEmail(dto.getEmail());
         }
+
         // 2. Pour password
-        if(dto.getNewPassword() != null && !dto.getNewPassword().isBlank()) {
+        if (dto.getNewPassword() != null && !dto.getNewPassword().isBlank()) {
 
             //Sécurité : ancien mot de passe obligatoire pour modif
-            if(dto.getOldPassword() == null || dto.getOldPassword().isBlank()){
+            if (dto.getOldPassword() == null || dto.getOldPassword().isBlank()) {
                 throw new IllegalArgumentException("L'ancien mot de passe est requis.");
             }
 
-            if(!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
                 throw new IllegalArgumentException("L'ancien mot de passe est incorrect.");
             }
-
             user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         }
+
+
         return user;
     }
 
@@ -105,6 +127,15 @@ public class UserServiceImpl implements IUserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setRole(user.getRole().name());
         return userDTO;
+    }
+
+    private UserUpdateResponseDto mapToUserUpdateResponseDto(User user, String newToken) {
+        UserUpdateResponseDto responseDto = new UserUpdateResponseDto();
+        responseDto.setId(user.getId());
+        responseDto.setEmail(user.getEmail());
+        responseDto.setRole(user.getRole().name());
+        responseDto.setUpdatedToken(newToken);
+        return responseDto;
     }
 
     private User mapUpdateDtoToUser(UserUpdateDto userUpdateDto) {

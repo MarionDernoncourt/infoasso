@@ -73,16 +73,18 @@ const handleUpdateAsso = async (updateData) => {
     router.push("/dashboard");
 
   } catch (error) {
-    console.error("Erreur lors de la modification : ", error);
-    const data = error.response.data;
+    if (error.response && error.response.status === 400) {
+     
+     const data = error.response.data;
 
-    if(data.errors){
-      backendErrors.value = data.errors;
-    } else if (data.message) {
-      alert(data.message);
-    } else {
-      alert("Une erreur inattendue est survenue.");
-    }
+     if(data.errors){
+       backendErrors.value = data.errors;
+     } else if (data.message) {
+       alert(data.message);
+     } 
+   } else {
+     alert("Une erreur inattendue est survenue.");
+   }
     
   } finally {
     isSubmitting.value = false;
