@@ -41,7 +41,7 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    // 2. Créer le jeton
+    // 2. Créer le jeton depuis l'Authentication
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
@@ -57,6 +57,17 @@ public class JwtUtils {
                 .signWith(key())
                 .compact();
     }
+    // 2. bis Créer le jeton depuis l'email
+    public String generateToken(User user) {
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("id", user.getId())
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key())
+                .compact();
+    }
+
     // 3. Extraire le nom du User depuis le jeton
     public String getUserNameFromToken(String token) {
         return Jwts.parser()

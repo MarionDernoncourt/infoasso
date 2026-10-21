@@ -3,6 +3,7 @@ package com.infoasso.api.service;
 
 import com.infoasso.api.dto.user.UserReadDto;
 import com.infoasso.api.dto.user.UserUpdateDto;
+import com.infoasso.api.dto.user.UserUpdateResponseDto;
 import com.infoasso.api.exceptions.ResourceNotFoundException;
 import com.infoasso.api.model.Role;
 import com.infoasso.api.model.User;
@@ -16,8 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
@@ -65,8 +65,11 @@ public class UserServiceIT {
     public void updateUser_whenSuccess() throws Exception {
         UserUpdateDto updateDto = new UserUpdateDto();
         updateDto.setEmail("updated@asso.com");
-        UserReadDto updatedUser = userService.updateUser(user.getId(), updateDto);
+       System.out.println(user.getId());
+        // Utilisation de UserUpdateResponseDto et vérification du token généré
+        UserUpdateResponseDto updatedUser = userService.updateUser(user.getId(), updateDto);
         assertEquals("updated@asso.com", updatedUser.getEmail());
+        assertNotNull(updatedUser.getUpdatedToken(), "Un nouveau JWT doit être généré lors de la mise à jour");
     }
 
     @Test
@@ -104,8 +107,10 @@ public class UserServiceIT {
         updateDto.setOldPassword("OldPassword123!");
         updateDto.setNewPassword("NewPassword123!");
 
-        UserReadDto updatedUser = userService.updateUser(user.getId(), updateDto);
+        // Utilisation de UserUpdateResponseDto
+        UserUpdateResponseDto updatedUser = userService.updateUser(user.getId(), updateDto);
         assertEquals(user.getEmail(), updatedUser.getEmail());
+        assertNotNull(updatedUser.getUpdatedToken());
     }
 
     @Test

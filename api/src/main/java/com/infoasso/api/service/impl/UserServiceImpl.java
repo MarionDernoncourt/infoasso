@@ -70,7 +70,7 @@ public class UserServiceImpl implements IUserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        String newToken = jwtUtils.generateToken(SecurityContextHolder.getContext().getAuthentication());
+        String newToken = jwtUtils.generateToken(savedUser);
         logger.info("User updated {}", savedUser.getEmail());
         return mapToUserUpdateResponseDto(savedUser, newToken);
     }
