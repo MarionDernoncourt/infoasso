@@ -9,12 +9,6 @@ INFO ASSO est une application web permettant de centraliser les informations des
 
 ## 🛠️ Technologies utilisées
 
-<<<<<<< HEAD
-* **Backend :** Java 21, Spring Boot 3.5 (API REST sécurisée avec Spring Security & JWT) 
-* **Frontend :** Vue.js 3 (Composition API, Vue Router)
-* **Styles & Accessibilité :** CSS moderne, conformité aux normes d'accessibilité (Attributs ARIA, gestion du focus, contrastes)
-* **Outils & Versioning :** Git, GitHub
-=======
 ### Backend
 - **Java 17+** & **Spring Boot 3** (API REST)
 - **Spring Security** & **JWT** (Authentification & Autorisation basée sur les rôles)
@@ -29,7 +23,6 @@ INFO ASSO est une application web permettant de centraliser les informations des
 ### Outils & Tooling
 - **Git** & **GitHub**
 - **Maven** & **npm**
->>>>>>> 1d3a7610313edd13afd22d41ab614e7d2c26ac27
 
 ---
 
@@ -88,6 +81,7 @@ cp .env.example .env
 # Lancer l'application
 ./mvnw spring-boot:run
 ```
+
 ### 2. Frontend (Vue.js)
 ```bash
 # Accédez au répertoire frontend
@@ -111,3 +105,13 @@ npm run dev
 
 - **Accessibilité Numérique :** Respect des bonnes pratiques d'ergonomics et d'accessibilité (ARIA) pour garantir une navigation fluide aux utilisateurs en situation de handicap (lecteurs d'écran, navigation au clavier).
 
+### 💻 2. Lance ces 3 commandes dans ton terminal :
+
+1. **Sauvegarde** le fichier dans IntelliJ.
+2. Exécute :
+
+```bash
+git add README.md
+git commit -m "docs: clean up merge markers in README"
+git push origin main
+```
