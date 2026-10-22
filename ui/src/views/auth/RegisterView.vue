@@ -59,7 +59,7 @@
               aria-describedby="emailError"
               >
             </label>
-            <p v-if="fieldErrors.email" id="emailError" class="error-text"> {{ fieldErrors.email }}</p>
+            <p v-if="fieldErrors.email" id="emailError" class="error-text" role="alert"> {{ fieldErrors.email }}</p>
           </div>
 
           <!-- MOT DE PASSE AVEC OEIL -->
@@ -93,7 +93,7 @@
               Doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre..
             </p>
 
-            <p v-if="fieldErrors.password" id="passwordError" class="error-text">
+            <p v-if="fieldErrors.password" id="passwordError" class="error-text" role="alert">
               {{ fieldErrors.password }}
             </p>
           </div>
@@ -114,12 +114,12 @@
                 J'accepte la <a href="#" @click.prevent="isModalOpen = true" class="gdpr-link">politique de confidentialité</a>.
               </span>
             </label>
-            <p v-if="fieldErrors.gdprConsent" id="gdprError" class="error-text">
+            <p v-if="fieldErrors.gdprConsent" id="gdprError" class="error-text" role=alert>
               {{ fieldErrors.gdprConsent }}
             </p>
           </div>
 
-          <button type="submit" :disabled="isLoading" aria-label="Inscrire mon association sur la plateforme">
+          <button type="submit" :disabled="isLoading" aria-label="Inscrire mon association sur la plateforme" :aria-busy="isLoading">
             {{ isLoading ? 'Création du compte...' : "Inscrire mon association" }}
           </button>
 
@@ -169,10 +169,30 @@ const showPassword = ref(false);
 const fieldErrors = ref({});
 const isLoading = ref(false);
 const isModalOpen = ref(false);
+const passwordRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 const register = async () => {
-  isLoading.value = true;
   fieldErrors.value = {};
+
+  const errors = {};
+  if (!userData.value.email?.trim()) {
+    errors.email = "L'email est obligatoire.";
+  }
+  if (!userData.value.password) {
+    errors.password = "Le mot de passe est obligatoire.";
+  } else if (!passwordRule.test(userData.value.password)) {
+    errors.password =
+      "Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre.";
+  }
+  if (!userData.value.gdprConsent) {
+    errors.gdprConsent = "Vous devez accepter la politique de confidentialité.";
+  }
+  if (Object.keys(errors).length > 0) {
+    fieldErrors.value = errors;
+    return;
+  }
+
+  isLoading.value = true;
 
   try {
     await authService.register(userData.value);

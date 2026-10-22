@@ -240,6 +240,7 @@
         {{ isSubmitting ? 'Enregistrement...' : submitButtonText || "Enregistrer" }}</button>
 
     </div>
+    </div>
   </form>
 </template>
 

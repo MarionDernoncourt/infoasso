@@ -91,8 +91,21 @@ const isLoading = ref(false);
 const showPassword = ref(false);
 
 const login = async () => {
-  isLoading.value = true;
   fieldErrors.value = {};
+
+  const errors = {};
+  if (!credentials.value.email?.trim()) {
+    errors.email = "L'email est obligatoire.";
+  }
+  if (!credentials.value.password) {
+    errors.password = "Le mot de passe est obligatoire.";
+  }
+  if (Object.keys(errors).length > 0) {
+    fieldErrors.value = errors;
+    return;
+  }
+
+  isLoading.value = true;
   try {
     await authService.login(credentials.value);
     router.push("/dashboard")

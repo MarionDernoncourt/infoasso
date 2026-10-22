@@ -9,7 +9,7 @@ INFO ASSO est une application web permettant de centraliser les informations des
 
 ## 🛠️ Technologies utilisées
 
-* **Backend :** Java, Spring Boot (API REST sécurisée avec Spring Security & JWT) 
+* **Backend :** Java 21, Spring Boot 3.5 (API REST sécurisée avec Spring Security & JWT) 
 * **Frontend :** Vue.js 3 (Composition API, Vue Router)
 * **Styles & Accessibilité :** CSS moderne, conformité aux normes d'accessibilité (Attributs ARIA, gestion du focus, contrastes)
 * **Outils & Versioning :** Git, GitHub
